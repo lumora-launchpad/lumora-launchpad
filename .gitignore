@@ -15,3 +15,6 @@ contracts/lib/
 # Misc
 .DS_Store
 *.log
+
+# Local off chain metadata store (web/lib/metadataStore.ts)
+web/.data/

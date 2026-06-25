@@ -1,18 +1,54 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import type { TokenView } from "@/lib/tokens";
 
+type TokenMetadata = {
+  description?: string;
+  imageUrl?: string;
+};
+
 export function TokenCard({ token }: { token: TokenView }) {
+  const [metadata, setMetadata] = useState<TokenMetadata | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    fetch(`/api/token?address=${token.address}`)
+      .then((res) => (res.ok ? res.json() : {}))
+      .then((data: TokenMetadata) => {
+        if (active) setMetadata(data);
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, [token.address]);
+
+  const description =
+    metadata?.description || token.blurb || "Live token on the Base curve.";
+  const imageUrl = metadata?.imageUrl || token.imageUrl;
+
   return (
     <Link
       href={`/token/${token.address}`}
       className="card group block transition hover:-translate-y-1 hover:shadow-glow"
     >
       <div className="flex items-center gap-4">
-        <div
-          className={`grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-br ${token.accent} text-xl font-black text-white shadow-glow`}
-        >
-          {token.symbol.slice(0, 2)}
-        </div>
+        {imageUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={imageUrl}
+            alt={token.name}
+            className="h-14 w-14 rounded-2xl object-cover shadow-glow"
+          />
+        ) : (
+          <div
+            className={`grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-br ${token.accent} text-xl font-black text-white shadow-glow`}
+          >
+            {token.symbol.slice(0, 2)}
+          </div>
+        )}
         <div className="min-w-0">
           <h3 className="truncate text-lg font-bold leading-tight">
             {token.name}
@@ -27,7 +63,7 @@ export function TokenCard({ token }: { token: TokenView }) {
       </div>
 
       <p className="mt-4 line-clamp-2 text-sm text-slate-500">
-        {token.blurb ?? "Live token on the Base curve."}
+        {description}
       </p>
 
       <div className="mt-5">
