@@ -1,0 +1,47 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-sans: "Inter", system-ui, sans-serif;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  color: theme(colors.ink);
+  background: theme(colors.cloud);
+  background-image: theme(backgroundImage.soft-radial);
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+
+@layer components {
+  .gradient-text {
+    @apply bg-brand-gradient bg-clip-text text-transparent;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center rounded-2xl bg-brand-gradient px-6 py-3 font-semibold text-white shadow-glow transition hover:brightness-110 active:scale-95 disabled:opacity-50 disabled:active:scale-100;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-white/70 px-6 py-3 font-semibold text-ink backdrop-blur transition hover:border-base-blue hover:text-base-blue;
+  }
+
+  .card {
+    @apply rounded-3xl border border-white/70 bg-white/80 p-6 shadow-card backdrop-blur;
+  }
+
+  .field {
+    @apply w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-ink outline-none transition focus:border-base-blue focus:ring-4 focus:ring-base-blue/15;
+  }
+
+  .pill {
+    @apply inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/70 px-4 py-1.5 text-sm font-medium text-slate-600 backdrop-blur;
+  }
+}
