@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { LiveTokenGrid } from "@/components/LiveTokenGrid";
+import { NewTokenTicker } from "@/components/NewTokenTicker";
 
 export default function HomePage() {
   return (
@@ -44,6 +45,9 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Live launches ticker */}
+      <NewTokenTicker />
 
       {/* Explore */}
       <section id="explore" className="py-12">

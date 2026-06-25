@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { useTradeHistory } from "@/lib/useTradeHistory";
+import type { TradePoint } from "@/lib/useTradeHistory";
 
 function fmtPrice(n: number): string {
   if (n === 0) return "0";
@@ -24,8 +24,13 @@ function fmtTime(ms: number, includeDate: boolean): string {
   return `${date} ${time}`;
 }
 
-export function PriceChart({ address }: { address: `0x${string}` }) {
-  const { trades, isLoading } = useTradeHistory(address);
+export function PriceChart({
+  trades,
+  isLoading,
+}: {
+  trades: TradePoint[];
+  isLoading: boolean;
+}) {
 
   const prices = useMemo(() => trades.map((t) => t.price), [trades]);
   const times = useMemo(() => trades.map((t) => t.time), [trades]);

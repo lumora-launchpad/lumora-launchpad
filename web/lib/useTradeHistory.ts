@@ -8,10 +8,13 @@ import { tokenAbi } from "./contracts";
 
 export type TradePoint = {
   price: number; // ETH per token
+  eth: number; // ETH value moved in the trade (in for buy, out for sell)
+  actor: string; // buyer or seller address
   side: "buy" | "sell";
   block: bigint;
   logIndex: number;
   time: number; // ms since epoch, from the block timestamp
+  fresh?: boolean; // arrived live this session
 };
 
 // Optional starting block to bound the historical scan. Public RPCs limit the
@@ -35,6 +38,7 @@ type RawTradePoint = Omit<TradePoint, "time">;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function toPoint(log: any, side: "buy" | "sell"): RawTradePoint | null {
   const args = log.args ?? {};
+  const ethRaw = (side === "buy" ? args.ethIn : args.ethOut) as bigint;
   const price =
     side === "buy"
       ? priceOf(args.ethIn as bigint, args.tokensOut as bigint)
@@ -42,6 +46,8 @@ function toPoint(log: any, side: "buy" | "sell"): RawTradePoint | null {
   if (price === null) return null;
   return {
     price,
+    eth: ethRaw ? Number(formatEther(ethRaw)) : 0,
+    actor: (side === "buy" ? args.buyer : args.seller) ?? "",
     side,
     block: log.blockNumber ?? 0n,
     logIndex: Number(log.logIndex ?? 0),
@@ -144,7 +150,9 @@ export function useTradeHistory(address: `0x${string}`): {
   async function append(incoming: (RawTradePoint | null)[]) {
     const fresh = incoming.filter((p): p is RawTradePoint => p !== null);
     if (fresh.length === 0 || !client) return;
-    const timed = await withTimes(client, fresh, blockTimeCache.current);
+    const timed = (await withTimes(client, fresh, blockTimeCache.current)).map(
+      (p) => ({ ...p, fresh: true }),
+    );
     setTrades((prev) => {
       const seen = new Set(prev.map(keyOf));
       const merged = [...prev];
