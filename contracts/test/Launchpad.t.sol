@@ -37,7 +37,7 @@ contract MockRouter {
 
 contract LaunchpadTest is Test {
     LaunchpadFactory factory;
-    address dev = address(0xD3V);
+    address dev = address(0xD37);
     address creator = address(0xC0FFEE);
     address buyer = address(0xB0B);
 
