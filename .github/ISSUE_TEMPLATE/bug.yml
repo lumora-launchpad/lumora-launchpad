@@ -1,0 +1,45 @@
+name: Laporan bug
+description: Laporkan perilaku yang salah di kontrak atau web
+title: "[Bug]: "
+labels: []
+body:
+  - type: textarea
+    id: deskripsi
+    attributes:
+      label: Deskripsi bug
+      description: Apa yang salah, sejelas mungkin
+    validations:
+      required: true
+  - type: textarea
+    id: langkah
+    attributes:
+      label: Langkah reproduksi
+      value: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+  - type: textarea
+    id: diharapkan
+    attributes:
+      label: Yang diharapkan
+    validations:
+      required: true
+  - type: textarea
+    id: aktual
+    attributes:
+      label: Yang terjadi
+    validations:
+      required: true
+  - type: input
+    id: lingkungan
+    attributes:
+      label: Lingkungan
+      placeholder: chain (Base Sepolia atau mainnet), browser, wallet
+    validations:
+      required: false
+  - type: markdown
+    attributes:
+      value: |
+        Setelah issue dibuat dan Claude GitHub App aktif, komentari issue ini dengan mention Claude kalau ingin Claude memperbaikinya.

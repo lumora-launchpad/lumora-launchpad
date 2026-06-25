@@ -1,0 +1,57 @@
+name: Tugas atau fitur
+description: Usulan pekerjaan terstruktur yang siap dikerjakan Claude
+title: "[Tugas]: "
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Isi tiap bagian sejelas mungkin. Semakin jelas konteks dan kriteria, semakin baik hasil yang dikerjakan.
+  - type: textarea
+    id: konteks
+    attributes:
+      label: Konteks
+      description: Latar belakang dan kondisi saat ini
+      placeholder: Jelaskan keadaan sekarang dan kenapa ini perlu
+    validations:
+      required: true
+  - type: textarea
+    id: tujuan
+    attributes:
+      label: Tujuan
+      description: Hasil akhir yang diinginkan dalam satu atau dua kalimat
+    validations:
+      required: true
+  - type: textarea
+    id: lingkup
+    attributes:
+      label: Lingkup kerja
+      description: Langkah konkret bernomor
+      value: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+  - type: textarea
+    id: kriteria
+    attributes:
+      label: Kriteria selesai
+      description: Checklist yang harus terpenuhi sebelum dianggap selesai
+      value: |
+        * [ ]
+        * [ ]
+    validations:
+      required: true
+  - type: textarea
+    id: file
+    attributes:
+      label: File terkait
+      description: Path file yang kemungkinan disentuh
+      placeholder: web/app/..., web/lib/..., contracts/src/...
+    validations:
+      required: false
+  - type: markdown
+    attributes:
+      value: |
+        Setelah issue dibuat dan Claude GitHub App aktif, komentari issue ini dengan mention Claude untuk mulai mengerjakan.
