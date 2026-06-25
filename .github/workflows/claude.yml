@@ -3,13 +3,10 @@
 # Membuat Claude bekerja otomatis di repo ini. Sebut @claude di dalam issue,
 # komentar PR, atau review PR, dan Claude akan menulis kode lalu membuka PR.
 #
-# Sebelum jalan, siapkan satu hal di repo:
-#   Settings > Secrets and variables > Actions > New repository secret
-#   Nama   : ANTHROPIC_API_KEY
-#   Nilai  : API key dari https://console.anthropic.com
-#
-# Cara termudah memasang semuanya sekaligus adalah menjalankan /install-github-app
-# di Claude Code, yang juga akan menjaga workflow ini tetap versi terbaru.
+# Autentikasi memakai secret CLAUDE_CODE_OAUTH_TOKEN yang dipasang otomatis oleh
+# /install-github-app (memakai langganan Claude, bukan API key berbayar).
+# Kalau mau memakai Anthropic API key sebagai gantinya, ganti baris with di bawah
+# menjadi: anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
 
 name: Claude Code
 
@@ -47,4 +44,4 @@ jobs:
       - name: Run Claude Code
         uses: anthropics/claude-code-action@v1
         with:
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
