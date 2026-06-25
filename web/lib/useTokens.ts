@@ -5,6 +5,7 @@ import { FACTORY_ADDRESS, factoryAbi, tokenAbi } from "./contracts";
 import { accentFor, formatEth, type TokenView } from "./tokens";
 
 const ZERO = "0x0000000000000000000000000000000000000000";
+const ZERO_ADDRESS = ZERO as `0x${string}`;
 const PAGE = 24; // newest tokens to show on the landing
 
 export function useTokens(): {
@@ -78,4 +79,89 @@ export function useTokens(): {
       (ordered.length > 0 && metaLoading));
 
   return { tokens, isLoading, hasFactory };
+}
+
+export type PortfolioHolding = {
+  address: `0x${string}`;
+  name: string;
+  symbol: string;
+  balance: bigint;
+  valueWei: bigint;
+  accent: string;
+};
+
+export function usePortfolio(account?: `0x${string}`): {
+  holdings: PortfolioHolding[];
+  isLoading: boolean;
+  hasFactory: boolean;
+} {
+  const hasFactory = FACTORY_ADDRESS.toLowerCase() !== ZERO;
+
+  const { data: count, isLoading: countLoading } = useReadContract({
+    address: FACTORY_ADDRESS,
+    abi: factoryAbi,
+    functionName: "tokensCount",
+    query: { enabled: hasFactory && !!account },
+  });
+
+  const total = count ? Number(count) : 0;
+
+  const { data: addresses, isLoading: addrLoading } = useReadContract({
+    address: FACTORY_ADDRESS,
+    abi: factoryAbi,
+    functionName: "getTokens",
+    args: [0n, BigInt(total)],
+    query: { enabled: hasFactory && !!account && total > 0 },
+  });
+
+  const list = (addresses as readonly `0x${string}`[]) ?? [];
+
+  const contracts = list.flatMap((addr) => [
+    { address: addr, abi: tokenAbi, functionName: "name" } as const,
+    { address: addr, abi: tokenAbi, functionName: "symbol" } as const,
+    { address: addr, abi: tokenAbi, functionName: "currentPrice" } as const,
+    {
+      address: addr,
+      abi: tokenAbi,
+      functionName: "balanceOf",
+      args: [account ?? ZERO_ADDRESS],
+    } as const,
+  ]);
+
+  const { data: meta, isLoading: metaLoading } = useReadContracts({
+    contracts,
+    query: { enabled: list.length > 0 && !!account },
+  });
+
+  const holdings: PortfolioHolding[] = [];
+  if (meta) {
+    for (let i = 0; i < list.length; i++) {
+      const b = i * 4;
+      const name = meta[b]?.result as string | undefined;
+      const symbol = meta[b + 1]?.result as string | undefined;
+      const price = meta[b + 2]?.result as bigint | undefined;
+      const balance = meta[b + 3]?.result as bigint | undefined;
+      if (!name || !symbol || !balance || balance <= 0n) continue;
+
+      const valueWei = price ? (balance * price) / 10n ** 18n : 0n;
+
+      holdings.push({
+        address: list[i],
+        name,
+        symbol,
+        balance,
+        valueWei,
+        accent: accentFor(list[i]),
+      });
+    }
+  }
+
+  const isLoading =
+    hasFactory &&
+    !!account &&
+    (countLoading ||
+      (total > 0 && addrLoading) ||
+      (list.length > 0 && metaLoading));
+
+  return { holdings, isLoading, hasFactory };
 }

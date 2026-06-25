@@ -23,6 +23,9 @@ export function Navbar() {
           <Link href="/create" className="transition hover:text-base-blue">
             Create
           </Link>
+          <Link href="/portfolio" className="transition hover:text-base-blue">
+            Portfolio
+          </Link>
           <a href="#how-it-works" className="transition hover:text-base-blue">
             How it works
           </a>
