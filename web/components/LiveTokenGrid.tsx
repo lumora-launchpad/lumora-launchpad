@@ -3,7 +3,9 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { TokenCard } from "./TokenCard";
+import { Sparkline } from "./Sparkline";
 import { useTokens } from "@/lib/useTokens";
+import { useMarketStats, type TokenStats } from "@/lib/useMarketStats";
 import { sampleTokens } from "@/lib/sampleTokens";
 import type { TokenView } from "@/lib/tokens";
 
@@ -26,8 +28,12 @@ function GridSkeleton() {
               <div className="h-4 w-24 rounded bg-slate-100" />
               <div className="h-3 w-12 rounded bg-slate-100" />
             </div>
+            <div className="ml-auto h-7 w-20 rounded bg-slate-100" />
           </div>
-          <div className="mt-6 h-2.5 w-full rounded-full bg-slate-100" />
+          <div className="mt-4 h-3 w-full rounded bg-slate-100" />
+          <div className="mt-2 h-3 w-2/3 rounded bg-slate-100" />
+          <div className="mt-4 h-12 w-full rounded-2xl bg-slate-100" />
+          <div className="mt-5 h-2.5 w-full rounded-full bg-slate-100" />
           <div className="mt-5 h-7 w-32 rounded-full bg-slate-100" />
         </div>
       ))}
@@ -36,7 +42,7 @@ function GridSkeleton() {
 }
 
 // The token closest to graduation, but not yet graduated: the current "king".
-function KingCard({ token }: { token: TokenView }) {
+function KingCard({ token, stats }: { token: TokenView; stats?: TokenStats }) {
   return (
     <Link
       href={`/token/${token.address}`}
@@ -73,6 +79,9 @@ function KingCard({ token }: { token: TokenView }) {
               {Math.round(token.progress)}%
             </p>
             <p className="text-xs font-medium text-slate-400">to Uniswap</p>
+            {stats && stats.spark.length >= 2 && (
+              <Sparkline data={stats.spark} className="ml-auto mt-1 h-7 w-28" />
+            )}
           </div>
         </div>
         <div className="mt-5 h-3 w-full overflow-hidden rounded-full bg-slate-100">
@@ -97,6 +106,9 @@ export function LiveTokenGrid() {
 
   const useSample = !hasFactory || tokens.length === 0;
   const base = useSample ? sampleTokens : tokens;
+
+  const stats = useMarketStats(useSample ? [] : tokens.map((t) => t.address));
+  const statOf = (addr: string) => stats.get(addr.toLowerCase());
 
   // The king is the live token closest to graduating (real data only).
   const king = useMemo(() => {
@@ -139,7 +151,7 @@ export function LiveTokenGrid() {
         </p>
       )}
 
-      {king && <KingCard token={king} />}
+      {king && <KingCard token={king} stats={statOf(king.address)} />}
 
       {/* Controls */}
       <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -178,7 +190,7 @@ export function LiveTokenGrid() {
               className="animate-rise"
               style={{ animationDelay: `${Math.min(i, 8) * 40}ms` }}
             >
-              <TokenCard token={t} />
+              <TokenCard token={t} stats={statOf(t.address)} />
             </div>
           ))}
         </div>
