@@ -40,10 +40,25 @@ const config: Config = {
           "0%": { backgroundPosition: "0% 50%" },
           "100%": { backgroundPosition: "200% 50%" },
         },
+        marquee: {
+          "0%": { transform: "translateX(0)" },
+          "100%": { transform: "translateX(-50%)" },
+        },
+        rise: {
+          "0%": { opacity: "0", transform: "translateY(8px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
+        },
+        flash: {
+          "0%": { backgroundColor: "rgba(16,185,129,0.18)" },
+          "100%": { backgroundColor: "transparent" },
+        },
       },
       animation: {
         float: "float 6s ease-in-out infinite",
         shimmer: "shimmer 6s linear infinite",
+        marquee: "marquee 40s linear infinite",
+        rise: "rise 0.4s ease-out both",
+        flash: "flash 1.2s ease-out",
       },
     },
   },

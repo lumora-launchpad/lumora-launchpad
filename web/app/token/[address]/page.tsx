@@ -14,6 +14,8 @@ import { tokenAbi } from "@/lib/contracts";
 import { accentFor } from "@/lib/tokens";
 import { txExplorerUrl } from "@/lib/wagmi";
 import { PriceChart } from "@/components/PriceChart";
+import { TradeFeed } from "@/components/TradeFeed";
+import { useTradeHistory } from "@/lib/useTradeHistory";
 import { useToast } from "@/components/Toast";
 
 type Side = "buy" | "sell";
@@ -54,6 +56,9 @@ export default function TokenPage({
   const [side, setSide] = useState<Side>("buy");
   const [amount, setAmount] = useState("");
   const [metadata, setMetadata] = useState<TokenMetadata | null>(null);
+
+  // Shared trade history feeds both the chart and the live trade list.
+  const { trades, isLoading: tradesLoading } = useTradeHistory(address);
 
   useEffect(() => {
     let active = true;
@@ -276,7 +281,11 @@ export default function TokenPage({
             </div>
 
             <div className="mt-6">
-              <PriceChart address={address} />
+              <PriceChart trades={trades} isLoading={tradesLoading} />
+            </div>
+
+            <div className="mt-6">
+              <TradeFeed trades={trades} isLoading={tradesLoading} />
             </div>
 
             <div className="mt-6">
