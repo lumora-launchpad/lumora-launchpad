@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { formatEther, type Log } from "viem";
+import type { PublicClient } from "viem";
 import { usePublicClient, useWatchContractEvent } from "wagmi";
 import { tokenAbi } from "./contracts";
 
@@ -10,6 +11,7 @@ export type TradePoint = {
   side: "buy" | "sell";
   block: bigint;
   logIndex: number;
+  time: number; // ms since epoch, from the block timestamp
 };
 
 // Optional starting block to bound the historical scan. Public RPCs limit the
@@ -28,8 +30,10 @@ function priceOf(a: bigint, b: bigint): number | null {
   return Number.isFinite(out) && out > 0 ? out : null;
 }
 
+type RawTradePoint = Omit<TradePoint, "time">;
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function toPoint(log: any, side: "buy" | "sell"): TradePoint | null {
+function toPoint(log: any, side: "buy" | "sell"): RawTradePoint | null {
   const args = log.args ?? {};
   const price =
     side === "buy"
@@ -42,6 +46,38 @@ function toPoint(log: any, side: "buy" | "sell"): TradePoint | null {
     block: log.blockNumber ?? 0n,
     logIndex: Number(log.logIndex ?? 0),
   };
+}
+
+type BlockTimeCache = Map<bigint, Promise<number>>;
+
+// Caches the in-flight getBlock promise per block number, so concurrent
+// trades in the same block (or overlapping backfill/live calls) only ever
+// trigger one getBlock request per block.
+function getBlockTime(
+  client: PublicClient,
+  block: bigint,
+  cache: BlockTimeCache,
+): Promise<number> {
+  const cached = cache.get(block);
+  if (cached !== undefined) return cached;
+  const pending = client
+    .getBlock({ blockNumber: block })
+    .then(({ timestamp }) => Number(timestamp) * 1000);
+  cache.set(block, pending);
+  return pending;
+}
+
+async function withTimes(
+  client: PublicClient,
+  points: RawTradePoint[],
+  cache: BlockTimeCache,
+): Promise<TradePoint[]> {
+  const uniqueBlocks = [...new Set(points.map((p) => p.block))];
+  const times = await Promise.all(
+    uniqueBlocks.map((b) => getBlockTime(client, b, cache)),
+  );
+  const timeByBlock = new Map(uniqueBlocks.map((b, i) => [b, times[i]]));
+  return points.map((p) => ({ ...p, time: timeByBlock.get(p.block) ?? 0 }));
 }
 
 function sortTrades(list: TradePoint[]): TradePoint[] {
@@ -61,6 +97,7 @@ export function useTradeHistory(address: `0x${string}`): {
   const client = usePublicClient();
   const [trades, setTrades] = useState<TradePoint[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const blockTimeCache = useRef<BlockTimeCache>(new Map());
 
   // Historical backfill.
   useEffect(() => {
@@ -85,10 +122,11 @@ export function useTradeHistory(address: `0x${string}`): {
             toBlock: "latest",
           }),
         ]);
-        const points = [
+        const rawPoints = [
           ...buys.map((l) => toPoint(l, "buy")),
           ...sells.map((l) => toPoint(l, "sell")),
-        ].filter((p): p is TradePoint => p !== null);
+        ].filter((p): p is RawTradePoint => p !== null);
+        const points = await withTimes(client, rawPoints, blockTimeCache.current);
         if (!cancelled) setTrades(sortTrades(points));
       } catch {
         // Range limited RPC. Fall back to live updates only.
@@ -103,13 +141,14 @@ export function useTradeHistory(address: `0x${string}`): {
     };
   }, [client, address]);
 
-  function append(incoming: (TradePoint | null)[]) {
-    const fresh = incoming.filter((p): p is TradePoint => p !== null);
-    if (fresh.length === 0) return;
+  async function append(incoming: (RawTradePoint | null)[]) {
+    const fresh = incoming.filter((p): p is RawTradePoint => p !== null);
+    if (fresh.length === 0 || !client) return;
+    const timed = await withTimes(client, fresh, blockTimeCache.current);
     setTrades((prev) => {
       const seen = new Set(prev.map(keyOf));
       const merged = [...prev];
-      for (const p of fresh) {
+      for (const p of timed) {
         if (!seen.has(keyOf(p))) {
           seen.add(keyOf(p));
           merged.push(p);
@@ -123,14 +162,14 @@ export function useTradeHistory(address: `0x${string}`): {
     address,
     abi: tokenAbi,
     eventName: "Buy",
-    onLogs: (logs: Log[]) => append(logs.map((l) => toPoint(l, "buy"))),
+    onLogs: (logs: Log[]) => void append(logs.map((l) => toPoint(l, "buy"))),
   });
 
   useWatchContractEvent({
     address,
     abi: tokenAbi,
     eventName: "Sell",
-    onLogs: (logs: Log[]) => append(logs.map((l) => toPoint(l, "sell"))),
+    onLogs: (logs: Log[]) => void append(logs.map((l) => toPoint(l, "sell"))),
   });
 
   return { trades, isLoading };
