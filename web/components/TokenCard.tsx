@@ -3,14 +3,50 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { TokenView } from "@/lib/tokens";
+import type { TokenStats } from "@/lib/useMarketStats";
+import { Sparkline } from "./Sparkline";
+import { useCountUp } from "@/lib/useCountUp";
 
 type TokenMetadata = {
   description?: string;
   imageUrl?: string;
 };
 
-export function TokenCard({ token }: { token: TokenView }) {
+function ago(ms?: number): string {
+  if (!ms) return "new";
+  const s = Math.max(0, Math.floor((Date.now() - ms) / 1000));
+  if (s < 60) return `${s}s`;
+  const m = Math.floor(s / 60);
+  if (m < 60) return `${m}m`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h}h`;
+  return `${Math.floor(h / 24)}d`;
+}
+
+function fmtVol(n: number): string {
+  if (!n) return "0";
+  if (n < 0.001) return "<0.001";
+  return n.toLocaleString("en-US", { maximumFractionDigits: 2 });
+}
+
+function Stat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex-1">
+      <p className="text-[11px] font-medium text-slate-400">{label}</p>
+      <p className="text-sm font-bold text-slate-700">{value}</p>
+    </div>
+  );
+}
+
+export function TokenCard({
+  token,
+  stats,
+}: {
+  token: TokenView;
+  stats?: TokenStats;
+}) {
   const [metadata, setMetadata] = useState<TokenMetadata | null>(null);
+  const animatedProgress = useCountUp(token.progress);
 
   useEffect(() => {
     let active = true;
@@ -28,6 +64,7 @@ export function TokenCard({ token }: { token: TokenView }) {
   const description =
     metadata?.description || token.blurb || "Live token on the Base curve.";
   const imageUrl = metadata?.imageUrl || token.imageUrl;
+  const spark = stats?.spark ?? [];
 
   return (
     <Link
@@ -55,27 +92,36 @@ export function TokenCard({ token }: { token: TokenView }) {
           </h3>
           <p className="text-sm font-medium text-slate-400">${token.symbol}</p>
         </div>
-        {token.graduated && (
-          <span className="ml-auto rounded-full bg-base-mint/15 px-3 py-1 text-xs font-bold text-base-mint">
-            Listed
-          </span>
-        )}
+        <div className="ml-auto flex flex-col items-end gap-1">
+          {token.graduated && (
+            <span className="rounded-full bg-base-mint/15 px-3 py-1 text-xs font-bold text-base-mint">
+              Listed
+            </span>
+          )}
+          {spark.length >= 2 && <Sparkline data={spark} className="h-7 w-20" />}
+        </div>
       </div>
 
-      <p className="mt-4 line-clamp-2 text-sm text-slate-500">
-        {description}
-      </p>
+      <p className="mt-4 line-clamp-2 text-sm text-slate-500">{description}</p>
+
+      {stats && (
+        <div className="mt-4 flex items-center gap-2 rounded-2xl bg-slate-50 px-4 py-2.5">
+          <Stat label="Age" value={ago(stats.createdMs)} />
+          <Stat label="Volume" value={`${fmtVol(stats.volumeEth)} ETH`} />
+          <Stat label="Traders" value={String(stats.traders)} />
+        </div>
+      )}
 
       <div className="mt-5">
         <div className="flex items-center justify-between text-xs font-medium text-slate-500">
           <span>Curve progress</span>
           <span className="font-bold text-slate-700">
-            {Math.round(token.progress)}%
+            {Math.round(animatedProgress)}%
           </span>
         </div>
         <div className="mt-2 h-2.5 w-full overflow-hidden rounded-full bg-slate-100">
           <div
-            className={`h-full rounded-full bg-gradient-to-r ${token.accent}`}
+            className={`h-full rounded-full bg-gradient-to-r ${token.accent} transition-all duration-700`}
             style={{ width: `${Math.min(token.progress, 100)}%` }}
           />
         </div>
