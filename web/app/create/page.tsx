@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { decodeEventLog } from "viem";
 import { useAccount, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { FACTORY_ADDRESS, factoryAbi } from "@/lib/contracts";
@@ -10,9 +11,15 @@ export default function CreatePage() {
   const [name, setName] = useState("");
   const [symbol, setSymbol] = useState("");
   const [blurb, setBlurb] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
+  const [metadataSaved, setMetadataSaved] = useState(false);
 
   const { writeContract, data: hash, isPending, error } = useWriteContract();
-  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
+  const {
+    data: receipt,
+    isLoading: isConfirming,
+    isSuccess,
+  } = useWaitForTransactionReceipt({
     hash,
   });
 
@@ -26,6 +33,42 @@ export default function CreatePage() {
       args: [name, symbol.toUpperCase()],
     });
   }
+
+  // Once the deploy transaction confirms, pull the new token address from
+  // the TokenCreated event and store the off chain description and image.
+  useEffect(() => {
+    if (!isSuccess || !receipt || (!blurb && !imageUrl)) return;
+
+    const log = receipt.logs.find(
+      (l) => l.address.toLowerCase() === FACTORY_ADDRESS.toLowerCase(),
+    );
+    if (!log) return;
+
+    try {
+      const decoded = decodeEventLog({
+        abi: factoryAbi,
+        eventName: "TokenCreated",
+        data: log.data,
+        topics: log.topics,
+      });
+      const tokenAddress = decoded.args.token as string;
+
+      fetch("/api/token", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          address: tokenAddress,
+          description: blurb,
+          imageUrl,
+        }),
+      })
+        .then(() => setMetadataSaved(true))
+        .catch(() => {});
+    } catch {
+      // Ignore logs that do not match the expected event shape.
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSuccess, receipt]);
 
   const preview = symbol ? symbol.toUpperCase().slice(0, 2) : "LU";
 
@@ -77,7 +120,23 @@ export default function CreatePage() {
               maxLength={140}
             />
             <span className="mt-1 block text-right text-xs text-slate-400">
-              Description will be stored off chain in a later version.
+              Description is stored off chain.
+            </span>
+          </label>
+
+          <label className="mt-5 block">
+            <span className="text-sm font-semibold text-slate-700">
+              Image URL
+            </span>
+            <input
+              className="field mt-2"
+              placeholder="https://example.com/logo.png"
+              value={imageUrl}
+              onChange={(e) => setImageUrl(e.target.value)}
+              maxLength={2048}
+            />
+            <span className="mt-1 block text-right text-xs text-slate-400">
+              Optional. Also stored off chain.
             </span>
           </label>
 
@@ -103,7 +162,11 @@ export default function CreatePage() {
 
           {isSuccess && (
             <p className="mt-4 rounded-2xl bg-base-mint/10 px-4 py-3 text-center text-sm font-semibold text-base-mint">
-              Token launched successfully. Check the transaction in your wallet.
+              Token launched successfully.
+              {(blurb || imageUrl) &&
+                (metadataSaved
+                  ? " Description and image saved."
+                  : " Saving description and image...")}
             </p>
           )}
           {error && (
@@ -120,9 +183,18 @@ export default function CreatePage() {
               Preview
             </p>
             <div className="mt-4 flex items-center gap-4">
-              <div className="grid h-16 w-16 place-items-center rounded-2xl bg-brand-gradient text-2xl font-black text-white shadow-glow">
-                {preview}
-              </div>
+              {imageUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={imageUrl}
+                  alt={name || "Token preview"}
+                  className="h-16 w-16 rounded-2xl object-cover shadow-glow"
+                />
+              ) : (
+                <div className="grid h-16 w-16 place-items-center rounded-2xl bg-brand-gradient text-2xl font-black text-white shadow-glow">
+                  {preview}
+                </div>
+              )}
               <div>
                 <h3 className="text-xl font-bold">{name || "Token name"}</h3>
                 <p className="text-sm font-medium text-slate-400">

@@ -5,6 +5,7 @@ export type TokenView = {
   name: string;
   symbol: string;
   blurb?: string;
+  imageUrl?: string;
   marketCap: string;
   progress: number; // 0 to 100
   accent: string; // tailwind gradient classes

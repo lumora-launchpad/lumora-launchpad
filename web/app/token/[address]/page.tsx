@@ -15,6 +15,10 @@ import { accentFor } from "@/lib/tokens";
 import { PriceChart } from "@/components/PriceChart";
 
 type Side = "buy" | "sell";
+type TokenMetadata = {
+  description?: string;
+  imageUrl?: string;
+};
 
 const SLIPPAGE_BPS = 500n; // 5 percent tolerance
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000" as const;
@@ -47,6 +51,23 @@ export default function TokenPage({
 
   const [side, setSide] = useState<Side>("buy");
   const [amount, setAmount] = useState("");
+  const [metadata, setMetadata] = useState<TokenMetadata | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    fetch(`/api/token?address=${address}`)
+      .then((res) => (res.ok ? res.json() : {}))
+      .then((data: TokenMetadata) => {
+        if (active) setMetadata(data);
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, [address]);
+
+  const description = metadata?.description || "No description provided yet.";
+  const imageUrl = metadata?.imageUrl;
 
   const accent = accentFor(address);
   const short = useMemo(
@@ -154,11 +175,20 @@ export default function TokenPage({
         <div className="lg:col-span-3">
           <div className="card">
             <div className="flex items-center gap-4">
-              <div
-                className={`grid h-16 w-16 place-items-center rounded-2xl bg-gradient-to-br ${accent} text-2xl font-black text-white shadow-glow`}
-              >
-                {symbol.slice(0, 2)}
-              </div>
+              {imageUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={imageUrl}
+                  alt={name}
+                  className="h-16 w-16 rounded-2xl object-cover shadow-glow"
+                />
+              ) : (
+                <div
+                  className={`grid h-16 w-16 place-items-center rounded-2xl bg-gradient-to-br ${accent} text-2xl font-black text-white shadow-glow`}
+                >
+                  {symbol.slice(0, 2)}
+                </div>
+              )}
               <div className="min-w-0">
                 <h1 className="truncate text-2xl font-black">{name}</h1>
                 <p className="text-sm font-medium text-slate-400">
@@ -172,6 +202,8 @@ export default function TokenPage({
                 {graduated ? "Listed" : "On the curve"}
               </span>
             </div>
+
+            <p className="mt-4 text-sm text-slate-500">{description}</p>
 
             <div className="mt-6 grid grid-cols-3 gap-4">
               <Stat k="Price" v={`${fmt(price)} ETH`} />
