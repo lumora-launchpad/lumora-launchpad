@@ -1,28 +1,29 @@
-# Deploy web ke Vercel
+# Deploy the web app to Vercel
 
-Web ini adalah app Next.js di folder `web/` dalam repo `lumora-launchpad`. Karena
-repo berisi dua folder (`web` dan `contracts`), kuncinya adalah memberi tahu
-Vercel bahwa root project ada di `web`.
+This web app is a Next.js app in the `web/` folder of the `lumora-launchpad`
+repo. Because the repo holds two folders (`web` and `contracts`), the key is to
+tell Vercel the project root is `web`.
 
-Ada dua cara: lewat dashboard dengan Git, atau lewat CLI tanpa Git.
+There are two ways: through the dashboard with Git, or through the CLI without
+Git.
 
-## Variabel lingkungan yang wajib diisi
+## Required environment variables
 
-Semua diawali `NEXT_PUBLIC_` sehingga dibaca saat build. Set semuanya di Vercel
-sebelum build pertama.
+All start with `NEXT_PUBLIC_` so they are read at build time. Set them all in
+Vercel before the first build.
 
-| Nama | Nilai |
+| Name | Value |
 | --- | --- |
-| `NEXT_PUBLIC_FACTORY_ADDRESS` | Alamat LaunchpadFactory hasil deploy |
-| `NEXT_PUBLIC_CHAIN_ID` | 84532 untuk Base Sepolia, 8453 untuk mainnet |
-| `NEXT_PUBLIC_START_BLOCK` | Block deploy factory, untuk grafik harga |
-| `NEXT_PUBLIC_WALLETCONNECT_ID` | Project id dari WalletConnect Cloud |
+| `NEXT_PUBLIC_FACTORY_ADDRESS` | The deployed LaunchpadFactory address |
+| `NEXT_PUBLIC_CHAIN_ID` | 84532 for Base Sepolia, 8453 for mainnet |
+| `NEXT_PUBLIC_START_BLOCK` | Factory deploy block, for the price chart |
+| `NEXT_PUBLIC_WALLETCONNECT_ID` | Project id from WalletConnect Cloud |
 
-WalletConnect id gratis di https://cloud.walletconnect.com
+A WalletConnect id is free at https://cloud.walletconnect.com
 
-## Cara A. Lewat dashboard dengan Git
+## Option A. Through the dashboard with Git
 
-1. Push repo ke GitHub, GitLab, atau Bitbucket.
+1. Push the repo to GitHub, GitLab, or Bitbucket.
 
    ```
    cd /root/lumora-launchpad
@@ -30,44 +31,44 @@ WalletConnect id gratis di https://cloud.walletconnect.com
    git add .
    git commit -m "Lumora launchpad"
    git branch -M main
-   git remote add origin <url repo kamu>
+   git remote add origin <your repo url>
    git push -u origin main
    ```
 
-2. Buka https://vercel.com lalu New Project dan import repo tadi.
+2. Open https://vercel.com then New Project and import that repo.
 
-3. Penting: di bagian Root Directory pilih `web`. Vercel otomatis mengenali
-   Next.js, jadi Build Command dan Output bisa dibiarkan default.
+3. Important: under Root Directory choose `web`. Vercel detects Next.js
+   automatically, so Build Command and Output can stay default.
 
-4. Buka Environment Variables, masukkan keempat variabel di tabel atas.
+4. Open Environment Variables and add the four variables from the table above.
 
-5. Klik Deploy. Setelah selesai kamu dapat URL produksi.
+5. Click Deploy. Once done you get a production URL.
 
-## Cara B. Lewat CLI tanpa Git
+## Option B. Through the CLI without Git
 
-1. Pasang dan login.
+1. Install and log in.
 
    ```
    npm i -g vercel
    vercel login
    ```
 
-2. Dari dalam folder web.
+2. From inside the web folder.
 
    ```
    cd /root/lumora-launchpad/web
    vercel
    ```
 
-   Saat ditanya, jawab:
+   When asked, answer:
    - Set up and deploy: yes
-   - Scope: pilih akun kamu
+   - Scope: choose your account
    - Link to existing project: no
    - Project name: lumora
-   - In which directory is your code: tekan enter karena kamu sudah di folder web
+   - In which directory is your code: press enter since you are already in the web folder
    - Override settings: no
 
-3. Set variabel lingkungan, lalu deploy produksi.
+3. Set the environment variables, then deploy to production.
 
    ```
    vercel env add NEXT_PUBLIC_FACTORY_ADDRESS
@@ -77,16 +78,16 @@ WalletConnect id gratis di https://cloud.walletconnect.com
    vercel --prod
    ```
 
-## Setelah deploy kontrak baru
+## After deploying a new contract
 
-Kalau kamu deploy ulang factory, perbarui `NEXT_PUBLIC_FACTORY_ADDRESS` dan
-`NEXT_PUBLIC_START_BLOCK` di Vercel, lalu jalankan redeploy. Lewat CLI cukup
-`vercel --prod`. Lewat dashboard, ubah env lalu klik Redeploy.
+If you redeploy the factory, update `NEXT_PUBLIC_FACTORY_ADDRESS` and
+`NEXT_PUBLIC_START_BLOCK` in Vercel, then run a redeploy. Through the CLI just
+run `vercel --prod`. Through the dashboard, change the env then click Redeploy.
 
-## Catatan
+## Notes
 
-- Variabel `NEXT_PUBLIC_` masuk ke bundel browser, jadi jangan taruh rahasia di
-  sana. Alamat kontrak dan chain id memang publik, aman.
-- Build menjalankan type check. Kalau gagal, jalankan `npm run build` lokal
-  dulu untuk melihat pesannya.
-- Untuk domain sendiri, tambahkan di menu Domains pada project Vercel.
+- `NEXT_PUBLIC_` variables go into the browser bundle, so do not put secrets
+  there. Contract addresses and chain id are public, which is fine.
+- The build runs a type check. If it fails, run `npm run build` locally first to
+  see the message.
+- For a custom domain, add it in the Domains menu of the Vercel project.

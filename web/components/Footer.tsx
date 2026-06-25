@@ -9,7 +9,7 @@ export function Footer() {
           <span className="font-semibold text-slate-700">Lumora Launchpad</span>
         </div>
         <p className="text-center">
-          Dibangun di atas Base. Fee trading 1 persen, dibagi 65 developer dan 35 creator.
+          Built on Base. 1 percent trading fee, split 65 developer and 35 creator.
         </p>
         <p>2026 Lumora</p>
       </div>

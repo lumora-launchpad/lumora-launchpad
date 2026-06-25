@@ -33,10 +33,10 @@ export default function CreatePage() {
     <div className="mx-auto max-w-5xl px-5 py-14">
       <div className="mx-auto max-w-2xl text-center">
         <h1 className="text-4xl font-black tracking-tight">
-          Buat <span className="gradient-text">token baru</span>
+          Create <span className="gradient-text">a new token</span>
         </h1>
         <p className="mt-3 text-slate-500">
-          Deploy kurva harga sendiri di Base. Tanpa coding, langsung jalan.
+          Deploy your own price curve on Base. No coding, ready instantly.
         </p>
       </div>
 
@@ -44,10 +44,10 @@ export default function CreatePage() {
         {/* Form */}
         <form onSubmit={handleSubmit} className="card lg:col-span-3">
           <label className="block">
-            <span className="text-sm font-semibold text-slate-700">Nama token</span>
+            <span className="text-sm font-semibold text-slate-700">Token name</span>
             <input
               className="field mt-2"
-              placeholder="Contoh Aurora"
+              placeholder="For example Aurora"
               value={name}
               onChange={(e) => setName(e.target.value)}
               maxLength={32}
@@ -55,7 +55,7 @@ export default function CreatePage() {
           </label>
 
           <label className="mt-5 block">
-            <span className="text-sm font-semibold text-slate-700">Simbol</span>
+            <span className="text-sm font-semibold text-slate-700">Symbol</span>
             <input
               className="field mt-2 uppercase"
               placeholder="AUR"
@@ -67,17 +67,17 @@ export default function CreatePage() {
 
           <label className="mt-5 block">
             <span className="text-sm font-semibold text-slate-700">
-              Deskripsi singkat
+              Short description
             </span>
             <textarea
               className="field mt-2 min-h-24 resize-none"
-              placeholder="Ceritakan token kamu dalam satu kalimat."
+              placeholder="Describe your token in one sentence."
               value={blurb}
               onChange={(e) => setBlurb(e.target.value)}
               maxLength={140}
             />
             <span className="mt-1 block text-right text-xs text-slate-400">
-              Deskripsi disimpan off chain di versi berikutnya.
+              Description will be stored off chain in a later version.
             </span>
           </label>
 
@@ -93,17 +93,17 @@ export default function CreatePage() {
                 disabled={isPending || isConfirming || !name || !symbol}
               >
                 {isPending
-                  ? "Konfirmasi di wallet"
+                  ? "Confirm in wallet"
                   : isConfirming
-                    ? "Memproses transaksi"
-                    : "Luncurkan token"}
+                    ? "Processing transaction"
+                    : "Launch token"}
               </button>
             )}
           </div>
 
           {isSuccess && (
             <p className="mt-4 rounded-2xl bg-base-mint/10 px-4 py-3 text-center text-sm font-semibold text-base-mint">
-              Token berhasil diluncurkan. Cek transaksi di wallet kamu.
+              Token launched successfully. Check the transaction in your wallet.
             </p>
           )}
           {error && (
@@ -117,28 +117,28 @@ export default function CreatePage() {
         <div className="lg:col-span-2">
           <div className="card sticky top-24">
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-              Pratinjau
+              Preview
             </p>
             <div className="mt-4 flex items-center gap-4">
               <div className="grid h-16 w-16 place-items-center rounded-2xl bg-brand-gradient text-2xl font-black text-white shadow-glow">
                 {preview}
               </div>
               <div>
-                <h3 className="text-xl font-bold">{name || "Nama token"}</h3>
+                <h3 className="text-xl font-bold">{name || "Token name"}</h3>
                 <p className="text-sm font-medium text-slate-400">
                   ${symbol ? symbol.toUpperCase() : "SYMBOL"}
                 </p>
               </div>
             </div>
             <p className="mt-4 text-sm text-slate-500">
-              {blurb || "Deskripsi token akan tampil di sini."}
+              {blurb || "Your token description will appear here."}
             </p>
 
             <div className="mt-6 space-y-3 text-sm">
               <Row k="Total supply" v="1,000,000,000" />
-              <Row k="Untuk kurva" v="800,000,000" />
-              <Row k="Fee trading" v="1%" />
-              <Row k="Bagian kamu" v="35% dari fee" />
+              <Row k="On the curve" v="800,000,000" />
+              <Row k="Trading fee" v="1%" />
+              <Row k="Your share" v="35% of fee" />
             </div>
           </div>
         </div>

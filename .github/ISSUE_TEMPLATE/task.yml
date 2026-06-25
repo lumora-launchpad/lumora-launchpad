@@ -1,32 +1,32 @@
-name: Tugas atau fitur
-description: Usulan pekerjaan terstruktur yang siap dikerjakan Claude
-title: "[Tugas]: "
+name: Task or feature
+description: A structured piece of work ready to be picked up by Claude
+title: "[Task]: "
 labels: []
 body:
   - type: markdown
     attributes:
       value: |
-        Isi tiap bagian sejelas mungkin. Semakin jelas konteks dan kriteria, semakin baik hasil yang dikerjakan.
+        Fill in each section as clearly as you can. The clearer the context and criteria, the better the result.
   - type: textarea
-    id: konteks
+    id: context
     attributes:
-      label: Konteks
-      description: Latar belakang dan kondisi saat ini
-      placeholder: Jelaskan keadaan sekarang dan kenapa ini perlu
+      label: Context
+      description: Background and current state
+      placeholder: Explain how things work today and why this is needed
     validations:
       required: true
   - type: textarea
-    id: tujuan
+    id: goal
     attributes:
-      label: Tujuan
-      description: Hasil akhir yang diinginkan dalam satu atau dua kalimat
+      label: Goal
+      description: The desired outcome in one or two sentences
     validations:
       required: true
   - type: textarea
-    id: lingkup
+    id: scope
     attributes:
-      label: Lingkup kerja
-      description: Langkah konkret bernomor
+      label: Scope
+      description: Concrete numbered steps
       value: |
         1.
         2.
@@ -34,24 +34,24 @@ body:
     validations:
       required: true
   - type: textarea
-    id: kriteria
+    id: criteria
     attributes:
-      label: Kriteria selesai
-      description: Checklist yang harus terpenuhi sebelum dianggap selesai
+      label: Done criteria
+      description: Checklist that must be met before this is considered complete
       value: |
         * [ ]
         * [ ]
     validations:
       required: true
   - type: textarea
-    id: file
+    id: files
     attributes:
-      label: File terkait
-      description: Path file yang kemungkinan disentuh
+      label: Related files
+      description: Paths likely to be touched
       placeholder: web/app/..., web/lib/..., contracts/src/...
     validations:
       required: false
   - type: markdown
     attributes:
       value: |
-        Setelah issue dibuat dan Claude GitHub App aktif, komentari issue ini dengan mention Claude untuk mulai mengerjakan.
+        Once the issue is created and the Claude GitHub App is active, comment on this issue mentioning Claude to start the work.

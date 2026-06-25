@@ -169,13 +169,13 @@ export default function TokenPage({
                 <span
                   className={`h-2 w-2 rounded-full ${graduated ? "bg-base-violet" : "bg-base-mint"}`}
                 />
-                {graduated ? "Listed" : "Di kurva"}
+                {graduated ? "Listed" : "On the curve"}
               </span>
             </div>
 
             <div className="mt-6 grid grid-cols-3 gap-4">
-              <Stat k="Harga" v={`${fmt(price)} ETH`} />
-              <Stat k="Terkumpul" v={`${fmt(raised, 3)} ETH`} />
+              <Stat k="Price" v={`${fmt(price)} ETH`} />
+              <Stat k="Raised" v={`${fmt(raised, 3)} ETH`} />
               <Stat
                 k="Creator"
                 v={creator ? `${creator.slice(0, 6)}...${creator.slice(-4)}` : "-"}
@@ -188,7 +188,7 @@ export default function TokenPage({
 
             <div className="mt-6">
               <div className="flex items-center justify-between text-sm font-medium text-slate-500">
-                <span>Progress menuju Uniswap</span>
+                <span>Progress to Uniswap</span>
                 <span className="font-bold text-slate-700">
                   {Math.round(progress)}%
                 </span>
@@ -200,7 +200,7 @@ export default function TokenPage({
                 />
               </div>
               <p className="mt-2 text-xs text-slate-400">
-                Saat penuh, likuiditas pindah ke Uniswap dan LP dikunci.
+                When the curve fills, liquidity moves to Uniswap and the LP is locked.
               </p>
             </div>
           </div>
@@ -211,10 +211,10 @@ export default function TokenPage({
           <div className="card sticky top-24">
             {graduated ? (
               <div className="py-6 text-center">
-                <p className="text-lg font-black">Token sudah listing</p>
+                <p className="text-lg font-black">Token already listed</p>
                 <p className="mt-2 text-sm text-slate-500">
-                  Trading kurva selesai. Likuiditas sudah pindah ke Uniswap dan
-                  bisa ditradingkan di sana.
+                  Curve trading is complete. Liquidity has moved to Uniswap and
+                  the token can be traded there.
                 </p>
               </div>
             ) : (
@@ -231,7 +231,7 @@ export default function TokenPage({
                         : "text-slate-500"
                     }`}
                   >
-                    Beli
+                    Buy
                   </button>
                   <button
                     onClick={() => {
@@ -244,16 +244,16 @@ export default function TokenPage({
                         : "text-slate-500"
                     }`}
                   >
-                    Jual
+                    Sell
                   </button>
                 </div>
 
                 <label className="mt-5 block">
                   <span className="flex items-center justify-between text-sm font-semibold text-slate-700">
-                    <span>{side === "buy" ? "Jumlah ETH" : `Jumlah ${symbol}`}</span>
+                    <span>{side === "buy" ? "ETH amount" : `${symbol} amount`}</span>
                     {side === "sell" && balance !== undefined && (
                       <span className="text-xs font-medium text-slate-400">
-                        Saldo {fmt(balance as bigint, 2)}
+                        Balance {fmt(balance as bigint, 2)}
                       </span>
                     )}
                   </span>
@@ -300,7 +300,7 @@ export default function TokenPage({
                 {parsed && quoteOut !== undefined && (
                   <div className="mt-4 rounded-2xl bg-slate-50 px-4 py-3 text-sm">
                     <div className="flex items-center justify-between">
-                      <span className="text-slate-500">Kamu terima sekitar</span>
+                      <span className="text-slate-500">You receive about</span>
                       <span className="font-bold text-slate-800">
                         {side === "buy"
                           ? `${fmt(quoteOut as bigint, 2)} ${symbol}`
@@ -308,7 +308,7 @@ export default function TokenPage({
                       </span>
                     </div>
                     <div className="mt-1 flex items-center justify-between text-xs text-slate-400">
-                      <span>Toleransi slippage</span>
+                      <span>Slippage tolerance</span>
                       <span>5%</span>
                     </div>
                   </div>
@@ -326,19 +326,19 @@ export default function TokenPage({
                       className="btn-primary w-full"
                     >
                       {isPending
-                        ? "Konfirmasi di wallet"
+                        ? "Confirm in wallet"
                         : isConfirming
-                          ? "Memproses"
+                          ? "Processing"
                           : side === "buy"
-                            ? "Beli token"
-                            : "Jual token"}
+                            ? "Buy token"
+                            : "Sell token"}
                     </button>
                   )}
                 </div>
 
                 {isSuccess && (
                   <p className="mt-4 rounded-2xl bg-base-mint/10 px-4 py-3 text-center text-sm font-semibold text-base-mint">
-                    Transaksi berhasil.
+                    Transaction successful.
                   </p>
                 )}
                 {error && (
@@ -348,7 +348,7 @@ export default function TokenPage({
                 )}
 
                 <p className="mt-4 text-center text-xs text-slate-400">
-                  Fee 1 persen per transaksi. 65 developer, 35 creator.
+                  1 percent fee per trade. 65 developer, 35 creator.
                 </p>
               </>
             )}

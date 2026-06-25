@@ -1,42 +1,42 @@
 # Lumora Launchpad
 
-Launchpad token di Base dengan bonding curve yang adil dan tampilan cerah.
-Setiap token bisa langsung ditradingkan di kurva harga, lalu likuiditas pindah
-otomatis ke Uniswap saat target tercapai. Fee trading 1 persen dibagi 65 persen
-ke developer dan 35 persen ke creator.
+A token launchpad on Base with a fair bonding curve and a bright interface.
+Every token can be traded instantly on its price curve, then liquidity moves
+automatically to Uniswap once the target is reached. The 1 percent trading fee
+is split 65 percent to the developer and 35 percent to the creator.
 
-## Struktur
+## Structure
 
 ```
 lumora-launchpad/
-  contracts/        Smart contract Foundry (Solidity)
+  contracts/        Foundry smart contracts (Solidity)
     src/
-      LaunchpadToken.sol      Token ERC20 plus bonding curve dan fee split
-      LaunchpadFactory.sol    Pabrik token dan registry untuk frontend
+      LaunchpadToken.sol      ERC20 token plus bonding curve and fee split
+      LaunchpadFactory.sol    Token factory and registry for the frontend
       interfaces/IUniswapV2.sol
     test/Launchpad.t.sol
     script/Deploy.s.sol
-  web/              Frontend Next.js (App Router, Tailwind, wagmi, RainbowKit)
-    app/            Landing, buat token, halaman trading
+  web/              Next.js frontend (App Router, Tailwind, wagmi, RainbowKit)
+    app/            Landing, create token, trading page
     components/     Navbar, Footer, TokenCard
-    lib/            Konfigurasi wagmi, ABI, alamat kontrak
+    lib/            wagmi config, ABIs, contract addresses
 ```
 
-## Cara kerja fee
+## How the fee works
 
-Setiap buy dan sell di kurva membayar fee 1 persen. Fee itu dibagi langsung di
-dalam smart contract:
+Every buy and sell on the curve pays a 1 percent fee. That fee is split directly
+inside the smart contract:
 
-- 65 persen masuk ke alamat developer treasury (kamu)
-- 35 persen masuk ke alamat creator token
+- 65 percent goes to the developer treasury address (you)
+- 35 percent goes to the token creator address
 
-Bagian developer diatur lewat `devTreasury` di `LaunchpadFactory`. Ganti alamat
-ini ke wallet kamu sebelum deploy.
+The developer share is set via `devTreasury` in `LaunchpadFactory`. Change this
+address to your own wallet before deploying.
 
-## Menjalankan smart contract
+## Running the smart contracts
 
-Butuh Foundry. Pasang dengan `curl -L https://foundry.paradigm.xyz | bash` lalu
-`foundryup`.
+You need Foundry. Install it with `curl -L https://foundry.paradigm.xyz | bash`
+then run `foundryup`.
 
 ```
 cd contracts
@@ -46,41 +46,42 @@ forge build
 forge test
 ```
 
-Deploy ke Base Sepolia untuk testing. Panduan lengkap end to end ada di
-`contracts/DEPLOY.md`. Cara cepat untuk playground testnet:
+Deploy to Base Sepolia for testing. The full end to end guide is in
+`contracts/DEPLOY.md`. Quick path for a testnet playground:
 
 ```
-cp .env.example .env        # isi PRIVATE_KEY dan DEV_TREASURY
+cp .env.example .env        # fill in PRIVATE_KEY and DEV_TREASURY
 make install
 make test
-make deploy-testnet         # mock router plus target graduate 0.05 ETH
+make deploy-testnet         # mock router plus a 0.05 ETH graduation target
 ```
 
-Catat alamat `LaunchpadFactory` yang tercetak. Masukkan ke web nanti.
+Note the printed `LaunchpadFactory` address. You will add it to the web app
+later.
 
-## Menjalankan web
+## Running the web app
 
 ```
 cd web
-cp .env.example .env.local   # isi NEXT_PUBLIC_FACTORY_ADDRESS dan WalletConnect id
+cp .env.example .env.local   # fill in NEXT_PUBLIC_FACTORY_ADDRESS and WalletConnect id
 npm install
 npm run dev
 ```
 
-Buka http://localhost:3000
+Open http://localhost:3000
 
-Untuk publikasi ke internet lewat Vercel, lihat `web/DEPLOY_VERCEL.md`.
+To publish to the internet via Vercel, see `web/DEPLOY_VERCEL.md`.
 
-## Catatan penting
+## Important notes
 
-Kontrak ini adalah titik awal yang solid, bukan versi siap mainnet. Sebelum
-dipakai dengan dana sungguhan, lakukan review dan audit, uji parameter kurva
-(`virtualEthReserve` dan `graduationEth`), dan pertimbangkan proteksi tambahan
-seperti batas anti bot di awal launch.
+This contract is a solid starting point, not a mainnet ready release. Before
+using it with real funds, do a review and audit, test the curve parameters
+(`virtualEthReserve` and `graduationEth`), and consider extra protections such
+as anti bot limits early in a launch.
 
-## Langkah berikutnya yang disarankan
+## Suggested next steps
 
-- Sambungkan landing dan halaman token ke pembacaan on chain (registry factory)
-- Simpan deskripsi dan gambar token di penyimpanan off chain
-- Tambah grafik harga real time dari event Buy dan Sell
-- Halaman portofolio per wallet
+- Connect the landing and token pages to on chain reads (factory registry)
+- Store token descriptions and images in off chain storage
+- Add a real time price chart from Buy and Sell events
+- A per wallet portfolio page

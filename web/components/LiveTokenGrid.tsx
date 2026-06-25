@@ -35,8 +35,8 @@ export function LiveTokenGrid() {
       {useSample && (
         <p className="mt-6 rounded-2xl border border-slate-200 bg-white/60 px-4 py-3 text-center text-sm text-slate-500 backdrop-blur">
           {hasFactory
-            ? "Belum ada token diluncurkan. Menampilkan contoh tampilan."
-            : "Factory belum tersambung. Menampilkan data contoh. Isi NEXT_PUBLIC_FACTORY_ADDRESS untuk data live."}
+            ? "No tokens launched yet. Showing a sample view."
+            : "Factory not connected. Showing sample data. Set NEXT_PUBLIC_FACTORY_ADDRESS for live data."}
         </p>
       )}
 

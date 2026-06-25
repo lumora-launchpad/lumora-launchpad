@@ -6,7 +6,7 @@ import { Footer } from "@/components/Footer";
 
 export const metadata: Metadata = {
   title: "Lumora Launchpad",
-  description: "Luncurkan token di Base dengan bonding curve yang adil dan cerah.",
+  description: "Launch tokens on Base with a fair and bright bonding curve.",
 };
 
 export default function RootLayout({
@@ -15,7 +15,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="id">
+    <html lang="en">
       <body>
         <Providers>
           <div className="flex min-h-screen flex-col">

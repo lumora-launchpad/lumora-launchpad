@@ -18,22 +18,19 @@ export function Navbar() {
 
         <nav className="hidden items-center gap-8 text-sm font-medium text-slate-600 md:flex">
           <Link href="/" className="transition hover:text-base-blue">
-            Jelajah
+            Explore
           </Link>
           <Link href="/create" className="transition hover:text-base-blue">
-            Buat Token
+            Create
           </Link>
-          <a
-            href="#cara-kerja"
-            className="transition hover:text-base-blue"
-          >
-            Cara Kerja
+          <a href="#how-it-works" className="transition hover:text-base-blue">
+            How it works
           </a>
         </nav>
 
         <div className="flex items-center gap-3">
           <Link href="/create" className="hidden btn-primary !px-5 !py-2.5 sm:inline-flex">
-            Luncurkan
+            Launch
           </Link>
           <ConnectButton
             showBalance={false}

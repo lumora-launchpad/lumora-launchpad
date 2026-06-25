@@ -27,12 +27,12 @@ export function TokenCard({ token }: { token: TokenView }) {
       </div>
 
       <p className="mt-4 line-clamp-2 text-sm text-slate-500">
-        {token.blurb ?? "Token live di kurva Base."}
+        {token.blurb ?? "Live token on the Base curve."}
       </p>
 
       <div className="mt-5">
         <div className="flex items-center justify-between text-xs font-medium text-slate-500">
-          <span>Progress kurva</span>
+          <span>Curve progress</span>
           <span className="font-bold text-slate-700">
             {Math.round(token.progress)}%
           </span>
@@ -46,7 +46,7 @@ export function TokenCard({ token }: { token: TokenView }) {
       </div>
 
       <div className="mt-5 flex items-center justify-between">
-        <span className="pill">Terkumpul {token.marketCap}</span>
+        <span className="pill">Raised {token.marketCap}</span>
         <span className="text-sm font-bold text-base-blue transition group-hover:translate-x-1">
           Trade
         </span>

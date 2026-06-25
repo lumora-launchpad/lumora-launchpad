@@ -1,12 +1,12 @@
 # Claude Code GitHub Action
 #
-# Membuat Claude bekerja otomatis di repo ini. Sebut @claude di dalam issue,
-# komentar PR, atau review PR, dan Claude akan menulis kode lalu membuka PR.
+# Lets Claude work automatically in this repo. Mention @claude inside an issue,
+# a PR comment, or a PR review, and Claude will write code then open a PR.
 #
-# Autentikasi memakai secret CLAUDE_CODE_OAUTH_TOKEN yang dipasang otomatis oleh
-# /install-github-app (memakai langganan Claude, bukan API key berbayar).
-# Kalau mau memakai Anthropic API key sebagai gantinya, ganti baris with di bawah
-# menjadi: anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+# Authentication uses the CLAUDE_CODE_OAUTH_TOKEN secret installed automatically
+# by /install-github-app (using a Claude subscription, not a paid API key).
+# To use an Anthropic API key instead, change the with line below to:
+# anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
 
 name: Claude Code
 

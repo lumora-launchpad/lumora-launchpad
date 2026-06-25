@@ -60,7 +60,7 @@ export function PriceChart({ address }: { address: `0x${string}` }) {
     <div className="rounded-2xl bg-gradient-to-br from-base-blue/5 via-base-violet/5 to-base-pink/10 p-5">
       <div className="flex items-end justify-between">
         <div>
-          <p className="text-xs font-medium text-slate-400">Harga terakhir</p>
+          <p className="text-xs font-medium text-slate-400">Last price</p>
           <p className="text-2xl font-black text-slate-800">
             {prices.length > 0 ? `${fmtPrice(last)} ETH` : "-"}
           </p>
@@ -80,13 +80,13 @@ export function PriceChart({ address }: { address: `0x${string}` }) {
       <div className="mt-4 h-44">
         {isLoading ? (
           <div className="grid h-full place-items-center">
-            <p className="text-sm text-slate-400">Memuat riwayat trade</p>
+            <p className="text-sm text-slate-400">Loading trade history</p>
           </div>
         ) : prices.length < 2 ? (
           <div className="grid h-full place-items-center">
             <p className="text-sm text-slate-400">
-              Belum cukup transaksi untuk grafik. Grafik muncul otomatis setelah
-              ada trade.
+              Not enough trades to chart yet. The chart appears automatically
+              once trades happen.
             </p>
           </div>
         ) : (
@@ -122,7 +122,7 @@ export function PriceChart({ address }: { address: `0x${string}` }) {
 
       {prices.length > 0 && (
         <p className="mt-2 text-right text-xs text-slate-400">
-          {prices.length} transaksi
+          {prices.length} trades
         </p>
       )}
     </div>

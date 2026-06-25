@@ -10,31 +10,31 @@ export default function HomePage() {
         <div className="mx-auto max-w-3xl text-center">
           <span className="pill mx-auto">
             <span className="h-2 w-2 rounded-full bg-base-mint" />
-            Live di Base
+            Live on Base
           </span>
           <h1 className="mt-6 text-5xl font-black leading-tight tracking-tight sm:text-6xl">
-            Luncurkan token kamu
+            Launch your token
             <br />
-            <span className="gradient-text">dalam hitungan detik</span>
+            <span className="gradient-text">in seconds</span>
           </h1>
           <p className="mx-auto mt-6 max-w-xl text-lg text-slate-500">
-            Bonding curve yang adil, likuiditas otomatis ke Uniswap, dan biaya
-            kreasi nyaris nol. Cerah, cepat, transparan.
+            A fair bonding curve, automatic liquidity to Uniswap, and near zero
+            creation cost. Bright, fast, transparent.
           </p>
           <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Link href="/create" className="btn-primary w-full sm:w-auto">
-              Buat token sekarang
+              Create a token now
             </Link>
-            <a href="#jelajah" className="btn-ghost w-full sm:w-auto">
-              Lihat yang sedang naik
+            <a href="#explore" className="btn-ghost w-full sm:w-auto">
+              See what is rising
             </a>
           </div>
 
           <div className="mt-12 grid grid-cols-3 gap-4">
             {[
-              { k: "Fee trading", v: "1%" },
-              { k: "Bagian creator", v: "35%" },
-              { k: "Likuiditas", v: "Auto" },
+              { k: "Trading fee", v: "1%" },
+              { k: "Creator share", v: "35%" },
+              { k: "Liquidity", v: "Auto" },
             ].map((s) => (
               <div key={s.k} className="card py-5 text-center">
                 <p className="text-3xl font-black gradient-text">{s.v}</p>
@@ -46,21 +46,21 @@ export default function HomePage() {
       </section>
 
       {/* Explore */}
-      <section id="jelajah" className="py-12">
+      <section id="explore" className="py-12">
         <div className="flex items-end justify-between">
           <div>
             <h2 className="text-3xl font-black tracking-tight">
-              Sedang <span className="gradient-text">menyala</span>
+              Trending <span className="gradient-text">now</span>
             </h2>
             <p className="mt-1 text-slate-500">
-              Token terbaru yang diluncurkan komunitas.
+              The latest tokens launched by the community.
             </p>
           </div>
           <Link
             href="/create"
             className="hidden text-sm font-bold text-base-blue hover:underline sm:block"
           >
-            Luncurkan punyamu
+            Launch yours
           </Link>
         </div>
 
@@ -68,26 +68,26 @@ export default function HomePage() {
       </section>
 
       {/* How it works */}
-      <section id="cara-kerja" className="py-16">
+      <section id="how-it-works" className="py-16">
         <h2 className="text-center text-3xl font-black tracking-tight">
-          Tiga langkah <span className="gradient-text">selesai</span>
+          Three steps <span className="gradient-text">done</span>
         </h2>
         <div className="mt-10 grid gap-6 md:grid-cols-3">
           {[
             {
               n: "01",
-              t: "Buat",
-              d: "Isi nama dan simbol token. Kontrak terdeploy otomatis dengan kurva harga yang adil.",
+              t: "Create",
+              d: "Enter a token name and symbol. The contract deploys automatically with a fair price curve.",
             },
             {
               n: "02",
               t: "Trade",
-              d: "Siapa pun bisa beli dan jual di kurva. Setiap transaksi membayar fee 1 persen.",
+              d: "Anyone can buy and sell on the curve. Every trade pays a 1 percent fee.",
             },
             {
               n: "03",
               t: "Graduate",
-              d: "Saat target tercapai, likuiditas pindah ke Uniswap dan LP dikunci selamanya.",
+              d: "When the target is reached, liquidity moves to Uniswap and the LP is locked forever.",
             },
           ].map((step) => (
             <div key={step.n} className="card">
@@ -104,10 +104,10 @@ export default function HomePage() {
         <div className="card overflow-hidden bg-brand-gradient !p-0 text-white">
           <div className="grid gap-8 p-10 md:grid-cols-2 md:items-center">
             <div>
-              <h2 className="text-3xl font-black">Model fee yang jujur</h2>
+              <h2 className="text-3xl font-black">An honest fee model</h2>
               <p className="mt-3 text-white/80">
-                Tidak ada biaya tersembunyi. Setiap trade membayar 1 persen,
-                dibagi transparan di dalam smart contract.
+                No hidden costs. Every trade pays 1 percent, split transparently
+                inside the smart contract.
               </p>
             </div>
             <div className="grid grid-cols-2 gap-4">

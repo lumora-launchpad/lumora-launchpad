@@ -1,95 +1,97 @@
-# Deploy ke Base Sepolia
+# Deploy to Base Sepolia
 
-Panduan menjalankan launchpad end to end di testnet Base Sepolia.
+A guide to running the launchpad end to end on the Base Sepolia testnet.
 
-## 1. Prasyarat
+## 1. Prerequisites
 
-1. Pasang Foundry.
+1. Install Foundry.
 
    ```
    curl -L https://foundry.paradigm.xyz | bash
    foundryup
    ```
 
-2. Siapkan satu wallet khusus testing. Jangan pakai wallet utama.
+2. Set up a dedicated test wallet. Do not use your main wallet.
 
-3. Ambil ETH Base Sepolia dari faucet, misalnya faucet Coinbase Developer
-   Platform atau Alchemy. Cukup sekitar 0.2 ETH untuk testing.
+3. Get Base Sepolia ETH from a faucet, for example the Coinbase Developer
+   Platform faucet or Alchemy. Around 0.2 ETH is enough for testing.
 
-4. Siapkan Basescan API key dari basescan.org kalau ingin verifikasi kontrak.
+4. Get a Basescan API key from basescan.org if you want to verify contracts.
 
-## 2. Konfigurasi
+## 2. Configuration
 
 ```
 cd contracts
 cp .env.example .env
 ```
 
-Isi `.env`:
+Fill in `.env`:
 
-- `PRIVATE_KEY` private key wallet testing kamu, diawali 0x.
-- `DEV_TREASURY` alamat penerima fee 65 persen. Boleh sama dengan wallet kamu.
-- `BASESCAN_API_KEY` opsional, untuk verifikasi.
-- `UNISWAP_V2_ROUTER` hanya dipakai oleh script Deploy biasa. Untuk testnet
-  pakai script DeployTestnet yang sudah membawa mock router sendiri.
+- `PRIVATE_KEY` the private key of your test wallet, prefixed with 0x.
+- `DEV_TREASURY` the address that receives the 65 percent fee. It can be the
+  same as your wallet.
+- `BASESCAN_API_KEY` optional, for verification.
+- `UNISWAP_V2_ROUTER` only used by the standard Deploy script. For testnet use
+  the DeployTestnet script which ships its own mock router.
 
-## 3. Install dependency dan tes
+## 3. Install dependencies and test
 
 ```
 make install
 make test
 ```
 
-Semua tes harus hijau sebelum lanjut.
+All tests must be green before continuing.
 
 ## 4. Deploy
 
-Ada dua pilihan.
+There are two options.
 
-### Pilihan A. Playground testnet dengan graduate yang mudah diuji
+### Option A. Testnet playground with an easy to test graduation
 
-Direkomendasikan untuk uji coba pertama. Script ini deploy mock router dan
-menyetel target graduate ke 0.05 ETH supaya alur lengkap dari beli sampai
-graduate bisa dicoba dengan ETH faucet.
+Recommended for your first run. This script deploys a mock router and sets the
+graduation target to 0.05 ETH so the full flow from buy to graduation can be
+tried with faucet ETH.
 
 ```
 make deploy-testnet
 ```
 
-Catat alamat yang tercetak: `LaunchpadFactory` dan `MockRouter`.
+Note the printed addresses: `LaunchpadFactory` and `MockRouter`.
 
-### Pilihan B. Deploy gaya produksi
+### Option B. Production style deploy
 
-Memakai `UNISWAP_V2_ROUTER` dari `.env` dan target graduate default 3 ETH.
-Pakai ini kalau kamu sudah punya alamat router Uniswap v2 yang valid di Sepolia.
+Uses `UNISWAP_V2_ROUTER` from `.env` and the default 3 ETH graduation target.
+Use this if you already have a valid Uniswap v2 router address on Sepolia.
 
 ```
 make deploy-sepolia
 ```
 
-## 5. Catat block deploy untuk grafik
+## 5. Record the deploy block for the chart
 
-Grafik harga di web membaca event mulai dari block tertentu. Ambil nomor block
-deploy factory dari output forge, atau dari berkas broadcast:
+The price chart in the web app reads events starting from a specific block. Get
+the factory deploy block number from the forge output, or from the broadcast
+file:
 
 ```
 contracts/broadcast/DeployTestnet.s.sol/84532/run-latest.json
 ```
 
-Cari field `receipt.blockNumber` untuk transaksi pembuatan factory.
+Look for the `receipt.blockNumber` field of the factory creation transaction.
 
-## 6. Sambungkan ke web
+## 6. Connect to the web app
 
-Di `web/.env.local`:
+In `web/.env.local`:
 
 ```
-NEXT_PUBLIC_FACTORY_ADDRESS=<alamat LaunchpadFactory>
+NEXT_PUBLIC_FACTORY_ADDRESS=<LaunchpadFactory address>
 NEXT_PUBLIC_CHAIN_ID=84532
-NEXT_PUBLIC_START_BLOCK=<block deploy factory>
-NEXT_PUBLIC_WALLETCONNECT_ID=<id dari WalletConnect Cloud>
+NEXT_PUBLIC_START_BLOCK=<factory deploy block>
+NEXT_PUBLIC_WALLETCONNECT_ID=<id from WalletConnect Cloud>
 ```
 
-Lalu:
+Then:
 
 ```
 cd ../web
@@ -97,33 +99,33 @@ npm install
 npm run dev
 ```
 
-## 7. Uji end to end
+## 7. Test end to end
 
-1. Buka http://localhost:3000 dan hubungkan wallet ke jaringan Base Sepolia.
-2. Masuk ke halaman Buat Token, isi nama dan simbol, lalu luncurkan.
-3. Token muncul di landing. Klik untuk masuk halaman trading.
-4. Beli sejumlah kecil ETH, cek saldo dan grafik ikut bergerak.
-5. Jual sebagian, pastikan ETH kembali dikurangi fee.
-6. Kalau pakai Pilihan A, beli hingga total 0.05 ETH untuk memicu graduate.
-   Panel trading akan berubah menjadi status sudah listing.
+1. Open http://localhost:3000 and connect your wallet to the Base Sepolia network.
+2. Go to the Create token page, enter a name and symbol, then launch.
+3. The token appears on the landing page. Click it to open the trading page.
+4. Buy a small amount of ETH, check the balance and watch the chart move.
+5. Sell part of it, confirm the ETH returns minus the fee.
+6. With Option A, buy up to a total of 0.05 ETH to trigger graduation. The
+   trading panel switches to a listed status.
 
-Cara cepat lewat command line untuk membuat token:
+Quick command line way to create a token:
 
 ```
 make create-token FACTORY=0xYourFactory NAME=Aurora SYMBOL=AUR
 ```
 
-## Memeriksa fee masuk
+## Checking the fee arrives
 
-Cek saldo dev treasury naik setelah beberapa transaksi:
+Confirm the dev treasury balance rises after a few transactions:
 
 ```
 cast balance <DEV_TREASURY> --rpc-url base_sepolia
 ```
 
-## Sebelum mainnet
+## Before mainnet
 
-- Lakukan review dan audit kontrak.
-- Ganti router ke Uniswap v2 yang benar di Base mainnet dan kembalikan target
-  graduate ke nilai produksi.
-- Uji ulang parameter kurva `virtualEthReserve` dan `graduationEth`.
+- Do a contract review and audit.
+- Switch the router to the correct Uniswap v2 on Base mainnet and restore the
+  graduation target to a production value.
+- Re test the curve parameters `virtualEthReserve` and `graduationEth`.
