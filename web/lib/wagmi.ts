@@ -5,6 +5,11 @@ const chainId = Number(process.env.NEXT_PUBLIC_CHAIN_ID ?? 84532);
 
 export const activeChain = chainId === base.id ? base : baseSepolia;
 
+export function txExplorerUrl(hash: string): string {
+  const baseUrl = activeChain.blockExplorers?.default.url ?? "https://basescan.org";
+  return `${baseUrl}/tx/${hash}`;
+}
+
 export const wagmiConfig = getDefaultConfig({
   appName: "Lumora Launchpad",
   projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_ID ?? "demo",

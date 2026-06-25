@@ -1,10 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { decodeEventLog } from "viem";
 import { useAccount, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { FACTORY_ADDRESS, factoryAbi } from "@/lib/contracts";
+import { txExplorerUrl } from "@/lib/wagmi";
+import { useToast } from "@/components/Toast";
 
 export default function CreatePage() {
   const { isConnected } = useAccount();
@@ -14,6 +16,10 @@ export default function CreatePage() {
   const [imageUrl, setImageUrl] = useState("");
   const [metadataSaved, setMetadataSaved] = useState(false);
 
+  const { showToast, dismissToast } = useToast();
+  const pendingToastId = useRef<number | null>(null);
+  const reportedHash = useRef<string | null>(null);
+
   const { writeContract, data: hash, isPending, error } = useWriteContract();
   const {
     data: receipt,
@@ -22,6 +28,60 @@ export default function CreatePage() {
   } = useWaitForTransactionReceipt({
     hash,
   });
+
+  useEffect(() => {
+    if (isPending && pendingToastId.current === null) {
+      pendingToastId.current = showToast({
+        title: "Confirm in your wallet",
+        description: "Approve the transaction to launch your token.",
+        variant: "pending",
+      });
+    }
+  }, [isPending, showToast]);
+
+  useEffect(() => {
+    if (!hash || reportedHash.current === hash) return;
+    reportedHash.current = hash;
+    if (pendingToastId.current !== null) {
+      dismissToast(pendingToastId.current);
+      pendingToastId.current = null;
+    }
+    pendingToastId.current = showToast({
+      title: "Transaction submitted",
+      description: "Waiting for confirmation on the network.",
+      variant: "pending",
+      href: txExplorerUrl(hash),
+    });
+  }, [hash, showToast, dismissToast]);
+
+  useEffect(() => {
+    if (!isSuccess || !hash) return;
+    if (pendingToastId.current !== null) {
+      dismissToast(pendingToastId.current);
+      pendingToastId.current = null;
+    }
+    showToast({
+      title: "Token launched successfully",
+      description: "Your token is now live on the bonding curve.",
+      variant: "success",
+      href: txExplorerUrl(hash),
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSuccess, hash]);
+
+  useEffect(() => {
+    if (!error) return;
+    if (pendingToastId.current !== null) {
+      dismissToast(pendingToastId.current);
+      pendingToastId.current = null;
+    }
+    showToast({
+      title: "Transaction failed",
+      description: error.message.slice(0, 120),
+      variant: "error",
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [error]);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -160,18 +220,11 @@ export default function CreatePage() {
             )}
           </div>
 
-          {isSuccess && (
+          {isSuccess && (blurb || imageUrl) && (
             <p className="mt-4 rounded-2xl bg-base-mint/10 px-4 py-3 text-center text-sm font-semibold text-base-mint">
-              Token launched successfully.
-              {(blurb || imageUrl) &&
-                (metadataSaved
-                  ? " Description and image saved."
-                  : " Saving description and image...")}
-            </p>
-          )}
-          {error && (
-            <p className="mt-4 rounded-2xl bg-base-pink/10 px-4 py-3 text-center text-sm font-semibold text-base-pink">
-              {error.message.slice(0, 120)}
+              {metadataSaved
+                ? "Description and image saved."
+                : "Saving description and image..."}
             </p>
           )}
         </form>

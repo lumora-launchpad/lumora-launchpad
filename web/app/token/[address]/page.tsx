@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { formatEther, parseEther } from "viem";
 import {
   useAccount,
@@ -12,7 +12,9 @@ import {
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { tokenAbi } from "@/lib/contracts";
 import { accentFor } from "@/lib/tokens";
+import { txExplorerUrl } from "@/lib/wagmi";
 import { PriceChart } from "@/components/PriceChart";
+import { useToast } from "@/components/Toast";
 
 type Side = "buy" | "sell";
 type TokenMetadata = {
@@ -134,6 +136,10 @@ export default function TokenPage({
     hash,
   });
 
+  const { showToast, dismissToast } = useToast();
+  const pendingToastId = useRef<number | null>(null);
+  const reportedHash = useRef<string | null>(null);
+
   useEffect(() => {
     if (isSuccess) {
       setAmount("");
@@ -141,6 +147,61 @@ export default function TokenPage({
       refetchBalance();
     }
   }, [isSuccess, refetchInfo, refetchBalance]);
+
+  useEffect(() => {
+    if (isPending && pendingToastId.current === null) {
+      pendingToastId.current = showToast({
+        title: "Confirm in your wallet",
+        description: side === "buy" ? "Approve the buy order." : "Approve the sell order.",
+        variant: "pending",
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isPending, showToast]);
+
+  useEffect(() => {
+    if (!hash || reportedHash.current === hash) return;
+    reportedHash.current = hash;
+    if (pendingToastId.current !== null) {
+      dismissToast(pendingToastId.current);
+      pendingToastId.current = null;
+    }
+    pendingToastId.current = showToast({
+      title: "Transaction submitted",
+      description: "Waiting for confirmation on the network.",
+      variant: "pending",
+      href: txExplorerUrl(hash),
+    });
+  }, [hash, showToast, dismissToast]);
+
+  useEffect(() => {
+    if (!isSuccess || !hash) return;
+    if (pendingToastId.current !== null) {
+      dismissToast(pendingToastId.current);
+      pendingToastId.current = null;
+    }
+    showToast({
+      title: side === "buy" ? "Buy successful" : "Sell successful",
+      description: "Your trade has been confirmed.",
+      variant: "success",
+      href: txExplorerUrl(hash),
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSuccess, hash]);
+
+  useEffect(() => {
+    if (!error) return;
+    if (pendingToastId.current !== null) {
+      dismissToast(pendingToastId.current);
+      pendingToastId.current = null;
+    }
+    showToast({
+      title: "Transaction failed",
+      description: error.message.slice(0, 120),
+      variant: "error",
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [error]);
 
   function handleTrade() {
     if (!parsed) return;
@@ -367,17 +428,6 @@ export default function TokenPage({
                     </button>
                   )}
                 </div>
-
-                {isSuccess && (
-                  <p className="mt-4 rounded-2xl bg-base-mint/10 px-4 py-3 text-center text-sm font-semibold text-base-mint">
-                    Transaction successful.
-                  </p>
-                )}
-                {error && (
-                  <p className="mt-4 rounded-2xl bg-base-pink/10 px-4 py-3 text-center text-sm font-semibold text-base-pink">
-                    {error.message.slice(0, 120)}
-                  </p>
-                )}
 
                 <p className="mt-4 text-center text-xs text-slate-400">
                   1 percent fee per trade. 65 developer, 35 creator.

@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { WagmiProvider } from "wagmi";
 import { useState } from "react";
 import { wagmiConfig } from "@/lib/wagmi";
+import { ToastProvider } from "@/components/Toast";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(() => new QueryClient());
@@ -20,7 +21,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
             borderRadius: "large",
           })}
         >
-          {children}
+          <ToastProvider>{children}</ToastProvider>
         </RainbowKitProvider>
       </QueryClientProvider>
     </WagmiProvider>
