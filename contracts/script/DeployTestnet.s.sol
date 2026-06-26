@@ -56,6 +56,7 @@ contract DeployTestnet is Script {
             1.5 ether, // graduationMarketCap
             3, // antiSnipeBlocks
             0.05 ether, // maxBuyPerWallet
+            100, // graduationFeeBps (1 percent)
             0 // creationFee
         );
         vm.stopBroadcast();

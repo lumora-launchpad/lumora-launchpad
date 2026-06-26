@@ -15,6 +15,7 @@ contract LaunchpadFactory {
     uint256 public graduationMarketCap; // FDV target at which tokens graduate
     uint256 public antiSnipeBlocks; // opening window length in blocks; 0 disables
     uint256 public maxBuyPerWallet; // max ETH per wallet during the window
+    uint256 public graduationFeeBps; // cut of raised ETH to dev at graduation
     uint256 public creationFee;
 
     address[] public allTokens;
@@ -38,6 +39,7 @@ contract LaunchpadFactory {
         graduationMarketCap = 20 ether; // roughly the old 3 ether raised target
         antiSnipeBlocks = 5; // about 10 seconds on Base
         maxBuyPerWallet = 0.1 ether;
+        graduationFeeBps = 100; // 1 percent of raised ETH to dev at graduation
         creationFee = 0;
     }
 
@@ -53,6 +55,7 @@ contract LaunchpadFactory {
             graduationMarketCap,
             antiSnipeBlocks,
             maxBuyPerWallet,
+            graduationFeeBps,
             router
         );
 
@@ -63,10 +66,10 @@ contract LaunchpadFactory {
             (bool ok,) = devTreasury.call{value: creationFee}("");
             require(ok, "fee transfer failed");
         }
+        // Any ETH beyond the creation fee seeds the creator's first buy.
         uint256 extra = msg.value - creationFee;
         if (extra > 0) {
-            (bool r,) = msg.sender.call{value: extra}("");
-            require(r, "refund failed");
+            token.initialBuy{value: extra}(msg.sender, 0);
         }
 
         emit TokenCreated(address(token), msg.sender, name, symbol);
@@ -102,16 +105,19 @@ contract LaunchpadFactory {
         uint256 graduationMarketCap_,
         uint256 antiSnipeBlocks_,
         uint256 maxBuyPerWallet_,
+        uint256 graduationFeeBps_,
         uint256 creationFee_
     ) external onlyOwner {
         require(devTreasury_ != address(0) && router_ != address(0), "zero address");
         require(virtualEthReserve_ > 0, "bad seed");
+        require(graduationFeeBps_ <= 1000, "fee too high");
         devTreasury = devTreasury_;
         router = router_;
         virtualEthReserve = virtualEthReserve_;
         graduationMarketCap = graduationMarketCap_;
         antiSnipeBlocks = antiSnipeBlocks_;
         maxBuyPerWallet = maxBuyPerWallet_;
+        graduationFeeBps = graduationFeeBps_;
         creationFee = creationFee_;
         emit ConfigUpdated();
     }
