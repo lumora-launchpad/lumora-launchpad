@@ -135,4 +135,31 @@ contract LaunchpadTest is Test {
         assertLt(token.marketCap(), token.graduationMarketCap());
         assertEq(token.graduationProgressBps(), 0);
     }
+
+    function test_CreatorInitialBuy() public {
+        vm.deal(creator, 1 ether);
+        vm.prank(creator);
+        // ETH sent with creation seeds the creator's first buy, even though the
+        // anti snipe window is active in this same block.
+        address t = factory.createToken{value: 0.05 ether}("Lumora", "LUM");
+        LaunchpadToken token = LaunchpadToken(payable(t));
+
+        assertTrue(token.initialBought());
+        assertGt(token.balanceOf(creator), 0);
+        assertGt(token.marketCap(), token.startMarketCap());
+    }
+
+    function test_GraduationFee() public {
+        LaunchpadToken token = _newToken();
+        vm.roll(block.number + 6);
+
+        vm.prank(buyer);
+        token.buy{value: 5 ether}(0); // graduates
+
+        assertTrue(token.graduated());
+        // Dev got the 1 percent graduation fee on top of trade fees. Trade fee
+        // alone would be about 0.0325 ether, so anything above 0.04 proves the
+        // graduation fee was paid.
+        assertGt(dev.balance, 0.04 ether);
+    }
 }

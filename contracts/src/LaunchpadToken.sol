@@ -36,16 +36,20 @@ contract LaunchpadToken is ERC20, ReentrancyGuard {
     uint16 public constant FEE_BPS = 100; // 1 percent per trade
     uint16 public constant DEV_SHARE_BPS = 6500; // 65 percent of the fee
 
+    uint256 public immutable graduationFeeBps; // cut of raised ETH to dev at graduation
+
     address public immutable creator;
     address public immutable devTreasury;
+    address public immutable factory; // deployer, may seed the creator's first buy
 
     bool public graduated;
+    bool public initialBought; // creator launch buy can run at most once
 
     IUniswapV2Router02 public immutable router;
 
     event Buy(address indexed buyer, uint256 ethIn, uint256 tokensOut, uint256 fee);
     event Sell(address indexed seller, uint256 tokensIn, uint256 ethOut, uint256 fee);
-    event Graduated(address indexed pair, uint256 ethLiquidity, uint256 tokenLiquidity);
+    event Graduated(address indexed pair, uint256 ethLiquidity, uint256 tokenLiquidity, uint256 devFee);
 
     constructor(
         string memory name_,
@@ -56,14 +60,18 @@ contract LaunchpadToken is ERC20, ReentrancyGuard {
         uint256 graduationMarketCap_,
         uint256 antiSnipeBlocks_,
         uint256 maxBuyPerWallet_,
+        uint256 graduationFeeBps_,
         address router_
     ) ERC20(name_, symbol_) {
         require(creator_ != address(0) && devTreasury_ != address(0), "zero address");
         require(virtualEthReserve_ > 0, "bad seed");
+        require(graduationFeeBps_ <= 1000, "fee too high"); // max 10 percent
 
         creator = creator_;
         devTreasury = devTreasury_;
+        factory = msg.sender;
         virtualEthReserve = virtualEthReserve_;
+        graduationFeeBps = graduationFeeBps_;
         router = IUniswapV2Router02(router_);
 
         _mint(address(this), TOTAL_SUPPLY);
@@ -88,18 +96,35 @@ contract LaunchpadToken is ERC20, ReentrancyGuard {
     }
 
     function buy(uint256 minTokensOut) external payable nonReentrant {
+        _buy(msg.sender, msg.value, minTokensOut, true);
+    }
+
+    /// @notice One time launch buy that seeds the creator's allocation, called by
+    ///         the factory in the same transaction as creation. Exempt from the
+    ///         anti snipe cap because it is the creator's own allocation.
+    function initialBuy(address to, uint256 minTokensOut) external payable nonReentrant {
+        require(msg.sender == factory, "only factory");
+        require(!initialBought, "already");
+        require(block.number == launchBlock, "window closed");
+        initialBought = true;
+        _buy(to, msg.value, minTokensOut, false);
+    }
+
+    function _buy(address recipient, uint256 value, uint256 minTokensOut, bool antiSnipeCheck)
+        internal
+    {
         require(!graduated, "graduated");
-        require(msg.value > 0, "no eth");
+        require(value > 0, "no eth");
 
         // Anti snipe: during the opening window, cap cumulative spend per wallet.
-        if (antiSnipeBlocks > 0 && block.number < launchBlock + antiSnipeBlocks) {
-            uint256 spent = windowSpent[msg.sender] + msg.value;
+        if (antiSnipeCheck && antiSnipeBlocks > 0 && block.number < launchBlock + antiSnipeBlocks) {
+            uint256 spent = windowSpent[recipient] + value;
             require(spent <= maxBuyPerWallet, "anti snipe cap");
-            windowSpent[msg.sender] = spent;
+            windowSpent[recipient] = spent;
         }
 
-        uint256 fee = (msg.value * FEE_BPS) / 10_000;
-        uint256 netEth = msg.value - fee;
+        uint256 fee = (value * FEE_BPS) / 10_000;
+        uint256 netEth = value - fee;
 
         uint256 newEthReserve = ethReserve + netEth;
         uint256 newTokenReserve = k / newEthReserve;
@@ -109,10 +134,10 @@ contract LaunchpadToken is ERC20, ReentrancyGuard {
         ethReserve = newEthReserve;
         tokenReserve = newTokenReserve;
 
-        _transfer(address(this), msg.sender, tokensOut);
+        _transfer(address(this), recipient, tokensOut);
         _splitFee(fee);
 
-        emit Buy(msg.sender, msg.value, tokensOut, fee);
+        emit Buy(recipient, value, tokensOut, fee);
 
         if (marketCap() >= graduationMarketCap) _graduate();
     }
@@ -160,6 +185,14 @@ contract LaunchpadToken is ERC20, ReentrancyGuard {
         uint256 ethLiq = realEthReserve();
         uint256 tokenLiq = balanceOf(address(this));
 
+        // Take the graduation fee from the raised ETH before seeding liquidity.
+        uint256 devFee = (ethLiq * graduationFeeBps) / 10_000;
+        if (devFee > 0) {
+            ethLiq -= devFee;
+            (bool f,) = devTreasury.call{value: devFee}("");
+            require(f, "grad fee failed");
+        }
+
         _approve(address(this), address(router), tokenLiq);
         router.addLiquidityETH{value: ethLiq}(
             address(this),
@@ -171,7 +204,7 @@ contract LaunchpadToken is ERC20, ReentrancyGuard {
         );
 
         address pair = IUniswapV2Factory(router.factory()).getPair(address(this), router.WETH());
-        emit Graduated(pair, ethLiq, tokenLiq);
+        emit Graduated(pair, ethLiq, tokenLiq, devFee);
     }
 
     // Views used by the frontend.

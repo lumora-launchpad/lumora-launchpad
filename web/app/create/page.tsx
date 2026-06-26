@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { decodeEventLog } from "viem";
+import { decodeEventLog, parseEther } from "viem";
 import { useAccount, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { FACTORY_ADDRESS, factoryAbi } from "@/lib/contracts";
@@ -14,6 +14,7 @@ export default function CreatePage() {
   const [symbol, setSymbol] = useState("");
   const [blurb, setBlurb] = useState("");
   const [imageUrl, setImageUrl] = useState("");
+  const [initialBuy, setInitialBuy] = useState("");
   const [metadataSaved, setMetadataSaved] = useState(false);
 
   const { showToast, dismissToast } = useToast();
@@ -86,11 +87,21 @@ export default function CreatePage() {
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!name || !symbol) return;
+    let value: bigint | undefined;
+    const amt = Number(initialBuy);
+    if (initialBuy && !Number.isNaN(amt) && amt > 0) {
+      try {
+        value = parseEther(initialBuy as `${number}`);
+      } catch {
+        value = undefined;
+      }
+    }
     writeContract({
       address: FACTORY_ADDRESS,
       abi: factoryAbi,
       functionName: "createToken",
       args: [name, symbol.toUpperCase()],
+      value,
     });
   }
 
@@ -197,6 +208,25 @@ export default function CreatePage() {
             />
             <span className="mt-1 block text-right text-xs text-slate-400">
               Optional. Also stored off chain.
+            </span>
+          </label>
+
+          <label className="mt-5 block">
+            <span className="text-sm font-semibold text-slate-700">
+              Initial buy (ETH)
+            </span>
+            <input
+              className="field mt-2"
+              placeholder="0.0"
+              inputMode="decimal"
+              value={initialBuy}
+              onChange={(e) =>
+                setInitialBuy(e.target.value.replace(/[^0-9.]/g, ""))
+              }
+            />
+            <span className="mt-1 block text-right text-xs text-slate-400">
+              Optional. Buy your own token in the same transaction, exempt from
+              the anti-snipe cap.
             </span>
           </label>
 
