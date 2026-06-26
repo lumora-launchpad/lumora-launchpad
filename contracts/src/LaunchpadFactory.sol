@@ -16,6 +16,8 @@ contract LaunchpadFactory {
     uint256 public antiSnipeBlocks; // opening window length in blocks; 0 disables
     uint256 public maxBuyPerWallet; // max ETH per wallet during the window
     uint256 public graduationFeeBps; // cut of raised ETH to dev at graduation
+    uint16 public devShareBps; // dev share of trade fee for instant tokens
+    uint16 public campaignDevShareBps; // dev share for campaign launched tokens (creator gets more)
     uint256 public creationFee;
 
     address[] public allTokens;
@@ -40,26 +42,30 @@ contract LaunchpadFactory {
         antiSnipeBlocks = 5; // about 10 seconds on Base
         maxBuyPerWallet = 0.1 ether;
         graduationFeeBps = 100; // 1 percent of raised ETH to dev at graduation
+        devShareBps = 6500; // instant: dev 65 / creator 35
+        campaignDevShareBps = 4000; // campaign: dev 40 / creator 60, rewards backers' creators
         creationFee = 0;
     }
 
     function createToken(string calldata name, string calldata symbol) external payable returns (address) {
-        return _create(msg.sender, name, symbol);
+        return _create(msg.sender, name, symbol, devShareBps);
     }
 
-    /// @notice Create a token whose creator (the 35 percent fee recipient) is set
-    ///         to `creator_`, while any initial buy tokens go to the caller. Used
-    ///         by launch campaigns that raise on behalf of a creator and then
-    ///         distribute the tokens to their backers.
+    /// @notice Create a token whose creator is set to `creator_`, while any
+    ///         initial buy tokens go to the caller. Used by launch campaigns,
+    ///         which give the creator a larger share of the trade fee.
     function createTokenFor(address creator_, string calldata name, string calldata symbol)
         external
         payable
         returns (address)
     {
-        return _create(creator_, name, symbol);
+        return _create(creator_, name, symbol, campaignDevShareBps);
     }
 
-    function _create(address creator_, string calldata name, string calldata symbol) internal returns (address) {
+    function _create(address creator_, string calldata name, string calldata symbol, uint16 shareBps)
+        internal
+        returns (address)
+    {
         require(creator_ != address(0), "zero creator");
         require(msg.value >= creationFee, "creation fee");
 
@@ -73,6 +79,7 @@ contract LaunchpadFactory {
             antiSnipeBlocks,
             maxBuyPerWallet,
             graduationFeeBps,
+            shareBps,
             router
         );
 
@@ -124,11 +131,14 @@ contract LaunchpadFactory {
         uint256 antiSnipeBlocks_,
         uint256 maxBuyPerWallet_,
         uint256 graduationFeeBps_,
+        uint16 devShareBps_,
+        uint16 campaignDevShareBps_,
         uint256 creationFee_
     ) external onlyOwner {
         require(devTreasury_ != address(0) && router_ != address(0), "zero address");
         require(virtualEthReserve_ > 0, "bad seed");
         require(graduationFeeBps_ <= 1000, "fee too high");
+        require(devShareBps_ <= 10_000 && campaignDevShareBps_ <= 10_000, "bad share");
         devTreasury = devTreasury_;
         router = router_;
         virtualEthReserve = virtualEthReserve_;
@@ -136,6 +146,8 @@ contract LaunchpadFactory {
         antiSnipeBlocks = antiSnipeBlocks_;
         maxBuyPerWallet = maxBuyPerWallet_;
         graduationFeeBps = graduationFeeBps_;
+        devShareBps = devShareBps_;
+        campaignDevShareBps = campaignDevShareBps_;
         creationFee = creationFee_;
         emit ConfigUpdated();
     }

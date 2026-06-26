@@ -46,10 +46,20 @@ export function TokenInfo({
     query: { enabled: !!creator },
   });
 
+  const { data: devShareBps } = useReadContract({
+    address,
+    abi: tokenAbi,
+    functionName: "devShareBps",
+  });
+
   const creatorTokens = creatorBal
     ? Number(formatEther(creatorBal as bigint))
     : 0;
   const creatorPct = (creatorTokens / TOTAL_SUPPLY) * 100;
+
+  const devShare = devShareBps !== undefined ? Number(devShareBps) / 100 : 65;
+  const creatorShare = 100 - devShare;
+  const isCampaign = devShare < 65;
 
   const mc =
     mcap !== undefined
@@ -81,10 +91,19 @@ export function TokenInfo({
         <Row label="Total supply">1,000,000,000</Row>
         <Row label="On the curve">800,000,000</Row>
         <Row label="Creator holds">{creatorPct.toFixed(2)}%</Row>
+        <Row label="Launch type">{isCampaign ? "Campaign" : "Instant"}</Row>
         <Row label="Trading fee">1%</Row>
-        <Row label="Fee split">65 / 35</Row>
+        <Row label="Fee split (dev / creator)">
+          {devShare} / {creatorShare}
+        </Row>
         <Row label="Graduation">By market cap</Row>
       </div>
+      {isCampaign && (
+        <p className="mt-3 rounded-xl bg-base-violet/5 px-3 py-2 text-xs font-medium text-base-violet">
+          Campaign launch: the creator earns {creatorShare} percent of every
+          trade fee, more than an instant launch.
+        </p>
+      )}
     </div>
   );
 }

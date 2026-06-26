@@ -34,7 +34,7 @@ contract LaunchpadToken is ERC20, ReentrancyGuard {
     mapping(address => uint256) public windowSpent;
 
     uint16 public constant FEE_BPS = 100; // 1 percent per trade
-    uint16 public constant DEV_SHARE_BPS = 6500; // 65 percent of the fee
+    uint16 public immutable devShareBps; // dev share of the trade fee; rest to creator
 
     uint256 public immutable graduationFeeBps; // cut of raised ETH to dev at graduation
 
@@ -61,17 +61,20 @@ contract LaunchpadToken is ERC20, ReentrancyGuard {
         uint256 antiSnipeBlocks_,
         uint256 maxBuyPerWallet_,
         uint256 graduationFeeBps_,
+        uint16 devShareBps_,
         address router_
     ) ERC20(name_, symbol_) {
         require(creator_ != address(0) && devTreasury_ != address(0), "zero address");
         require(virtualEthReserve_ > 0, "bad seed");
         require(graduationFeeBps_ <= 1000, "fee too high"); // max 10 percent
+        require(devShareBps_ <= 10_000, "bad share");
 
         creator = creator_;
         devTreasury = devTreasury_;
         factory = msg.sender;
         virtualEthReserve = virtualEthReserve_;
         graduationFeeBps = graduationFeeBps_;
+        devShareBps = devShareBps_;
         router = IUniswapV2Router02(router_);
 
         _mint(address(this), TOTAL_SUPPLY);
@@ -168,7 +171,7 @@ contract LaunchpadToken is ERC20, ReentrancyGuard {
 
     function _splitFee(uint256 fee) internal {
         if (fee == 0) return;
-        uint256 devCut = (fee * DEV_SHARE_BPS) / 10_000;
+        uint256 devCut = (fee * devShareBps) / 10_000;
         uint256 creatorCut = fee - devCut;
         if (devCut > 0) {
             (bool a,) = devTreasury.call{value: devCut}("");
