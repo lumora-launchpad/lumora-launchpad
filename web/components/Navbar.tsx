@@ -20,6 +20,9 @@ export function Navbar() {
           <Link href="/" className="transition hover:text-base-blue">
             Explore
           </Link>
+          <Link href="/campaigns" className="transition hover:text-base-blue">
+            Campaigns
+          </Link>
           <Link href="/create" className="transition hover:text-base-blue">
             Create
           </Link>

@@ -44,12 +44,29 @@ contract LaunchpadFactory {
     }
 
     function createToken(string calldata name, string calldata symbol) external payable returns (address) {
+        return _create(msg.sender, name, symbol);
+    }
+
+    /// @notice Create a token whose creator (the 35 percent fee recipient) is set
+    ///         to `creator_`, while any initial buy tokens go to the caller. Used
+    ///         by launch campaigns that raise on behalf of a creator and then
+    ///         distribute the tokens to their backers.
+    function createTokenFor(address creator_, string calldata name, string calldata symbol)
+        external
+        payable
+        returns (address)
+    {
+        return _create(creator_, name, symbol);
+    }
+
+    function _create(address creator_, string calldata name, string calldata symbol) internal returns (address) {
+        require(creator_ != address(0), "zero creator");
         require(msg.value >= creationFee, "creation fee");
 
         LaunchpadToken token = new LaunchpadToken(
             name,
             symbol,
-            msg.sender,
+            creator_,
             devTreasury,
             virtualEthReserve,
             graduationMarketCap,
@@ -60,19 +77,20 @@ contract LaunchpadFactory {
         );
 
         allTokens.push(address(token));
-        tokensByCreator[msg.sender].push(address(token));
+        tokensByCreator[creator_].push(address(token));
 
         if (creationFee > 0) {
             (bool ok,) = devTreasury.call{value: creationFee}("");
             require(ok, "fee transfer failed");
         }
-        // Any ETH beyond the creation fee seeds the creator's first buy.
+        // Any ETH beyond the creation fee seeds the first buy, credited to the
+        // caller (the creator directly, or a campaign that will distribute).
         uint256 extra = msg.value - creationFee;
         if (extra > 0) {
             token.initialBuy{value: extra}(msg.sender, 0);
         }
 
-        emit TokenCreated(address(token), msg.sender, name, symbol);
+        emit TokenCreated(address(token), creator_, name, symbol);
         return address(token);
     }
 

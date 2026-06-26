@@ -3,6 +3,7 @@ pragma solidity 0.8.24;
 
 import {Script, console2} from "forge-std/Script.sol";
 import {LaunchpadFactory} from "../src/LaunchpadFactory.sol";
+import {CampaignFactory} from "../src/CampaignFactory.sol";
 
 /// @notice Minimal router so the graduation path can run on a testnet where a
 ///         real Uniswap v2 router may not be deployed. It accepts the liquidity
@@ -59,9 +60,21 @@ contract DeployTestnet is Script {
             100, // graduationFeeBps (1 percent)
             0 // creationFee
         );
+
+        // Demand gated campaigns. Low min target so a campaign is reachable with
+        // faucet ETH; 2 percent commit fee to the dev treasury on launch.
+        CampaignFactory campaignFactory = new CampaignFactory(address(factory), devTreasury);
+        campaignFactory.setConfig(
+            address(factory),
+            devTreasury,
+            0.02 ether, // minTarget
+            7 days, // maxDuration
+            200 // commitFeeBps (2 percent)
+        );
         vm.stopBroadcast();
 
         console2.log("MockRouter", address(router));
+        console2.log("CampaignFactory", address(campaignFactory));
         console2.log("LaunchpadFactory", address(factory));
         console2.log("Dev treasury", devTreasury);
         console2.log("Graduation market cap", "1.5 ether FDV");
