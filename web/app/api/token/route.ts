@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { metadataStore } from "@/lib/metadataStore";
+import { rateLimit, clientIp } from "@/lib/server/rateLimit";
 
 const ADDRESS_RE = /^0x[a-fA-F0-9]{40}$/;
 const MAX_DESCRIPTION_LENGTH = 280;
@@ -20,6 +21,11 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  // 20 metadata writes per 10 minutes per IP.
+  if (!rateLimit(`meta:${clientIp(request)}`, 20, 600_000)) {
+    return NextResponse.json({ error: "Too many requests, slow down" }, { status: 429 });
+  }
+
   const body = await request.json().catch(() => null);
   const address = body?.address;
 
