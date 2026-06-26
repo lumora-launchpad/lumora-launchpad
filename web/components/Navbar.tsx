@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { GlobalSearch } from "./GlobalSearch";
 
 const LINKS = [
   { label: "Explore", href: "/explore" },
@@ -33,6 +34,7 @@ export function Navbar() {
         </nav>
 
         <div className="flex items-center gap-3">
+          <GlobalSearch className="hidden w-48 lg:block" />
           <Link href="/create" className="hidden btn-primary !px-5 !py-2.5 sm:inline-flex">
             Launch
           </Link>
@@ -67,6 +69,9 @@ export function Navbar() {
       {open && (
         <div className="border-t border-slate-100 bg-white/95 backdrop-blur md:hidden">
           <nav className="mx-auto flex max-w-7xl flex-col gap-1 px-6 py-3">
+            <div className="mb-2">
+              <GlobalSearch />
+            </div>
             {LINKS.map((l) => (
               <Link
                 key={l.href}
