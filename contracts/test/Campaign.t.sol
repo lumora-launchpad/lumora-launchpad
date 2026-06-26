@@ -83,6 +83,8 @@ contract CampaignTest is Test {
         LaunchpadToken token = LaunchpadToken(payable(c.token()));
         // token creator is the original creator, not the campaign
         assertEq(token.creator(), creator);
+        // campaign tokens give the creator a larger share of the trade fee
+        assertEq(token.devShareBps(), 4000);
 
         uint256 pool = c.tokensForBackers();
         assertGt(pool, 0);

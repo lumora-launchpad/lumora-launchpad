@@ -124,6 +124,13 @@ export const tokenAbi = [
   },
   {
     type: "function",
+    name: "devShareBps",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ name: "", type: "uint16" }],
+  },
+  {
+    type: "function",
     name: "quoteBuy",
     stateMutability: "view",
     inputs: [{ name: "ethIn", type: "uint256" }],

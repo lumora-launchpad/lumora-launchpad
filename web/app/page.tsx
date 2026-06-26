@@ -57,11 +57,16 @@ export default function HomePage() {
         </h2>
         <div className="mt-10 grid gap-6 md:grid-cols-2">
           <div className="card">
-            <h3 className="text-xl font-bold">Instant curve launch</h3>
+            <div className="flex items-center justify-between">
+              <h3 className="text-xl font-bold">Instant curve launch</h3>
+              <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">
+                Creator earns 35%
+              </span>
+            </div>
             <p className="mt-2 text-sm text-slate-500">
               Enter a name and symbol and your token deploys instantly with a
-              fair price curve. Anyone can trade right away. Optionally buy your
-              own allocation at launch, exempt from the anti-snipe cap.
+              fair price curve. Anyone can trade right away. Fast and easy, the
+              creator earns 35 percent of every trade fee.
             </p>
             <Link
               href="/create"
@@ -71,11 +76,16 @@ export default function HomePage() {
             </Link>
           </div>
           <div className="card">
-            <h3 className="text-xl font-bold">Demand gated campaign</h3>
+            <div className="flex items-center justify-between">
+              <h3 className="text-xl font-bold">Demand gated campaign</h3>
+              <span className="rounded-full bg-base-violet/10 px-3 py-1 text-xs font-bold text-base-violet">
+                Creator earns 60%
+              </span>
+            </div>
             <p className="mt-2 text-sm text-slate-500">
               Raise commitments first. The token only launches once backers hit
-              the target, then they claim pro rata. If it falls short, everyone
-              refunds. No empty coins.
+              the target, then they claim pro rata, refunds if it falls short.
+              More effort, so the creator earns 60 percent of every trade fee.
             </p>
             <Link
               href="/campaigns"

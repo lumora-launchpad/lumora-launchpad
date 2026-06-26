@@ -58,6 +58,8 @@ contract DeployTestnet is Script {
             3, // antiSnipeBlocks
             0.05 ether, // maxBuyPerWallet
             100, // graduationFeeBps (1 percent)
+            6500, // devShareBps (instant: dev 65 / creator 35)
+            4000, // campaignDevShareBps (campaign: dev 40 / creator 60)
             0 // creationFee
         );
 
