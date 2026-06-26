@@ -16,9 +16,12 @@ import { txExplorerUrl } from "@/lib/wagmi";
 import { PriceChart } from "@/components/PriceChart";
 import { TradeFeed } from "@/components/TradeFeed";
 import { Comments } from "@/components/Comments";
+import { Holders } from "@/components/Holders";
 import { ShareButton } from "@/components/ShareButton";
 import { useTradeHistory } from "@/lib/useTradeHistory";
 import { useToast } from "@/components/Toast";
+
+type Tab = "chart" | "trades" | "comments" | "holders";
 
 type Side = "buy" | "sell";
 type TokenMetadata = {
@@ -57,6 +60,7 @@ export default function TokenPage({
 
   const [side, setSide] = useState<Side>("buy");
   const [amount, setAmount] = useState("");
+  const [tab, setTab] = useState<Tab>("chart");
   const [metadata, setMetadata] = useState<TokenMetadata | null>(null);
 
   // Shared trade history feeds both the chart and the live trade list.
@@ -298,14 +302,6 @@ export default function TokenPage({
             </div>
 
             <div className="mt-6">
-              <PriceChart trades={trades} isLoading={tradesLoading} />
-            </div>
-
-            <div className="mt-6">
-              <TradeFeed trades={trades} isLoading={tradesLoading} />
-            </div>
-
-            <div className="mt-6">
               <div className="flex items-center justify-between text-sm font-medium text-slate-500">
                 <span>Progress to Uniswap</span>
                 <span className="font-bold text-slate-700">
@@ -324,8 +320,41 @@ export default function TokenPage({
             </div>
           </div>
 
-          <div className="mt-8">
-            <Comments address={address} />
+          {/* Tabbed panel */}
+          <div className="card mt-8">
+            <div className="flex gap-1.5 rounded-2xl bg-slate-100 p-1">
+              {(
+                [
+                  ["chart", "Chart"],
+                  ["trades", "Trades"],
+                  ["comments", "Comments"],
+                  ["holders", "Holders"],
+                ] as [Tab, string][]
+              ).map(([id, label]) => (
+                <button
+                  key={id}
+                  onClick={() => setTab(id)}
+                  className={`flex-1 rounded-xl py-2 text-sm font-bold transition ${
+                    tab === id
+                      ? "bg-white text-base-blue shadow"
+                      : "text-slate-500 hover:text-slate-700"
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+
+            <div className="mt-5">
+              {tab === "chart" && (
+                <PriceChart trades={trades} isLoading={tradesLoading} />
+              )}
+              {tab === "trades" && (
+                <TradeFeed trades={trades} isLoading={tradesLoading} />
+              )}
+              {tab === "comments" && <Comments address={address} />}
+              {tab === "holders" && <Holders address={address} />}
+            </div>
           </div>
         </div>
 

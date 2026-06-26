@@ -61,7 +61,7 @@ export function Comments({ address }: { address: `0x${string}` }) {
   }
 
   return (
-    <div className="card">
+    <div>
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-bold text-slate-700">Comments</h3>
         <span className="text-xs font-medium text-slate-400">
