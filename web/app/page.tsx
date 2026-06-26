@@ -1,13 +1,14 @@
 import Link from "next/link";
+import { HeroVisual } from "@/components/HeroVisual";
 
 export default function HomePage() {
   return (
     <div className="mx-auto max-w-7xl px-6">
       {/* Hero */}
-      <section className="relative py-20 sm:py-28">
-        <div className="absolute left-1/2 top-10 -z-10 h-72 w-72 -translate-x-1/2 rounded-full bg-brand-gradient opacity-20 blur-3xl animate-float" />
-        <div className="mx-auto max-w-3xl text-center">
-          <span className="pill mx-auto">
+      <section className="relative grid items-center gap-12 py-16 sm:py-24 lg:grid-cols-2">
+        <div className="absolute left-0 top-10 -z-10 h-72 w-72 rounded-full bg-brand-gradient opacity-20 blur-3xl animate-float" />
+        <div>
+          <span className="pill">
             <span className="h-2 w-2 rounded-full bg-base-mint" />
             Live on Base
           </span>
@@ -16,12 +17,12 @@ export default function HomePage() {
             <br />
             <span className="gradient-text">on Base</span>
           </h1>
-          <p className="mx-auto mt-6 max-w-xl text-lg text-slate-500">
+          <p className="mt-6 max-w-xl text-lg text-slate-500">
             Launch a token on a fair bonding curve, or run a demand gated
             campaign so only coins with real backers go live. Liquidity locks on
             graduation. Bright, fast, transparent.
           </p>
-          <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
+          <div className="mt-9 flex flex-col gap-3 sm:flex-row">
             <Link href="/create" className="btn-primary w-full sm:w-auto">
               Create a token
             </Link>
@@ -30,7 +31,7 @@ export default function HomePage() {
             </Link>
           </div>
 
-          <div className="mx-auto mt-12 grid max-w-xl grid-cols-3 gap-4">
+          <div className="mt-10 grid max-w-md grid-cols-3 gap-4">
             {[
               { k: "Trading fee", v: "1%" },
               { k: "Creator share", v: "35%" },
@@ -42,6 +43,10 @@ export default function HomePage() {
               </div>
             ))}
           </div>
+        </div>
+
+        <div className="mx-auto w-full max-w-md lg:max-w-none">
+          <HeroVisual />
         </div>
       </section>
 
