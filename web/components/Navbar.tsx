@@ -17,7 +17,7 @@ export function Navbar() {
         </Link>
 
         <nav className="hidden items-center gap-8 text-sm font-medium text-slate-600 md:flex">
-          <Link href="/" className="transition hover:text-base-blue">
+          <Link href="/explore" className="transition hover:text-base-blue">
             Explore
           </Link>
           <Link href="/campaigns" className="transition hover:text-base-blue">

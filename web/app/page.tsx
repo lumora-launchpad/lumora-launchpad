@@ -1,12 +1,10 @@
 import Link from "next/link";
-import { LiveTokenGrid } from "@/components/LiveTokenGrid";
-import { NewTokenTicker } from "@/components/NewTokenTicker";
 
 export default function HomePage() {
   return (
     <div className="mx-auto max-w-7xl px-6">
       {/* Hero */}
-      <section className="relative py-16 sm:py-24">
+      <section className="relative py-20 sm:py-28">
         <div className="absolute left-1/2 top-10 -z-10 h-72 w-72 -translate-x-1/2 rounded-full bg-brand-gradient opacity-20 blur-3xl animate-float" />
         <div className="mx-auto max-w-3xl text-center">
           <span className="pill mx-auto">
@@ -14,24 +12,25 @@ export default function HomePage() {
             Live on Base
           </span>
           <h1 className="mt-6 text-5xl font-black leading-tight tracking-tight sm:text-6xl">
-            Launch your token
+            The bright launchpad
             <br />
-            <span className="gradient-text">in seconds</span>
+            <span className="gradient-text">on Base</span>
           </h1>
           <p className="mx-auto mt-6 max-w-xl text-lg text-slate-500">
-            A fair bonding curve, automatic liquidity to Uniswap, and near zero
-            creation cost. Bright, fast, transparent.
+            Launch a token on a fair bonding curve, or run a demand gated
+            campaign so only coins with real backers go live. Liquidity locks on
+            graduation. Bright, fast, transparent.
           </p>
           <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Link href="/create" className="btn-primary w-full sm:w-auto">
-              Create a token now
+              Create a token
             </Link>
-            <a href="#explore" className="btn-ghost w-full sm:w-auto">
-              See what is rising
-            </a>
+            <Link href="/explore" className="btn-ghost w-full sm:w-auto">
+              Explore tokens
+            </Link>
           </div>
 
-          <div className="mt-12 grid grid-cols-3 gap-4">
+          <div className="mx-auto mt-12 grid max-w-xl grid-cols-3 gap-4">
             {[
               { k: "Trading fee", v: "1%" },
               { k: "Creator share", v: "35%" },
@@ -46,29 +45,41 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Live launches ticker */}
-      <NewTokenTicker />
-
-      {/* Explore */}
-      <section id="explore" className="py-12">
-        <div className="flex items-end justify-between">
-          <div>
-            <h2 className="text-3xl font-black tracking-tight">
-              Trending <span className="gradient-text">now</span>
-            </h2>
-            <p className="mt-1 text-slate-500">
-              The latest tokens launched by the community.
+      {/* What you can do */}
+      <section className="py-12">
+        <h2 className="text-center text-3xl font-black tracking-tight">
+          Two ways to <span className="gradient-text">launch</span>
+        </h2>
+        <div className="mt-10 grid gap-6 md:grid-cols-2">
+          <div className="card">
+            <h3 className="text-xl font-bold">Instant curve launch</h3>
+            <p className="mt-2 text-sm text-slate-500">
+              Enter a name and symbol and your token deploys instantly with a
+              fair price curve. Anyone can trade right away. Optionally buy your
+              own allocation at launch, exempt from the anti-snipe cap.
             </p>
+            <Link
+              href="/create"
+              className="mt-4 inline-block text-sm font-bold text-base-blue hover:underline"
+            >
+              Create a token
+            </Link>
           </div>
-          <Link
-            href="/create"
-            className="hidden text-sm font-bold text-base-blue hover:underline sm:block"
-          >
-            Launch yours
-          </Link>
+          <div className="card">
+            <h3 className="text-xl font-bold">Demand gated campaign</h3>
+            <p className="mt-2 text-sm text-slate-500">
+              Raise commitments first. The token only launches once backers hit
+              the target, then they claim pro rata. If it falls short, everyone
+              refunds. No empty coins.
+            </p>
+            <Link
+              href="/campaigns"
+              className="mt-4 inline-block text-sm font-bold text-base-blue hover:underline"
+            >
+              Start a campaign
+            </Link>
+          </div>
         </div>
-
-        <LiveTokenGrid />
       </section>
 
       {/* How it works */}
@@ -104,7 +115,7 @@ export default function HomePage() {
       </section>
 
       {/* Fee model */}
-      <section className="pb-20">
+      <section className="pb-12">
         <div className="card overflow-hidden bg-brand-gradient !p-0 text-white">
           <div className="grid gap-8 p-10 md:grid-cols-2 md:items-center">
             <div>
@@ -125,6 +136,25 @@ export default function HomePage() {
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Closing CTA */}
+      <section className="pb-24 text-center">
+        <h2 className="text-3xl font-black tracking-tight">
+          Ready to <span className="gradient-text">launch</span>?
+        </h2>
+        <p className="mx-auto mt-3 max-w-md text-slate-500">
+          Connect a wallet on Base and create your token, or explore what the
+          community is launching right now.
+        </p>
+        <div className="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row">
+          <Link href="/create" className="btn-primary w-full sm:w-auto">
+            Create a token
+          </Link>
+          <Link href="/explore" className="btn-ghost w-full sm:w-auto">
+            Explore tokens
+          </Link>
         </div>
       </section>
     </div>
