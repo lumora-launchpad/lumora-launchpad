@@ -19,6 +19,7 @@ import { Comments } from "@/components/Comments";
 import { Holders } from "@/components/Holders";
 import { ShareButton } from "@/components/ShareButton";
 import { StarButton } from "@/components/StarButton";
+import { TokenInfo } from "@/components/TokenInfo";
 import { useTradeHistory } from "@/lib/useTradeHistory";
 import { useToast } from "@/components/Toast";
 
@@ -362,7 +363,8 @@ export default function TokenPage({
 
         {/* Trade panel */}
         <div className="lg:col-span-4">
-          <div className="card sticky top-24">
+          <div className="space-y-6 lg:sticky lg:top-24">
+            <div className="card">
             {graduated ? (
               <div className="py-6 text-center">
                 <p className="text-lg font-black">Token already listed</p>
@@ -495,6 +497,9 @@ export default function TokenPage({
                 </p>
               </>
             )}
+            </div>
+
+            <TokenInfo address={address} creator={creator} mcap={mcap} />
           </div>
         </div>
       </div>
