@@ -12,7 +12,9 @@ contract LaunchpadFactory {
     address public devTreasury;
     address public router;
     uint256 public virtualEthReserve;
-    uint256 public graduationEth;
+    uint256 public graduationMarketCap; // FDV target at which tokens graduate
+    uint256 public antiSnipeBlocks; // opening window length in blocks; 0 disables
+    uint256 public maxBuyPerWallet; // max ETH per wallet during the window
     uint256 public creationFee;
 
     address[] public allTokens;
@@ -33,15 +35,26 @@ contract LaunchpadFactory {
         devTreasury = devTreasury_;
         router = router_;
         virtualEthReserve = 1 ether;
-        graduationEth = 3 ether;
+        graduationMarketCap = 20 ether; // roughly the old 3 ether raised target
+        antiSnipeBlocks = 5; // about 10 seconds on Base
+        maxBuyPerWallet = 0.1 ether;
         creationFee = 0;
     }
 
     function createToken(string calldata name, string calldata symbol) external payable returns (address) {
         require(msg.value >= creationFee, "creation fee");
 
-        LaunchpadToken token =
-            new LaunchpadToken(name, symbol, msg.sender, devTreasury, virtualEthReserve, graduationEth, router);
+        LaunchpadToken token = new LaunchpadToken(
+            name,
+            symbol,
+            msg.sender,
+            devTreasury,
+            virtualEthReserve,
+            graduationMarketCap,
+            antiSnipeBlocks,
+            maxBuyPerWallet,
+            router
+        );
 
         allTokens.push(address(token));
         tokensByCreator[msg.sender].push(address(token));
@@ -86,7 +99,9 @@ contract LaunchpadFactory {
         address devTreasury_,
         address router_,
         uint256 virtualEthReserve_,
-        uint256 graduationEth_,
+        uint256 graduationMarketCap_,
+        uint256 antiSnipeBlocks_,
+        uint256 maxBuyPerWallet_,
         uint256 creationFee_
     ) external onlyOwner {
         require(devTreasury_ != address(0) && router_ != address(0), "zero address");
@@ -94,7 +109,9 @@ contract LaunchpadFactory {
         devTreasury = devTreasury_;
         router = router_;
         virtualEthReserve = virtualEthReserve_;
-        graduationEth = graduationEth_;
+        graduationMarketCap = graduationMarketCap_;
+        antiSnipeBlocks = antiSnipeBlocks_;
+        maxBuyPerWallet = maxBuyPerWallet_;
         creationFee = creationFee_;
         emit ConfigUpdated();
     }

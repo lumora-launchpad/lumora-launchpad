@@ -47,13 +47,23 @@ contract DeployTestnet is Script {
         vm.startBroadcast(pk);
         MockRouterTestnet router = new MockRouterTestnet();
         LaunchpadFactory factory = new LaunchpadFactory(devTreasury, address(router));
-        // Lower graduation target to 0.05 ether so the full flow is easy to test.
-        factory.setConfig(devTreasury, address(router), 1 ether, 0.05 ether, 0);
+        // Low graduation market cap (1.5 ether FDV) reachable with faucet ETH, plus
+        // a short anti snipe window so the feature can be exercised on testnet.
+        factory.setConfig(
+            devTreasury,
+            address(router),
+            1 ether, // virtualEthReserve
+            1.5 ether, // graduationMarketCap
+            3, // antiSnipeBlocks
+            0.05 ether, // maxBuyPerWallet
+            0 // creationFee
+        );
         vm.stopBroadcast();
 
         console2.log("MockRouter", address(router));
         console2.log("LaunchpadFactory", address(factory));
         console2.log("Dev treasury", devTreasury);
-        console2.log("Graduation target", "0.05 ether");
+        console2.log("Graduation market cap", "1.5 ether FDV");
+        console2.log("Anti snipe", "3 blocks, 0.05 ether per wallet");
     }
 }

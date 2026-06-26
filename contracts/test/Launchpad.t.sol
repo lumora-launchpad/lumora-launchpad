@@ -61,6 +61,7 @@ contract LaunchpadTest is Test {
 
     function test_BuySplitsFee() public {
         LaunchpadToken token = _newToken();
+        vm.roll(block.number + 6); // past the anti snipe window
 
         vm.prank(buyer);
         token.buy{value: 1 ether}(0);
@@ -73,6 +74,7 @@ contract LaunchpadTest is Test {
 
     function test_BuyThenSell() public {
         LaunchpadToken token = _newToken();
+        vm.roll(block.number + 6); // past the anti snipe window
 
         vm.startPrank(buyer);
         token.buy{value: 1 ether}(0);
@@ -86,9 +88,10 @@ contract LaunchpadTest is Test {
 
     function test_Graduation() public {
         LaunchpadToken token = _newToken();
+        vm.roll(block.number + 6); // past the anti snipe window
 
         vm.prank(buyer);
-        token.buy{value: 5 ether}(0); // crosses the 3 ether graduation target
+        token.buy{value: 5 ether}(0); // crosses the 20 ether market cap target
 
         assertTrue(token.graduated());
         assertEq(token.graduationProgressBps(), 10_000);
@@ -96,5 +99,40 @@ contract LaunchpadTest is Test {
         vm.expectRevert("graduated");
         vm.prank(buyer);
         token.buy{value: 1 ether}(0);
+    }
+
+    function test_AntiSnipe() public {
+        LaunchpadToken token = _newToken();
+        // Factory defaults: 5 block window, 0.1 ether cap per wallet.
+        assertTrue(token.antiSnipeActive());
+
+        // A single buy above the cap reverts inside the window.
+        vm.prank(buyer);
+        vm.expectRevert("anti snipe cap");
+        token.buy{value: 0.2 ether}(0);
+
+        // Buying at the cap is allowed.
+        vm.prank(buyer);
+        token.buy{value: 0.1 ether}(0);
+        assertGt(token.balanceOf(buyer), 0);
+
+        // A further buy that exceeds the cumulative cap reverts.
+        vm.prank(buyer);
+        vm.expectRevert("anti snipe cap");
+        token.buy{value: 0.01 ether}(0);
+
+        // After the window the cap no longer applies.
+        vm.roll(block.number + 6);
+        assertFalse(token.antiSnipeActive());
+        vm.prank(buyer);
+        token.buy{value: 1 ether}(0);
+    }
+
+    function test_MarketCapGraduationTarget() public {
+        LaunchpadToken token = _newToken();
+        // Market cap starts above zero (virtual reserve) and below the target.
+        assertGt(token.marketCap(), 0);
+        assertLt(token.marketCap(), token.graduationMarketCap());
+        assertEq(token.graduationProgressBps(), 0);
     }
 }

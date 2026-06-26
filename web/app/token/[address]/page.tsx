@@ -94,6 +94,8 @@ export default function TokenPage({
       { address, abi: tokenAbi, functionName: "currentPrice" },
       { address, abi: tokenAbi, functionName: "graduationProgressBps" },
       { address, abi: tokenAbi, functionName: "realEthReserve" },
+      { address, abi: tokenAbi, functionName: "marketCap" },
+      { address, abi: tokenAbi, functionName: "antiSnipeActive" },
     ],
   });
 
@@ -103,7 +105,8 @@ export default function TokenPage({
   const graduated = Boolean(info?.[3]?.result);
   const price = info?.[4]?.result as bigint | undefined;
   const bps = info?.[5]?.result as bigint | undefined;
-  const raised = info?.[6]?.result as bigint | undefined;
+  const mcap = info?.[7]?.result as bigint | undefined;
+  const antiSnipe = Boolean(info?.[8]?.result);
   const progress = bps ? Number(bps) / 100 : 0;
 
   // Connected wallet balance.
@@ -277,9 +280,17 @@ export default function TokenPage({
               <ShareButton name={name} symbol={symbol} />
             </div>
 
+            {antiSnipe && !graduated && (
+              <div className="mt-4 flex items-center gap-2 rounded-2xl border border-base-violet/30 bg-base-violet/5 px-4 py-2.5 text-sm font-medium text-base-violet">
+                <span className="h-2 w-2 animate-pulse rounded-full bg-base-violet" />
+                Anti-snipe window active. Per-wallet buys are capped for the first
+                few blocks.
+              </div>
+            )}
+
             <div className="mt-6 grid grid-cols-3 gap-4">
               <Stat k="Price" v={`${fmt(price)} ETH`} />
-              <Stat k="Raised" v={`${fmt(raised, 3)} ETH`} />
+              <Stat k="Market cap" v={`${fmt(mcap, 2)} ETH`} />
               <Stat
                 k="Creator"
                 v={creator ? `${creator.slice(0, 6)}...${creator.slice(-4)}` : "-"}

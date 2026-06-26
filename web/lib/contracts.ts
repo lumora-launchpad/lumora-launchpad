@@ -93,6 +93,20 @@ export const tokenAbi = [
   },
   {
     type: "function",
+    name: "marketCap",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ name: "", type: "uint256" }],
+  },
+  {
+    type: "function",
+    name: "antiSnipeActive",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ name: "", type: "bool" }],
+  },
+  {
+    type: "function",
     name: "quoteBuy",
     stateMutability: "view",
     inputs: [{ name: "ethIn", type: "uint256" }],
