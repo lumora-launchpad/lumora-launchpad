@@ -13,19 +13,9 @@ import {
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { campaignAbi } from "@/lib/campaigns";
 import { accentFor, formatEth } from "@/lib/tokens";
+import { Countdown } from "@/components/Countdown";
 
 const ZERO = "0x0000000000000000000000000000000000000000" as const;
-
-function fmtTimeLeft(deadline: number): string {
-  const s = deadline - Math.floor(Date.now() / 1000);
-  if (s <= 0) return "ended";
-  const d = Math.floor(s / 86400);
-  const h = Math.floor((s % 86400) / 3600);
-  const m = Math.floor((s % 3600) / 60);
-  if (d > 0) return `${d}d ${h}h left`;
-  if (h > 0) return `${h}h ${m}m left`;
-  return `${m}m left`;
-}
 
 export default function CampaignPage({
   params,
@@ -144,7 +134,13 @@ export default function CampaignPage({
                   : "bg-base-violet/10 text-base-violet"
             }`}
           >
-            {launched ? "Launched" : ended ? "Did not reach" : fmtTimeLeft(deadline)}
+            {launched ? (
+              "Launched"
+            ) : ended ? (
+              "Did not reach"
+            ) : (
+              <Countdown deadline={deadline} />
+            )}
           </span>
         </div>
 

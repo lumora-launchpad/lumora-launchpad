@@ -10,22 +10,13 @@ import {
   campaignFactoryAbi,
 } from "@/lib/campaigns";
 import { useCampaigns, type CampaignView } from "@/lib/useCampaigns";
+import { Countdown } from "@/components/Countdown";
 
 const DURATIONS = [
   { label: "1 day", secs: 86400 },
   { label: "3 days", secs: 259200 },
   { label: "7 days", secs: 604800 },
 ];
-
-function timeLeft(deadline: number): string {
-  const s = deadline - Math.floor(Date.now() / 1000);
-  if (s <= 0) return "ended";
-  const d = Math.floor(s / 86400);
-  if (d > 0) return `${d}d left`;
-  const h = Math.floor(s / 3600);
-  if (h > 0) return `${h}h left`;
-  return `${Math.floor(s / 60)}m left`;
-}
 
 function CampaignCard({ c }: { c: CampaignView }) {
   return (
@@ -50,7 +41,7 @@ function CampaignCard({ c }: { c: CampaignView }) {
               : "bg-base-violet/10 text-base-violet"
           }`}
         >
-          {c.launched ? "Launched" : timeLeft(c.deadline)}
+          {c.launched ? "Launched" : <Countdown deadline={c.deadline} />}
         </span>
       </div>
 

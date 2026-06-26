@@ -1,13 +1,18 @@
 import Link from "next/link";
 import { LiveTokenGrid } from "@/components/LiveTokenGrid";
 import { NewTokenTicker } from "@/components/NewTokenTicker";
+import { ExploreCampaigns } from "@/components/ExploreCampaigns";
 
 export default function ExplorePage() {
   return (
     <div className="mx-auto max-w-7xl px-6 py-10">
       <NewTokenTicker />
 
-      <section id="explore" className="mt-8">
+      <div className="mt-8">
+        <ExploreCampaigns />
+      </div>
+
+      <section id="explore">
         <div className="flex items-end justify-between">
           <div>
             <h1 className="text-3xl font-black tracking-tight">
