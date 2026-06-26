@@ -13,7 +13,7 @@ export default function PortfolioPage() {
   const totalValueWei = holdings.reduce((sum, h) => sum + h.valueWei, 0n);
 
   return (
-    <div className="mx-auto max-w-6xl px-5 py-12">
+    <div className="mx-auto max-w-7xl px-6 py-12">
       <div className="mb-10">
         <h1 className="text-3xl font-black tracking-tight">
           Your <span className="gradient-text">portfolio</span>
@@ -38,7 +38,7 @@ export default function PortfolioPage() {
           see a live portfolio.
         </div>
       ) : isLoading ? (
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {Array.from({ length: 3 }).map((_, i) => (
             <div key={i} className="card animate-pulse">
               <div className="flex items-center gap-4">
@@ -79,7 +79,7 @@ export default function PortfolioPage() {
             </p>
           </div>
 
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {holdings.map((h) => (
               <PortfolioCard key={h.address} holding={h} />
             ))}
