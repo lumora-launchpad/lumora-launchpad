@@ -119,47 +119,29 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Fee model */}
-      <section className="pb-12">
-        <div className="card overflow-hidden bg-brand-gradient !p-0 text-white">
-          <div className="grid gap-8 p-10 md:grid-cols-2 md:items-center">
-            <div>
-              <h2 className="text-3xl font-black">An honest fee model</h2>
-              <p className="mt-3 text-white/80">
-                No hidden costs. Every trade pays 1 percent, split transparently
-                inside the smart contract.
-              </p>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="rounded-2xl bg-white/15 p-6 backdrop-blur">
-                <p className="text-4xl font-black">65%</p>
-                <p className="mt-1 text-sm text-white/80">Developer</p>
-              </div>
-              <div className="rounded-2xl bg-white/15 p-6 backdrop-blur">
-                <p className="text-4xl font-black">35%</p>
-                <p className="mt-1 text-sm text-white/80">Creator</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Closing CTA */}
-      <section className="pb-24 text-center">
-        <h2 className="text-3xl font-black tracking-tight">
-          Ready to <span className="gradient-text">launch</span>?
-        </h2>
-        <p className="mx-auto mt-3 max-w-md text-slate-500">
-          Connect a wallet on Base and create your token, or explore what the
-          community is launching right now.
-        </p>
-        <div className="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row">
-          <Link href="/create" className="btn-primary w-full sm:w-auto">
-            Create a token
-          </Link>
-          <Link href="/explore" className="btn-ghost w-full sm:w-auto">
-            Explore tokens
-          </Link>
+      <section className="pb-24">
+        <div className="card overflow-hidden bg-brand-gradient text-white">
+          <div className="flex flex-col items-center gap-5 px-8 py-14 text-center">
+            <h2 className="text-3xl font-black sm:text-4xl">Ready to launch?</h2>
+            <p className="max-w-lg text-white/80">
+              Create your token in seconds on a fair curve. A 1 percent trading
+              fee split 65 developer and 35 creator, and liquidity that locks on
+              graduation.
+            </p>
+            <Link
+              href="/create"
+              className="rounded-2xl bg-white px-7 py-3 font-bold text-base-blue shadow-card transition hover:brightness-95 active:scale-95"
+            >
+              Create a token
+            </Link>
+            <Link
+              href="/explore"
+              className="text-sm font-semibold text-white/80 underline-offset-4 hover:underline"
+            >
+              or explore what is launching
+            </Link>
+          </div>
         </div>
       </section>
     </div>
