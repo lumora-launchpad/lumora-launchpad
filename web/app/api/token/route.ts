@@ -36,9 +36,15 @@ export async function POST(request: NextRequest) {
       ? body.imageUrl.trim().slice(0, MAX_IMAGE_URL_LENGTH)
       : undefined;
 
+  const link = (v: unknown): string | undefined =>
+    typeof v === "string" && v.trim() ? v.trim().slice(0, 200) : undefined;
+
   await metadataStore.set(address, {
     description: description || undefined,
     imageUrl: imageUrl || undefined,
+    website: link(body.website),
+    x: link(body.x),
+    telegram: link(body.telegram),
   });
 
   return NextResponse.json({ ok: true });
