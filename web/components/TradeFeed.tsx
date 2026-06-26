@@ -35,7 +35,7 @@ export function TradeFeed({
   const rows = useMemo(() => [...trades].reverse().slice(0, 30), [trades]);
 
   return (
-    <div className="card">
+    <div>
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-bold text-slate-700">Live trades</h3>
         <span className="flex items-center gap-1.5 text-xs font-medium text-slate-400">
