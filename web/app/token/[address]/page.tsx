@@ -15,6 +15,8 @@ import { accentFor } from "@/lib/tokens";
 import { txExplorerUrl } from "@/lib/wagmi";
 import { PriceChart } from "@/components/PriceChart";
 import { TradeFeed } from "@/components/TradeFeed";
+import { Comments } from "@/components/Comments";
+import { ShareButton } from "@/components/ShareButton";
 import { useTradeHistory } from "@/lib/useTradeHistory";
 import { useToast } from "@/components/Toast";
 
@@ -271,6 +273,10 @@ export default function TokenPage({
 
             <p className="mt-4 text-sm text-slate-500">{description}</p>
 
+            <div className="mt-4">
+              <ShareButton name={name} symbol={symbol} />
+            </div>
+
             <div className="mt-6 grid grid-cols-3 gap-4">
               <Stat k="Price" v={`${fmt(price)} ETH`} />
               <Stat k="Raised" v={`${fmt(raised, 3)} ETH`} />
@@ -305,6 +311,10 @@ export default function TokenPage({
                 When the curve fills, liquidity moves to Uniswap and the LP is locked.
               </p>
             </div>
+          </div>
+
+          <div className="mt-8">
+            <Comments address={address} />
           </div>
         </div>
 
