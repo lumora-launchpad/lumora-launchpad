@@ -23,7 +23,15 @@ contract LaunchpadToken is ERC20, ReentrancyGuard {
     uint256 public tokenReserve;
     uint256 public immutable k;
 
-    uint256 public immutable graduationEth; // real ETH needed to graduate
+    uint256 public immutable graduationMarketCap; // FDV (price x total supply) to graduate
+    uint256 public immutable startMarketCap; // FDV at launch, the progress baseline
+
+    // Anti snipe: cap each wallet's ETH spend during an opening window of blocks
+    // so a bot cannot grab a huge share of the curve at launch.
+    uint256 public immutable launchBlock;
+    uint256 public immutable antiSnipeBlocks; // window length in blocks; 0 disables
+    uint256 public immutable maxBuyPerWallet; // max cumulative ETH per wallet in window
+    mapping(address => uint256) public windowSpent;
 
     uint16 public constant FEE_BPS = 100; // 1 percent per trade
     uint16 public constant DEV_SHARE_BPS = 6500; // 65 percent of the fee
@@ -45,7 +53,9 @@ contract LaunchpadToken is ERC20, ReentrancyGuard {
         address creator_,
         address devTreasury_,
         uint256 virtualEthReserve_,
-        uint256 graduationEth_,
+        uint256 graduationMarketCap_,
+        uint256 antiSnipeBlocks_,
+        uint256 maxBuyPerWallet_,
         address router_
     ) ERC20(name_, symbol_) {
         require(creator_ != address(0) && devTreasury_ != address(0), "zero address");
@@ -54,7 +64,6 @@ contract LaunchpadToken is ERC20, ReentrancyGuard {
         creator = creator_;
         devTreasury = devTreasury_;
         virtualEthReserve = virtualEthReserve_;
-        graduationEth = graduationEth_;
         router = IUniswapV2Router02(router_);
 
         _mint(address(this), TOTAL_SUPPLY);
@@ -62,6 +71,15 @@ contract LaunchpadToken is ERC20, ReentrancyGuard {
         ethReserve = virtualEthReserve_;
         tokenReserve = CURVE_SUPPLY;
         k = virtualEthReserve_ * CURVE_SUPPLY;
+
+        uint256 startMc = (virtualEthReserve_ * TOTAL_SUPPLY) / CURVE_SUPPLY;
+        require(graduationMarketCap_ > startMc, "bad target");
+        startMarketCap = startMc;
+        graduationMarketCap = graduationMarketCap_;
+
+        launchBlock = block.number;
+        antiSnipeBlocks = antiSnipeBlocks_;
+        maxBuyPerWallet = maxBuyPerWallet_;
     }
 
     /// @notice Real ETH held by the curve, excluding the virtual seed.
@@ -72,6 +90,13 @@ contract LaunchpadToken is ERC20, ReentrancyGuard {
     function buy(uint256 minTokensOut) external payable nonReentrant {
         require(!graduated, "graduated");
         require(msg.value > 0, "no eth");
+
+        // Anti snipe: during the opening window, cap cumulative spend per wallet.
+        if (antiSnipeBlocks > 0 && block.number < launchBlock + antiSnipeBlocks) {
+            uint256 spent = windowSpent[msg.sender] + msg.value;
+            require(spent <= maxBuyPerWallet, "anti snipe cap");
+            windowSpent[msg.sender] = spent;
+        }
 
         uint256 fee = (msg.value * FEE_BPS) / 10_000;
         uint256 netEth = msg.value - fee;
@@ -89,7 +114,7 @@ contract LaunchpadToken is ERC20, ReentrancyGuard {
 
         emit Buy(msg.sender, msg.value, tokensOut, fee);
 
-        if (realEthReserve() >= graduationEth) _graduate();
+        if (marketCap() >= graduationMarketCap) _graduate();
     }
 
     function sell(uint256 tokenAmount, uint256 minEthOut) external nonReentrant {
@@ -170,10 +195,23 @@ contract LaunchpadToken is ERC20, ReentrancyGuard {
         return (ethReserve * 1e18) / tokenReserve;
     }
 
-    /// @notice Curve progress toward graduation in basis points (0 to 10000).
+    /// @notice Fully diluted market cap in wei: marginal price times total supply.
+    function marketCap() public view returns (uint256) {
+        return (ethReserve * TOTAL_SUPPLY) / tokenReserve;
+    }
+
+    /// @notice True while the opening anti snipe window is still active.
+    function antiSnipeActive() external view returns (bool) {
+        return antiSnipeBlocks > 0 && block.number < launchBlock + antiSnipeBlocks;
+    }
+
+    /// @notice Curve progress toward graduation in basis points (0 to 10000),
+    ///         measured on market cap from the launch baseline to the target.
     function graduationProgressBps() external view returns (uint256) {
         if (graduated) return 10_000;
-        uint256 p = (realEthReserve() * 10_000) / graduationEth;
+        uint256 mc = marketCap();
+        if (mc <= startMarketCap) return 0;
+        uint256 p = ((mc - startMarketCap) * 10_000) / (graduationMarketCap - startMarketCap);
         return p > 10_000 ? 10_000 : p;
     }
 
