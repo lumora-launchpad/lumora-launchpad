@@ -6,11 +6,12 @@ import { TokenCard } from "./TokenCard";
 import { Sparkline } from "./Sparkline";
 import { useTokens } from "@/lib/useTokens";
 import { useMarketStats, type TokenStats } from "@/lib/useMarketStats";
+import { useWatchlist } from "@/lib/useWatchlist";
 import { sampleTokens } from "@/lib/sampleTokens";
 import type { TokenView } from "@/lib/tokens";
 
 type Sort = "new" | "progress" | "almost";
-type Status = "all" | "live" | "listed";
+type Status = "all" | "live" | "listed" | "saved";
 
 const SORTS: { id: Sort; label: string }[] = [
   { id: "new", label: "Newest" },
@@ -22,6 +23,7 @@ const STATUSES: { id: Status; label: string }[] = [
   { id: "all", label: "All" },
   { id: "live", label: "Live" },
   { id: "listed", label: "Listed" },
+  { id: "saved", label: "Saved" },
 ];
 
 function Metric({ label, value }: { label: string; value: string }) {
@@ -127,6 +129,8 @@ export function LiveTokenGrid() {
   const stats = useMarketStats(useSample ? [] : tokens.map((t) => t.address));
   const statOf = (addr: string) => stats.get(addr.toLowerCase());
 
+  const { has: isSaved } = useWatchlist();
+
   // Aggregate metrics for the dashboard strip.
   const metrics = useMemo(() => {
     const live = base.filter((t) => !t.graduated).length;
@@ -148,6 +152,7 @@ export function LiveTokenGrid() {
     let out = [...base];
     if (status === "live") out = out.filter((t) => !t.graduated);
     else if (status === "listed") out = out.filter((t) => t.graduated);
+    else if (status === "saved") out = out.filter((t) => isSaved(t.address));
     const q = query.trim().toLowerCase();
     if (q) {
       out = out.filter(
@@ -165,7 +170,7 @@ export function LiveTokenGrid() {
     }
     // "new" keeps the incoming order (already newest first)
     return out;
-  }, [base, query, sort, status]);
+  }, [base, query, sort, status, isSaved]);
 
   if (isLoading) return <GridSkeleton />;
 

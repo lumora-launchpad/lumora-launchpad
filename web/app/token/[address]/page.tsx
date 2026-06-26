@@ -18,6 +18,7 @@ import { TradeFeed } from "@/components/TradeFeed";
 import { Comments } from "@/components/Comments";
 import { Holders } from "@/components/Holders";
 import { ShareButton } from "@/components/ShareButton";
+import { StarButton } from "@/components/StarButton";
 import { useTradeHistory } from "@/lib/useTradeHistory";
 import { useToast } from "@/components/Toast";
 
@@ -276,6 +277,7 @@ export default function TokenPage({
                 />
                 {graduated ? "Listed" : "On the curve"}
               </span>
+              <StarButton address={address} />
             </div>
 
             <p className="mt-4 text-sm text-slate-500">{description}</p>
