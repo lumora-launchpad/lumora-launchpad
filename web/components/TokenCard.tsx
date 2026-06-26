@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import type { TokenView } from "@/lib/tokens";
 import type { TokenStats } from "@/lib/useMarketStats";
 import { Sparkline } from "./Sparkline";
+import { StarButton } from "./StarButton";
 import { useCountUp } from "@/lib/useCountUp";
 
 type TokenMetadata = {
@@ -93,11 +94,14 @@ export function TokenCard({
           <p className="text-sm font-medium text-slate-400">${token.symbol}</p>
         </div>
         <div className="ml-auto flex flex-col items-end gap-1">
-          {token.graduated && (
-            <span className="rounded-full bg-base-mint/15 px-3 py-1 text-xs font-bold text-base-mint">
-              Listed
-            </span>
-          )}
+          <div className="flex items-center gap-1">
+            {token.graduated && (
+              <span className="rounded-full bg-base-mint/15 px-3 py-1 text-xs font-bold text-base-mint">
+                Listed
+              </span>
+            )}
+            <StarButton address={token.address} />
+          </div>
           {spark.length >= 2 && <Sparkline data={spark} className="h-7 w-20" />}
         </div>
       </div>
