@@ -4,7 +4,10 @@ import { Providers } from "./providers";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://lumora.men";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: "Lumora Launchpad",
   description: "Launch tokens on Base with a fair and bright bonding curve.",
 };

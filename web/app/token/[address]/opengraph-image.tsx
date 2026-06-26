@@ -32,27 +32,35 @@ export default async function Image({
           fontFamily: "sans-serif",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: "36px" }}>
+        <div style={{ display: "flex", alignItems: "center" }}>
           <div
             style={{
+              display: "flex",
               width: "180px",
               height: "180px",
               borderRadius: "40px",
               background: "rgba(255,255,255,0.18)",
-              display: "flex",
               alignItems: "center",
               justifyContent: "center",
               fontSize: "84px",
               fontWeight: 800,
+              marginRight: "36px",
             }}
           >
             {initials}
           </div>
           <div style={{ display: "flex", flexDirection: "column" }}>
-            <div style={{ fontSize: "84px", fontWeight: 800, lineHeight: 1.05 }}>
+            <div style={{ display: "flex", fontSize: "84px", fontWeight: 800 }}>
               {displayName}
             </div>
-            <div style={{ fontSize: "44px", opacity: 0.85, marginTop: "8px" }}>
+            <div
+              style={{
+                display: "flex",
+                fontSize: "44px",
+                opacity: 0.85,
+                marginTop: "8px",
+              }}
+            >
               ${displaySymbol}
             </div>
           </div>
@@ -66,8 +74,10 @@ export default async function Image({
             fontSize: "34px",
           }}
         >
-          <div style={{ fontWeight: 700 }}>Lumora</div>
-          <div style={{ opacity: 0.85 }}>Bonding curve launchpad on Base</div>
+          <div style={{ display: "flex", fontWeight: 700 }}>Lumora</div>
+          <div style={{ display: "flex", opacity: 0.85 }}>
+            Bonding curve launchpad on Base
+          </div>
         </div>
       </div>
     ),
