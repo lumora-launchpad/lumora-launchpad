@@ -27,6 +27,20 @@ export default function CampaignPage({
   const address = params.address as `0x${string}`;
   const { address: account, isConnected } = useAccount();
   const [amount, setAmount] = useState("");
+  const [meta, setMeta] = useState<{ imageUrl?: string; description?: string }>({});
+
+  useEffect(() => {
+    let active = true;
+    fetch(`/api/token?address=${address}`)
+      .then((r) => (r.ok ? r.json() : {}))
+      .then((d: { imageUrl?: string; description?: string }) => {
+        if (active) setMeta(d ?? {});
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, [address]);
 
   const accent = accentFor(address);
   const short = useMemo(
@@ -167,11 +181,20 @@ export default function CampaignPage({
 
       <div className="card mt-4">
         <div className="flex items-center gap-4">
-          <div
-            className={`grid h-16 w-16 place-items-center rounded-2xl bg-gradient-to-br ${accent} text-2xl font-black text-white shadow-glow`}
-          >
-            {symbol.slice(0, 2)}
-          </div>
+          {meta.imageUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={meta.imageUrl}
+              alt={name}
+              className="h-16 w-16 rounded-2xl object-cover shadow-glow"
+            />
+          ) : (
+            <div
+              className={`grid h-16 w-16 place-items-center rounded-2xl bg-gradient-to-br ${accent} text-2xl font-black text-white shadow-glow`}
+            >
+              {symbol.slice(0, 2)}
+            </div>
+          )}
           <div className="min-w-0">
             <h1 className="truncate text-2xl font-black">{name}</h1>
             <p className="text-sm font-medium text-slate-400">
@@ -196,6 +219,10 @@ export default function CampaignPage({
             )}
           </span>
         </div>
+
+        {meta.description && (
+          <p className="mt-4 text-sm text-slate-500">{meta.description}</p>
+        )}
 
         <div className="mt-6">
           <div className="flex items-center justify-between text-sm font-medium text-slate-500">
