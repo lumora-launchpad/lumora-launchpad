@@ -15,9 +15,11 @@ Vercel before the first build.
 | Name | Value |
 | --- | --- |
 | `NEXT_PUBLIC_FACTORY_ADDRESS` | The deployed LaunchpadFactory address |
+| `NEXT_PUBLIC_CAMPAIGN_FACTORY_ADDRESS` | The deployed CampaignFactory address |
 | `NEXT_PUBLIC_CHAIN_ID` | 84532 for Base Sepolia, 8453 for mainnet |
-| `NEXT_PUBLIC_START_BLOCK` | Factory deploy block, for the price chart |
+| `NEXT_PUBLIC_START_BLOCK` | Factory deploy block, bounds event log scans |
 | `NEXT_PUBLIC_WALLETCONNECT_ID` | Project id from WalletConnect Cloud |
+| `NEXT_PUBLIC_SITE_URL` | Public site URL, for absolute OG image links |
 
 A WalletConnect id is free at https://cloud.walletconnect.com
 
@@ -72,9 +74,11 @@ A WalletConnect id is free at https://cloud.walletconnect.com
 
    ```
    vercel env add NEXT_PUBLIC_FACTORY_ADDRESS
+   vercel env add NEXT_PUBLIC_CAMPAIGN_FACTORY_ADDRESS
    vercel env add NEXT_PUBLIC_CHAIN_ID
    vercel env add NEXT_PUBLIC_START_BLOCK
    vercel env add NEXT_PUBLIC_WALLETCONNECT_ID
+   vercel env add NEXT_PUBLIC_SITE_URL
    vercel --prod
    ```
 

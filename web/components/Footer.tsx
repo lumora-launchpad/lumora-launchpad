@@ -37,9 +37,9 @@ const COLUMNS: { title: string; links: { label: string; href: string; external?:
   },
 ];
 
-const SOCIAL = [
-  { label: "X", href: "https://x.com" },
-  { label: "Farcaster", href: "https://warpcast.com" },
+// Add real handles here when the accounts exist. The GitHub link points to the
+// repository, which must be public for visitors to open it.
+const SOCIAL: { label: string; href: string }[] = [
   { label: "GitHub", href: GITHUB },
 ];
 
