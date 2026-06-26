@@ -10,11 +10,13 @@ import { useWatchlist } from "@/lib/useWatchlist";
 import { sampleTokens } from "@/lib/sampleTokens";
 import type { TokenView } from "@/lib/tokens";
 
-type Sort = "new" | "progress" | "almost";
+type Sort = "new" | "progress" | "almost" | "volume" | "trades";
 type Status = "all" | "live" | "listed" | "saved";
 
 const SORTS: { id: Sort; label: string }[] = [
   { id: "new", label: "Newest" },
+  { id: "volume", label: "Top volume" },
+  { id: "trades", label: "Most traded" },
   { id: "progress", label: "Top progress" },
   { id: "almost", label: "Almost there" },
 ];
@@ -167,10 +169,22 @@ export function LiveTokenGrid() {
       out = out
         .filter((t) => !t.graduated)
         .sort((a, b) => b.progress - a.progress);
+    } else if (sort === "volume") {
+      out.sort(
+        (a, b) =>
+          (statOf(b.address)?.volumeEth ?? 0) -
+          (statOf(a.address)?.volumeEth ?? 0),
+      );
+    } else if (sort === "trades") {
+      out.sort(
+        (a, b) =>
+          (statOf(b.address)?.trades ?? 0) - (statOf(a.address)?.trades ?? 0),
+      );
     }
     // "new" keeps the incoming order (already newest first)
     return out;
-  }, [base, query, sort, status, isSaved]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [base, query, sort, status, isSaved, stats]);
 
   if (isLoading) return <GridSkeleton />;
 

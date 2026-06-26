@@ -30,6 +30,23 @@ export const factoryAbi = [
     outputs: [{ name: "page", type: "address[]" }],
   },
   {
+    type: "function",
+    name: "creatorTokensCount",
+    stateMutability: "view",
+    inputs: [{ name: "creator", type: "address" }],
+    outputs: [{ name: "", type: "uint256" }],
+  },
+  {
+    type: "function",
+    name: "tokensByCreator",
+    stateMutability: "view",
+    inputs: [
+      { name: "creator", type: "address" },
+      { name: "index", type: "uint256" },
+    ],
+    outputs: [{ name: "", type: "address" }],
+  },
+  {
     type: "event",
     name: "TokenCreated",
     inputs: [

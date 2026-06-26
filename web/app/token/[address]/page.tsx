@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { formatEther, parseEther } from "viem";
 import {
@@ -330,10 +331,19 @@ export default function TokenPage({
             <div className="mt-6 grid grid-cols-3 gap-4">
               <Stat k="Price" v={`${fmt(price)} ETH`} />
               <Stat k="Market cap" v={`${fmt(mcap, 2)} ETH`} />
-              <Stat
-                k="Creator"
-                v={creator ? `${creator.slice(0, 6)}...${creator.slice(-4)}` : "-"}
-              />
+              {creator ? (
+                <Link
+                  href={`/creator/${creator}`}
+                  className="transition hover:opacity-80"
+                >
+                  <Stat
+                    k="Creator"
+                    v={`${creator.slice(0, 6)}...${creator.slice(-4)}`}
+                  />
+                </Link>
+              ) : (
+                <Stat k="Creator" v="-" />
+              )}
             </div>
 
             <div className="mt-6">
