@@ -87,6 +87,56 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Why Lumora */}
+      <section className="py-12">
+        <h2 className="text-center text-3xl font-black tracking-tight">
+          Why <span className="gradient-text">Lumora</span>
+        </h2>
+        <div className="mt-10 grid gap-6 sm:grid-cols-3">
+          {[
+            {
+              t: "Fair launch",
+              d: "An anti-snipe window caps per-wallet buys at the start, so bots cannot grab the whole curve before anyone else.",
+              icon: (
+                <path d="M12 3l7 3v5c0 4-3 7-7 8-4-1-7-4-7-8V6l7-3z" />
+              ),
+            },
+            {
+              t: "Demand gated",
+              d: "Campaigns only launch a token once real backers commit, with full refunds if they fall short. No empty coins.",
+              icon: (
+                <>
+                  <circle cx="9" cy="8" r="3" />
+                  <path d="M15 11a3 3 0 100-6" />
+                  <path d="M3 20c0-3 3-5 6-5s6 2 6 5" />
+                  <path d="M17 15c2 0 4 2 4 5" />
+                </>
+              ),
+            },
+            {
+              t: "Liquidity locks",
+              d: "On graduation, liquidity moves to Uniswap and the LP is burned, so it is locked forever and cannot be pulled.",
+              icon: (
+                <>
+                  <rect x="5" y="11" width="14" height="9" rx="2" />
+                  <path d="M8 11V7a4 4 0 018 0v4" />
+                </>
+              ),
+            },
+          ].map((f) => (
+            <div key={f.t} className="card">
+              <div className="grid h-11 w-11 place-items-center rounded-2xl bg-brand-gradient text-white shadow-glow">
+                <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  {f.icon}
+                </svg>
+              </div>
+              <h3 className="mt-4 text-lg font-bold">{f.t}</h3>
+              <p className="mt-2 text-sm text-slate-500">{f.d}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* How it works */}
       <section id="how-it-works" className="py-16">
         <h2 className="text-center text-3xl font-black tracking-tight">
