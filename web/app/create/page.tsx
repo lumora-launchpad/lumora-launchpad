@@ -19,6 +19,8 @@ export default function CreatePage() {
   const [telegram, setTelegram] = useState("");
   const [initialBuy, setInitialBuy] = useState("");
   const [metadataSaved, setMetadataSaved] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState("");
 
   const { showToast, dismissToast } = useToast();
   const pendingToastId = useRef<number | null>(null);
@@ -148,6 +150,25 @@ export default function CreatePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSuccess, receipt]);
 
+  async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadError("");
+    setUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await fetch("/api/upload", { method: "POST", body: fd });
+      const data = await res.json();
+      if (res.ok && data.url) setImageUrl(data.url);
+      else setUploadError(data.error || "Upload failed");
+    } catch {
+      setUploadError("Upload failed");
+    } finally {
+      setUploading(false);
+    }
+  }
+
   const preview = symbol ? symbol.toUpperCase().slice(0, 2) : "LU";
 
   return (
@@ -202,21 +223,57 @@ export default function CreatePage() {
             </span>
           </label>
 
-          <label className="mt-5 block">
-            <span className="text-sm font-semibold text-slate-700">
-              Image URL
+          <div className="mt-5">
+            <span className="text-sm font-semibold text-slate-700">Image</span>
+            <div className="mt-2 flex items-center gap-4">
+              {imageUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={imageUrl}
+                  alt="Token"
+                  className="h-16 w-16 rounded-2xl object-cover shadow-glow"
+                />
+              ) : (
+                <div className="grid h-16 w-16 place-items-center rounded-2xl bg-slate-100 text-xs font-medium text-slate-400">
+                  none
+                </div>
+              )}
+              <div className="flex items-center gap-2">
+                <label className="btn-ghost cursor-pointer !px-4 !py-2 text-sm">
+                  {uploading
+                    ? "Uploading"
+                    : imageUrl
+                      ? "Change image"
+                      : "Choose image"}
+                  <input
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp,image/gif"
+                    className="hidden"
+                    disabled={uploading}
+                    onChange={handleFile}
+                  />
+                </label>
+                {imageUrl && (
+                  <button
+                    type="button"
+                    onClick={() => setImageUrl("")}
+                    className="text-xs font-semibold text-slate-400 transition hover:text-base-pink"
+                  >
+                    Remove
+                  </button>
+                )}
+              </div>
+            </div>
+            <span className="mt-1 block text-xs text-slate-400">
+              Optional. Pick from your gallery or device. PNG, JPG, WEBP, or GIF
+              up to 2 MB.
             </span>
-            <input
-              className="field mt-2"
-              placeholder="https://example.com/logo.png"
-              value={imageUrl}
-              onChange={(e) => setImageUrl(e.target.value)}
-              maxLength={2048}
-            />
-            <span className="mt-1 block text-right text-xs text-slate-400">
-              Optional. Also stored off chain.
-            </span>
-          </label>
+            {uploadError && (
+              <span className="mt-1 block text-xs font-semibold text-base-pink">
+                {uploadError}
+              </span>
+            )}
+          </div>
 
           <div className="mt-5 grid gap-3 sm:grid-cols-3">
             <label className="block">
