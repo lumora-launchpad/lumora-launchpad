@@ -245,10 +245,10 @@ export default function TokenPage({
   }
 
   return (
-    <div className="mx-auto max-w-6xl px-5 py-12">
-      <div className="grid gap-8 lg:grid-cols-5">
+    <div className="mx-auto max-w-7xl px-6 py-12">
+      <div className="grid gap-8 lg:grid-cols-12">
         {/* Token info */}
-        <div className="lg:col-span-3">
+        <div className="lg:col-span-8">
           <div className="card">
             <div className="flex items-center gap-4">
               {imageUrl ? (
@@ -361,7 +361,7 @@ export default function TokenPage({
         </div>
 
         {/* Trade panel */}
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-4">
           <div className="card sticky top-24">
             {graduated ? (
               <div className="py-6 text-center">

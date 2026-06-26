@@ -144,7 +144,7 @@ export default function CreatePage() {
   const preview = symbol ? symbol.toUpperCase().slice(0, 2) : "LU";
 
   return (
-    <div className="mx-auto max-w-5xl px-5 py-14">
+    <div className="mx-auto max-w-6xl px-6 py-14">
       <div className="mx-auto max-w-2xl text-center">
         <h1 className="text-4xl font-black tracking-tight">
           Create <span className="gradient-text">a new token</span>

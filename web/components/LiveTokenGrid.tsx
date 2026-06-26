@@ -37,7 +37,7 @@ function Metric({ label, value }: { label: string; value: string }) {
 
 function GridSkeleton() {
   return (
-    <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {Array.from({ length: 6 }).map((_, i) => (
         <div key={i} className="card animate-pulse">
           <div className="flex items-center gap-4">
@@ -248,7 +248,7 @@ export function LiveTokenGrid() {
           No tokens match these filters.
         </p>
       ) : (
-        <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {list.map((t, i) => (
             <div
               key={t.address}
