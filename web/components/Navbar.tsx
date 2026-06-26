@@ -29,9 +29,6 @@ export function Navbar() {
           <Link href="/portfolio" className="transition hover:text-base-blue">
             Portfolio
           </Link>
-          <a href="#how-it-works" className="transition hover:text-base-blue">
-            How it works
-          </a>
         </nav>
 
         <div className="flex items-center gap-3">
