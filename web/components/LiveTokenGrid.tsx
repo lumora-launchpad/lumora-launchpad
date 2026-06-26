@@ -10,12 +10,28 @@ import { sampleTokens } from "@/lib/sampleTokens";
 import type { TokenView } from "@/lib/tokens";
 
 type Sort = "new" | "progress" | "almost";
+type Status = "all" | "live" | "listed";
 
 const SORTS: { id: Sort; label: string }[] = [
   { id: "new", label: "Newest" },
   { id: "progress", label: "Top progress" },
   { id: "almost", label: "Almost there" },
 ];
+
+const STATUSES: { id: Status; label: string }[] = [
+  { id: "all", label: "All" },
+  { id: "live", label: "Live" },
+  { id: "listed", label: "Listed" },
+];
+
+function Metric({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="card py-4 text-center">
+      <p className="text-2xl font-black gradient-text">{value}</p>
+      <p className="mt-0.5 text-xs font-medium text-slate-400">{label}</p>
+    </div>
+  );
+}
 
 function GridSkeleton() {
   return (
@@ -103,12 +119,22 @@ export function LiveTokenGrid() {
   const { tokens, isLoading, hasFactory } = useTokens();
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<Sort>("new");
+  const [status, setStatus] = useState<Status>("all");
 
   const useSample = !hasFactory || tokens.length === 0;
   const base = useSample ? sampleTokens : tokens;
 
   const stats = useMarketStats(useSample ? [] : tokens.map((t) => t.address));
   const statOf = (addr: string) => stats.get(addr.toLowerCase());
+
+  // Aggregate metrics for the dashboard strip.
+  const metrics = useMemo(() => {
+    const live = base.filter((t) => !t.graduated).length;
+    const listed = base.filter((t) => t.graduated).length;
+    let volume = 0;
+    for (const s of stats.values()) volume += s.volumeEth;
+    return { total: base.length, live, listed, volume };
+  }, [base, stats]);
 
   // The king is the live token closest to graduating (real data only).
   const king = useMemo(() => {
@@ -120,6 +146,8 @@ export function LiveTokenGrid() {
 
   const list = useMemo(() => {
     let out = [...base];
+    if (status === "live") out = out.filter((t) => !t.graduated);
+    else if (status === "listed") out = out.filter((t) => t.graduated);
     const q = query.trim().toLowerCase();
     if (q) {
       out = out.filter(
@@ -137,7 +165,7 @@ export function LiveTokenGrid() {
     }
     // "new" keeps the incoming order (already newest first)
     return out;
-  }, [base, query, sort]);
+  }, [base, query, sort, status]);
 
   if (isLoading) return <GridSkeleton />;
 
@@ -151,27 +179,59 @@ export function LiveTokenGrid() {
         </p>
       )}
 
+      {/* Dashboard metrics */}
+      {!useSample && (
+        <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
+          <Metric label="Tokens" value={String(metrics.total)} />
+          <Metric label="Live" value={String(metrics.live)} />
+          <Metric label="Listed" value={String(metrics.listed)} />
+          <Metric
+            label="Volume"
+            value={`${metrics.volume.toLocaleString("en-US", {
+              maximumFractionDigits: 2,
+            })} ETH`}
+          />
+        </div>
+      )}
+
       {king && <KingCard token={king} stats={statOf(king.address)} />}
 
-      {/* Controls */}
-      <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex gap-1.5 rounded-2xl bg-slate-100 p-1">
-          {SORTS.map((s) => (
-            <button
-              key={s.id}
-              onClick={() => setSort(s.id)}
-              className={`rounded-xl px-3 py-1.5 text-sm font-bold transition ${
-                sort === s.id
-                  ? "bg-white text-base-blue shadow"
-                  : "text-slate-500 hover:text-slate-700"
-              }`}
-            >
-              {s.label}
-            </button>
-          ))}
+      {/* Toolbar: status filter, sort, search */}
+      <div className="mt-8 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex flex-wrap gap-3">
+          <div className="flex gap-1.5 rounded-2xl bg-slate-100 p-1">
+            {STATUSES.map((s) => (
+              <button
+                key={s.id}
+                onClick={() => setStatus(s.id)}
+                className={`rounded-xl px-3 py-1.5 text-sm font-bold transition ${
+                  status === s.id
+                    ? "bg-white text-base-violet shadow"
+                    : "text-slate-500 hover:text-slate-700"
+                }`}
+              >
+                {s.label}
+              </button>
+            ))}
+          </div>
+          <div className="flex gap-1.5 rounded-2xl bg-slate-100 p-1">
+            {SORTS.map((s) => (
+              <button
+                key={s.id}
+                onClick={() => setSort(s.id)}
+                className={`rounded-xl px-3 py-1.5 text-sm font-bold transition ${
+                  sort === s.id
+                    ? "bg-white text-base-blue shadow"
+                    : "text-slate-500 hover:text-slate-700"
+                }`}
+              >
+                {s.label}
+              </button>
+            ))}
+          </div>
         </div>
         <input
-          className="field sm:max-w-xs"
+          className="field lg:max-w-xs"
           placeholder="Search name or symbol"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
@@ -180,7 +240,7 @@ export function LiveTokenGrid() {
 
       {list.length === 0 ? (
         <p className="mt-8 rounded-2xl border border-slate-200 bg-white/60 px-4 py-10 text-center text-sm text-slate-500">
-          No tokens match your search.
+          No tokens match these filters.
         </p>
       ) : (
         <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
