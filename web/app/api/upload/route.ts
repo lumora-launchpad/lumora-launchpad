@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { promises as fs } from "fs";
 import path from "path";
 import { randomUUID } from "crypto";
+import { rateLimit, clientIp } from "@/lib/server/rateLimit";
 
 const MAX_BYTES = 2 * 1024 * 1024; // 2 MB
 const EXT: Record<string, string> = {
@@ -17,6 +18,11 @@ const UPLOAD_DIR = path.join(process.cwd(), ".data", "uploads");
 // URL served back by /api/image. Keeps uploads on the server (persists on a
 // long lived host) instead of asking the user for an external URL.
 export async function POST(request: NextRequest) {
+  // 10 uploads per 10 minutes per IP, to protect the disk.
+  if (!rateLimit(`upload:${clientIp(request)}`, 10, 600_000)) {
+    return NextResponse.json({ error: "Too many uploads, slow down" }, { status: 429 });
+  }
+
   let file: unknown = null;
   try {
     const form = (await request.formData()) as unknown as {
