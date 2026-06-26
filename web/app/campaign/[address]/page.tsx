@@ -14,6 +14,7 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { campaignAbi } from "@/lib/campaigns";
 import { accentFor, formatEth } from "@/lib/tokens";
 import { Countdown } from "@/components/Countdown";
+import { BackButton } from "@/components/BackButton";
 
 const ZERO = "0x0000000000000000000000000000000000000000" as const;
 
@@ -105,12 +106,7 @@ export default function CampaignPage({
 
   return (
     <div className="mx-auto max-w-3xl px-6 py-12">
-      <Link
-        href="/campaigns"
-        className="text-sm font-semibold text-slate-400 hover:text-base-blue"
-      >
-        Back to campaigns
-      </Link>
+      <BackButton label="Back to campaigns" fallback="/campaigns" />
 
       <div className="card mt-4">
         <div className="flex items-center gap-4">

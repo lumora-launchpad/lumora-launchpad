@@ -20,6 +20,7 @@ import { Holders } from "@/components/Holders";
 import { ShareButton } from "@/components/ShareButton";
 import { StarButton } from "@/components/StarButton";
 import { TokenInfo } from "@/components/TokenInfo";
+import { BackButton } from "@/components/BackButton";
 import { useTradeHistory } from "@/lib/useTradeHistory";
 import { useToast } from "@/components/Toast";
 
@@ -247,6 +248,9 @@ export default function TokenPage({
 
   return (
     <div className="mx-auto max-w-7xl px-6 py-12">
+      <div className="mb-5">
+        <BackButton label="Back to explore" />
+      </div>
       <div className="grid gap-8 lg:grid-cols-12">
         {/* Token info */}
         <div className="lg:col-span-8">
