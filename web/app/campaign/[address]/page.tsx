@@ -1,11 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { formatEther, parseEther } from "viem";
+import { parseEther } from "viem";
 import {
   useAccount,
-  useReadContract,
   useReadContracts,
   useWriteContract,
   useWaitForTransactionReceipt,
@@ -13,8 +12,10 @@ import {
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { campaignAbi } from "@/lib/campaigns";
 import { accentFor, formatEth } from "@/lib/tokens";
+import { txExplorerUrl } from "@/lib/wagmi";
 import { Countdown } from "@/components/Countdown";
 import { BackButton } from "@/components/BackButton";
+import { useToast } from "@/components/Toast";
 
 const ZERO = "0x0000000000000000000000000000000000000000" as const;
 
@@ -77,10 +78,14 @@ export default function CampaignPage({
   const now = Math.floor(Date.now() / 1000);
   const ended = now >= deadline;
 
-  const { writeContract, data: hash, isPending } = useWriteContract();
+  const { writeContract, data: hash, isPending, error } = useWriteContract();
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
     hash,
   });
+
+  const { showToast, dismissToast } = useToast();
+  const pendingToastId = useRef<number | null>(null);
+  const reportedHash = useRef<string | null>(null);
 
   useEffect(() => {
     if (isSuccess) {
@@ -89,6 +94,58 @@ export default function CampaignPage({
       refetchMine();
     }
   }, [isSuccess, refetchInfo, refetchMine]);
+
+  useEffect(() => {
+    if (isPending && pendingToastId.current === null) {
+      pendingToastId.current = showToast({
+        title: "Confirm in your wallet",
+        variant: "pending",
+      });
+    }
+  }, [isPending, showToast]);
+
+  useEffect(() => {
+    if (!hash || reportedHash.current === hash) return;
+    reportedHash.current = hash;
+    if (pendingToastId.current !== null) {
+      dismissToast(pendingToastId.current);
+      pendingToastId.current = null;
+    }
+    pendingToastId.current = showToast({
+      title: "Transaction submitted",
+      description: "Waiting for confirmation.",
+      variant: "pending",
+      href: txExplorerUrl(hash),
+    });
+  }, [hash, showToast, dismissToast]);
+
+  useEffect(() => {
+    if (!isSuccess || !hash) return;
+    if (pendingToastId.current !== null) {
+      dismissToast(pendingToastId.current);
+      pendingToastId.current = null;
+    }
+    showToast({
+      title: "Transaction confirmed",
+      variant: "success",
+      href: txExplorerUrl(hash),
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSuccess, hash]);
+
+  useEffect(() => {
+    if (!error) return;
+    if (pendingToastId.current !== null) {
+      dismissToast(pendingToastId.current);
+      pendingToastId.current = null;
+    }
+    showToast({
+      title: "Transaction failed",
+      description: error.message.slice(0, 120),
+      variant: "error",
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [error]);
 
   function doCommit() {
     let value: bigint;

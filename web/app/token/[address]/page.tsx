@@ -30,9 +30,11 @@ type Side = "buy" | "sell";
 type TokenMetadata = {
   description?: string;
   imageUrl?: string;
+  website?: string;
+  x?: string;
+  telegram?: string;
 };
 
-const SLIPPAGE_BPS = 500n; // 5 percent tolerance
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000" as const;
 
 function tryParseEther(v: string): bigint | null {
@@ -64,6 +66,7 @@ export default function TokenPage({
   const [side, setSide] = useState<Side>("buy");
   const [amount, setAmount] = useState("");
   const [tab, setTab] = useState<Tab>("chart");
+  const [slippage, setSlippage] = useState(5); // percent
   const [metadata, setMetadata] = useState<TokenMetadata | null>(null);
 
   // Shared trade history feeds both the chart and the live trade list.
@@ -143,9 +146,10 @@ export default function TokenPage({
   });
   const quoteOut = side === "buy" ? buyQuote : sellQuote;
 
+  const slippageBps = BigInt(Math.round(slippage * 100));
   const minOut =
     quoteOut !== undefined
-      ? ((quoteOut as bigint) * (10000n - SLIPPAGE_BPS)) / 10000n
+      ? ((quoteOut as bigint) * (10000n - slippageBps)) / 10000n
       : 0n;
 
   const { writeContract, data: hash, isPending, error } = useWriteContract();
@@ -286,6 +290,30 @@ export default function TokenPage({
             </div>
 
             <p className="mt-4 text-sm text-slate-500">{description}</p>
+
+            {(metadata?.website || metadata?.x || metadata?.telegram) && (
+              <div className="mt-3 flex flex-wrap gap-2">
+                {(
+                  [
+                    ["Website", metadata?.website],
+                    ["X", metadata?.x],
+                    ["Telegram", metadata?.telegram],
+                  ] as const
+                )
+                  .filter(([, href]) => !!href)
+                  .map(([label, href]) => (
+                    <a
+                      key={label}
+                      href={href as string}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="rounded-xl border border-slate-200 bg-white/70 px-3 py-1.5 text-xs font-bold text-slate-600 transition hover:border-base-blue hover:text-base-blue"
+                    >
+                      {label}
+                    </a>
+                  ))}
+              </div>
+            )}
 
             <div className="mt-4">
               <ShareButton name={name} symbol={symbol} />
@@ -457,6 +485,27 @@ export default function TokenPage({
                       ))}
                 </div>
 
+                <div className="mt-4 flex items-center justify-between">
+                  <span className="text-xs font-medium text-slate-400">
+                    Slippage
+                  </span>
+                  <div className="flex gap-1.5">
+                    {[0.5, 1, 5, 10].map((v) => (
+                      <button
+                        key={v}
+                        onClick={() => setSlippage(v)}
+                        className={`rounded-lg px-2.5 py-1 text-xs font-bold transition ${
+                          slippage === v
+                            ? "bg-base-blue text-white"
+                            : "bg-slate-100 text-slate-500 hover:text-slate-700"
+                        }`}
+                      >
+                        {v}%
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
                 {parsed && quoteOut !== undefined && (
                   <div className="mt-4 rounded-2xl bg-slate-50 px-4 py-3 text-sm">
                     <div className="flex items-center justify-between">
@@ -469,7 +518,7 @@ export default function TokenPage({
                     </div>
                     <div className="mt-1 flex items-center justify-between text-xs text-slate-400">
                       <span>Slippage tolerance</span>
-                      <span>5%</span>
+                      <span>{slippage}%</span>
                     </div>
                   </div>
                 )}

@@ -14,6 +14,9 @@ export default function CreatePage() {
   const [symbol, setSymbol] = useState("");
   const [blurb, setBlurb] = useState("");
   const [imageUrl, setImageUrl] = useState("");
+  const [website, setWebsite] = useState("");
+  const [x, setX] = useState("");
+  const [telegram, setTelegram] = useState("");
   const [initialBuy, setInitialBuy] = useState("");
   const [metadataSaved, setMetadataSaved] = useState(false);
 
@@ -108,7 +111,8 @@ export default function CreatePage() {
   // Once the deploy transaction confirms, pull the new token address from
   // the TokenCreated event and store the off chain description and image.
   useEffect(() => {
-    if (!isSuccess || !receipt || (!blurb && !imageUrl)) return;
+    if (!isSuccess || !receipt) return;
+    if (!blurb && !imageUrl && !website && !x && !telegram) return;
 
     const log = receipt.logs.find(
       (l) => l.address.toLowerCase() === FACTORY_ADDRESS.toLowerCase(),
@@ -131,6 +135,9 @@ export default function CreatePage() {
           address: tokenAddress,
           description: blurb,
           imageUrl,
+          website,
+          x,
+          telegram,
         }),
       })
         .then(() => setMetadataSaved(true))
@@ -210,6 +217,39 @@ export default function CreatePage() {
               Optional. Also stored off chain.
             </span>
           </label>
+
+          <div className="mt-5 grid gap-3 sm:grid-cols-3">
+            <label className="block">
+              <span className="text-sm font-semibold text-slate-700">Website</span>
+              <input
+                className="field mt-2"
+                placeholder="https://"
+                value={website}
+                onChange={(e) => setWebsite(e.target.value)}
+                maxLength={200}
+              />
+            </label>
+            <label className="block">
+              <span className="text-sm font-semibold text-slate-700">X</span>
+              <input
+                className="field mt-2"
+                placeholder="https://x.com/..."
+                value={x}
+                onChange={(e) => setX(e.target.value)}
+                maxLength={200}
+              />
+            </label>
+            <label className="block">
+              <span className="text-sm font-semibold text-slate-700">Telegram</span>
+              <input
+                className="field mt-2"
+                placeholder="https://t.me/..."
+                value={telegram}
+                onChange={(e) => setTelegram(e.target.value)}
+                maxLength={200}
+              />
+            </label>
+          </div>
 
           <label className="mt-5 block">
             <span className="text-sm font-semibold text-slate-700">

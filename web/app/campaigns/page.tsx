@@ -167,8 +167,26 @@ function CreateForm() {
   );
 }
 
+type Filter = "all" | "active" | "launched" | "ended";
+
+const FILTERS: { id: Filter; label: string }[] = [
+  { id: "all", label: "All" },
+  { id: "active", label: "Active" },
+  { id: "launched", label: "Launched" },
+  { id: "ended", label: "Ended" },
+];
+
 export default function CampaignsPage() {
   const { campaigns, isLoading, hasFactory } = useCampaigns();
+  const [filter, setFilter] = useState<Filter>("all");
+
+  const now = Math.floor(Date.now() / 1000);
+  const list = campaigns.filter((c) => {
+    if (filter === "launched") return c.launched;
+    if (filter === "active") return !c.launched && c.deadline > now;
+    if (filter === "ended") return !c.launched && c.deadline <= now;
+    return true;
+  });
 
   return (
     <div className="mx-auto max-w-7xl px-6 py-12">
@@ -184,23 +202,43 @@ export default function CampaignsPage() {
 
       <CreateForm />
 
+      {hasFactory && campaigns.length > 0 && (
+        <div className="mt-8 flex gap-1.5 rounded-2xl bg-slate-100 p-1 sm:w-fit">
+          {FILTERS.map((f) => (
+            <button
+              key={f.id}
+              onClick={() => setFilter(f.id)}
+              className={`flex-1 rounded-xl px-3 py-1.5 text-sm font-bold transition sm:flex-none ${
+                filter === f.id
+                  ? "bg-white text-base-blue shadow"
+                  : "text-slate-500 hover:text-slate-700"
+              }`}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+      )}
+
       {!hasFactory ? (
         <p className="mt-8 rounded-2xl border border-slate-200 bg-white/60 px-4 py-10 text-center text-sm text-slate-500">
           Campaign factory not connected. Set NEXT_PUBLIC_CAMPAIGN_FACTORY_ADDRESS.
         </p>
       ) : isLoading ? (
-        <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="card h-44 animate-pulse bg-slate-50" />
           ))}
         </div>
-      ) : campaigns.length === 0 ? (
-        <p className="mt-8 rounded-2xl border border-slate-200 bg-white/60 px-4 py-10 text-center text-sm text-slate-500">
-          No campaigns yet. Start the first one above.
+      ) : list.length === 0 ? (
+        <p className="mt-6 rounded-2xl border border-slate-200 bg-white/60 px-4 py-10 text-center text-sm text-slate-500">
+          {campaigns.length === 0
+            ? "No campaigns yet. Start the first one above."
+            : "No campaigns match this filter."}
         </p>
       ) : (
-        <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {campaigns.map((c) => (
+        <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {list.map((c) => (
             <CampaignCard key={c.address} c={c} />
           ))}
         </div>
