@@ -2,14 +2,24 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --font-sans: "Inter", system-ui, sans-serif;
-}
+/* --font-sans is provided by next/font (Inter), with a fallback in the
+   Tailwind config. */
 
 html,
 body {
   padding: 0;
   margin: 0;
+}
+
+/* Respect users who prefer less motion: drop the looping animations. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
 }
 
 body {

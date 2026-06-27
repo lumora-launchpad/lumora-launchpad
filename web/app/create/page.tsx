@@ -314,6 +314,8 @@ export default function CreatePage() {
                 <img
                   src={imageUrl}
                   alt="Token"
+                  loading="lazy"
+                  decoding="async"
                   className="h-16 w-16 rounded-2xl object-cover shadow-glow"
                 />
               ) : (
@@ -479,6 +481,8 @@ export default function CreatePage() {
                 <img
                   src={imageUrl}
                   alt={name || "Token preview"}
+                  loading="lazy"
+                  decoding="async"
                   className="h-16 w-16 rounded-2xl object-cover shadow-glow"
                 />
               ) : (

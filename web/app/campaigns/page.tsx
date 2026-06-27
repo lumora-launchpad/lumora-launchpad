@@ -58,6 +58,8 @@ function CampaignCard({ c, backers }: { c: CampaignView; backers?: number }) {
         <img
           src={img}
           alt={c.name}
+          loading="lazy"
+          decoding="async"
           className="-mx-6 -mt-6 mb-4 h-28 w-[calc(100%+3rem)] object-cover"
         />
       ) : (
@@ -272,6 +274,8 @@ function CreateForm() {
           <img
             src={imageUrl}
             alt="Campaign"
+            loading="lazy"
+            decoding="async"
             className="h-14 w-14 rounded-2xl object-cover shadow-glow"
           />
         ) : (
@@ -336,6 +340,8 @@ function CreateForm() {
               <img
                 src={imageUrl}
                 alt={name || "Campaign"}
+                loading="lazy"
+                decoding="async"
                 className="h-16 w-16 rounded-2xl object-cover shadow-glow"
               />
             ) : (
