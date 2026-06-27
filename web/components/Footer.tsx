@@ -2,6 +2,10 @@ import Link from "next/link";
 
 const GITHUB = "https://github.com/lumora-launchpad/lumora-launchpad";
 
+const FACTORY = process.env.NEXT_PUBLIC_FACTORY_ADDRESS;
+const EXPLORER = process.env.NEXT_PUBLIC_EXPLORER_URL ?? "https://sepolia.basescan.org";
+const CONTRACT_URL = FACTORY ? `${EXPLORER}/address/${FACTORY}` : GITHUB;
+
 const COLUMNS: { title: string; links: { label: string; href: string; external?: boolean }[] }[] = [
   {
     title: "Product",
@@ -17,6 +21,7 @@ const COLUMNS: { title: string; links: { label: string; href: string; external?:
     links: [
       { label: "How it works", href: "/#how-it-works" },
       { label: "Docs", href: GITHUB, external: true },
+      { label: "Contract", href: CONTRACT_URL, external: true },
       { label: "FAQ", href: "/faq" },
     ],
   },
@@ -109,7 +114,13 @@ export function Footer() {
           ))}
         </div>
 
-        <div className="mt-10 flex flex-col items-center justify-between gap-3 border-t border-slate-100 pt-6 text-xs text-slate-400 sm:flex-row">
+        <div className="mt-10 flex flex-wrap items-center gap-2 border-t border-slate-100 pt-6">
+          <span className="pill !py-1 text-xs">Built on Base</span>
+          <span className="pill !py-1 text-xs">Powered by Uniswap</span>
+          <span className="pill !py-1 text-xs">Open source</span>
+        </div>
+
+        <div className="mt-6 flex flex-col items-center justify-between gap-3 text-xs text-slate-400 sm:flex-row">
           <p>2026 Lumora. Built on Base.</p>
           <p>
             Not financial advice. Trade responsibly. Tokens carry risk of total

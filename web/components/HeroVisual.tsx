@@ -10,8 +10,8 @@ export function HeroVisual() {
   if (!failed) {
     return (
       <div className="relative">
-        {/* Slow moving glow behind the image for a living feel */}
-        <div className="absolute -inset-4 -z-10 rounded-[2rem] bg-brand-gradient opacity-30 blur-3xl animate-float" />
+        {/* Very slow moving glow behind the image for a living feel */}
+        <div className="absolute -inset-6 -z-10 rounded-[2rem] bg-brand-gradient opacity-30 blur-3xl animate-float [animation-duration:14s]" />
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/hero.png"
