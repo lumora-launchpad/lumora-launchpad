@@ -75,6 +75,8 @@ function KingCard({ token, stats }: { token: TokenView; stats?: TokenStats }) {
             <img
               src={token.imageUrl}
               alt={token.name}
+              loading="lazy"
+              decoding="async"
               className="h-16 w-16 rounded-2xl object-cover shadow-glow"
             />
           ) : (

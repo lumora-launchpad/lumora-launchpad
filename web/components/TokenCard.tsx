@@ -92,6 +92,8 @@ export function TokenCard({
           <img
             src={imageUrl}
             alt={token.name}
+            loading="lazy"
+            decoding="async"
             className="h-14 w-14 rounded-2xl object-cover shadow-glow"
           />
         ) : (
