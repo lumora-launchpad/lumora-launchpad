@@ -7,6 +7,7 @@ export type TokenView = {
   blurb?: string;
   imageUrl?: string;
   marketCap: string;
+  raisedEth: number; // real ETH raised on the curve, numeric
   progress: number; // 0 to 100
   accent: string; // tailwind gradient classes
   graduated?: boolean;

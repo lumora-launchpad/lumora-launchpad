@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { HeroVisual } from "@/components/HeroVisual";
+import { LandingStats } from "@/components/LandingStats";
 
 export default function HomePage() {
   return (
@@ -13,36 +14,28 @@ export default function HomePage() {
             Live on Base
           </span>
           <h1 className="mt-6 text-5xl font-black leading-tight tracking-tight sm:text-6xl">
-            The bright launchpad
+            One launchpad.
             <br />
-            <span className="gradient-text">on Base</span>
+            <span className="gradient-text">Two ways to launch.</span>
           </h1>
-          <p className="mt-6 max-w-xl text-lg text-slate-500">
-            Launch a token on a fair bonding curve, or run a demand gated
-            campaign so only coins with real backers go live. Liquidity locks on
-            graduation. Bright, fast, transparent.
+          <p className="mt-6 max-w-md text-lg text-slate-500">
+            Launch a token instantly, or launch it only when real demand shows
+            up. Bright, fair, on Base.
           </p>
           <div className="mt-9 flex flex-col gap-3 sm:flex-row">
             <Link href="/create" className="btn-primary w-full sm:w-auto">
-              Create a token
+              Instant Launch
             </Link>
-            <Link href="/explore" className="btn-ghost w-full sm:w-auto">
-              Explore tokens
+            <Link href="/campaigns" className="btn-ghost w-full sm:w-auto">
+              Demand Campaign
             </Link>
           </div>
-
-          <div className="mt-10 grid max-w-md grid-cols-3 gap-4">
-            {[
-              { k: "Trading fee", v: "1%" },
-              { k: "Creator share", v: "35%" },
-              { k: "Liquidity", v: "Auto" },
-            ].map((s) => (
-              <div key={s.k} className="card py-5 text-center">
-                <p className="text-3xl font-black gradient-text">{s.v}</p>
-                <p className="mt-1 text-xs font-medium text-slate-400">{s.k}</p>
-              </div>
-            ))}
-          </div>
+          <Link
+            href="/explore"
+            className="mt-4 inline-block text-sm font-semibold text-slate-500 underline-offset-4 hover:text-base-blue hover:underline"
+          >
+            or explore what is launching
+          </Link>
         </div>
 
         <div className="mx-auto w-full max-w-md lg:max-w-none">
@@ -50,48 +43,67 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* What you can do */}
+      {/* Social proof */}
+      <LandingStats />
+
+      {/* The two launch modes */}
       <section className="py-12">
         <h2 className="text-center text-3xl font-black tracking-tight">
           Two ways to <span className="gradient-text">launch</span>
         </h2>
+        <p className="mx-auto mt-3 max-w-xl text-center text-slate-500">
+          Pick how your token goes live. Both trade on a fair curve and lock
+          liquidity on graduation.
+        </p>
         <div className="mt-10 grid gap-6 md:grid-cols-2">
-          <div className="card">
-            <div className="flex items-center justify-between">
-              <h3 className="text-xl font-bold">Instant curve launch</h3>
-              <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">
-                Creator earns 35%
+          {/* Instant */}
+          <div className="card border-base-blue/20">
+            <div className="flex items-start justify-between">
+              <div className="grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br from-base-blue to-base-sky text-white shadow-glow">
+                <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z" />
+                </svg>
+              </div>
+              <span className="rounded-full bg-base-blue/10 px-3 py-1 text-xs font-bold text-base-blue">
+                Instant Launch
               </span>
             </div>
+            <h3 className="mt-5 text-xl font-bold">Trade from second one</h3>
             <p className="mt-2 text-sm text-slate-500">
               Enter a name and symbol and your token deploys instantly with a
-              fair price curve. Anyone can trade right away. Fast and easy, the
-              creator earns 35 percent of every trade fee.
+              fair price curve. Anyone can trade right away. Fast and simple.
             </p>
             <Link
               href="/create"
               className="mt-4 inline-block text-sm font-bold text-base-blue hover:underline"
             >
-              Create a token
+              Start an instant launch
             </Link>
           </div>
-          <div className="card">
-            <div className="flex items-center justify-between">
-              <h3 className="text-xl font-bold">Demand gated campaign</h3>
+          {/* Campaign */}
+          <div className="card border-base-violet/20">
+            <div className="flex items-start justify-between">
+              <div className="grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br from-base-violet to-base-pink text-white shadow-glow">
+                <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="9" />
+                  <circle cx="12" cy="12" r="4.5" />
+                  <circle cx="12" cy="12" r="1" fill="currentColor" />
+                </svg>
+              </div>
               <span className="rounded-full bg-base-violet/10 px-3 py-1 text-xs font-bold text-base-violet">
-                Creator earns 60%
+                Demand Campaign
               </span>
             </div>
+            <h3 className="mt-5 text-xl font-bold">Launch only on real demand</h3>
             <p className="mt-2 text-sm text-slate-500">
               Raise commitments first. The token only launches once backers hit
-              the target, then they claim pro rata, refunds if it falls short.
-              More effort, so the creator earns 60 percent of every trade fee.
+              the target, then they claim pro rata. Refunds if it falls short.
             </p>
             <Link
               href="/campaigns"
-              className="mt-4 inline-block text-sm font-bold text-base-blue hover:underline"
+              className="mt-4 inline-block text-sm font-bold text-base-violet hover:underline"
             >
-              Start a campaign
+              Start a demand campaign
             </Link>
           </div>
         </div>
@@ -147,32 +159,40 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* How it works */}
+      {/* How it works: the full flow */}
       <section id="how-it-works" className="py-16">
         <h2 className="text-center text-3xl font-black tracking-tight">
-          Three steps <span className="gradient-text">done</span>
+          How it <span className="gradient-text">works</span>
         </h2>
-        <div className="mt-10 grid gap-6 md:grid-cols-3">
+        <p className="mx-auto mt-3 max-w-xl text-center text-slate-500">
+          From idea to locked liquidity in one simple flow.
+        </p>
+        <div className="mt-10 grid gap-6 md:grid-cols-4">
           {[
             {
               n: "01",
-              t: "Create",
-              d: "Enter a token name and symbol. The contract deploys automatically with a fair price curve.",
+              t: "Choose launch type",
+              d: "Pick an instant launch, or a demand campaign that only fires when backers commit.",
             },
             {
               n: "02",
+              t: "Launch",
+              d: "Your token deploys on a fair price curve, ready to trade on Base.",
+            },
+            {
+              n: "03",
               t: "Trade",
               d: "Anyone can buy and sell on the curve. Every trade pays a 1 percent fee.",
             },
             {
-              n: "03",
+              n: "04",
               t: "Graduate",
-              d: "When the target is reached, liquidity moves to Uniswap and the LP is locked forever.",
+              d: "At the target, liquidity moves to Uniswap and the LP is locked forever.",
             },
           ].map((step) => (
             <div key={step.n} className="card">
               <span className="text-sm font-black text-base-blue">{step.n}</span>
-              <h3 className="mt-2 text-xl font-bold">{step.t}</h3>
+              <h3 className="mt-2 text-lg font-bold">{step.t}</h3>
               <p className="mt-2 text-sm text-slate-500">{step.d}</p>
             </div>
           ))}
@@ -185,22 +205,23 @@ export default function HomePage() {
           <div className="flex flex-col items-center gap-5 px-8 py-14 text-center">
             <h2 className="text-3xl font-black sm:text-4xl">Ready to launch?</h2>
             <p className="max-w-lg text-white/80">
-              Create your token in seconds on a fair curve. A 1 percent trading
-              fee split 65 developer and 35 creator, and liquidity that locks on
-              graduation.
+              Launch instantly, or let real demand decide. Either way, liquidity
+              locks on graduation.
             </p>
-            <Link
-              href="/create"
-              className="rounded-2xl bg-white px-7 py-3 font-bold text-base-blue shadow-card transition hover:brightness-95 active:scale-95"
-            >
-              Create a token
-            </Link>
-            <Link
-              href="/explore"
-              className="text-sm font-semibold text-white/80 underline-offset-4 hover:underline"
-            >
-              or explore what is launching
-            </Link>
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <Link
+                href="/create"
+                className="rounded-2xl bg-white px-7 py-3 font-bold text-base-blue shadow-card transition hover:brightness-95 active:scale-95"
+              >
+                Instant Launch
+              </Link>
+              <Link
+                href="/campaigns"
+                className="rounded-2xl bg-white/15 px-7 py-3 font-bold text-white backdrop-blur transition hover:bg-white/25 active:scale-95"
+              >
+                Demand Campaign
+              </Link>
+            </div>
           </div>
         </div>
       </section>

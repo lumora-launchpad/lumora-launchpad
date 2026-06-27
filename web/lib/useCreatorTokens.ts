@@ -1,5 +1,6 @@
 "use client";
 
+import { formatEther } from "viem";
 import { useReadContract, useReadContracts } from "wagmi";
 import { FACTORY_ADDRESS, factoryAbi, tokenAbi } from "./contracts";
 import { accentFor, formatEth, type TokenView } from "./tokens";
@@ -67,6 +68,7 @@ export function useCreatorTokens(creator?: `0x${string}`): {
         name,
         symbol,
         marketCap: `${formatEth(raised)} ETH`,
+        raisedEth: raised ? Number(formatEther(raised)) : 0,
         progress: bps ? Number(bps) / 100 : 0,
         accent: accentFor(ordered[i]),
         graduated: Boolean(graduated),
