@@ -24,6 +24,23 @@ export default function HomePage() {
       {/* Hero */}
       <section className="relative grid items-center gap-12 py-16 sm:py-24 lg:grid-cols-2">
         <div className="absolute left-0 top-10 -z-10 h-72 w-72 rounded-full bg-brand-gradient opacity-20 blur-3xl animate-float" />
+        {/* Soft floating particles */}
+        <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+          {[
+            { c: "bg-base-blue", s: "h-2 w-2", p: "left-[12%] top-[20%]", d: "0s", dur: "7s" },
+            { c: "bg-base-violet", s: "h-3 w-3", p: "left-[28%] top-[70%]", d: "1.2s", dur: "9s" },
+            { c: "bg-base-pink", s: "h-1.5 w-1.5", p: "left-[60%] top-[15%]", d: "0.6s", dur: "8s" },
+            { c: "bg-base-mint", s: "h-2 w-2", p: "left-[80%] top-[55%]", d: "2s", dur: "10s" },
+            { c: "bg-base-sky", s: "h-1.5 w-1.5", p: "left-[45%] top-[40%]", d: "1.6s", dur: "6.5s" },
+            { c: "bg-base-violet", s: "h-2 w-2", p: "left-[92%] top-[28%]", d: "0.9s", dur: "8.5s" },
+          ].map((dot, i) => (
+            <span
+              key={i}
+              className={`absolute rounded-full ${dot.c} ${dot.s} ${dot.p} opacity-40 animate-float`}
+              style={{ animationDelay: dot.d, animationDuration: dot.dur }}
+            />
+          ))}
+        </div>
         <div>
           <span className="pill">
             <span className="h-2 w-2 rounded-full bg-base-mint" />

@@ -222,6 +222,14 @@ export default function CreatePage() {
   const startPrice = virtualEth / CURVE_SUPPLY; // ETH per token
   const startMcap = startPrice * TOTAL_SUPPLY; // fully diluted, ETH
 
+  // Graduation estimates. At graduation the marginal price equals the target
+  // market cap divided by total supply; the curve's real ETH at that point
+  // seeds the Uniswap pool (minus the ~1 percent graduation fee).
+  const gradPrice = gradMcap / TOTAL_SUPPLY; // ETH per token at graduation
+  const kProduct = virtualEth * CURVE_SUPPLY;
+  const ethAtGrad = Math.sqrt(gradPrice * kProduct);
+  const lpEth = Math.max(0, ethAtGrad - virtualEth) * 0.99;
+
   // If the creator adds an initial buy, simulate it on the constant product
   // curve to estimate tokens received and the share of total supply.
   const buyAmt = Number(initialBuy);
@@ -520,6 +528,11 @@ export default function CreatePage() {
                 />
                 <Row k="Starting market cap" v={`${fmt(startMcap)} ETH`} />
                 <Row k="Graduates at" v={`${fmt(gradMcap)} ETH`} />
+                <Row
+                  k="Graduation price"
+                  v={`${gradPrice.toPrecision(2)} ETH`}
+                />
+                <Row k="Est. LP at graduation" v={`${fmt(lpEth)} ETH`} />
               </div>
 
               <div className="mt-4">
