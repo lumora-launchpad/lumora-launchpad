@@ -9,8 +9,10 @@ import {
   CAMPAIGN_FACTORY_ADDRESS,
   campaignFactoryAbi,
 } from "@/lib/campaigns";
-import { useCampaigns, targetLabel, type CampaignView } from "@/lib/useCampaigns";
+import { useCampaigns, type CampaignView } from "@/lib/useCampaigns";
+import { useCampaignBackers } from "@/lib/useCampaignBackers";
 import { Countdown } from "@/components/Countdown";
+import { formatEth, shortAddress } from "@/lib/tokens";
 
 const DURATIONS = [
   { label: "1 day", secs: 86400 },
@@ -18,7 +20,16 @@ const DURATIONS = [
   { label: "7 days", secs: 604800 },
 ];
 
-function CampaignCard({ c }: { c: CampaignView }) {
+function CMetric({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <p className="text-[11px] font-medium text-slate-400">{label}</p>
+      <p className="text-sm font-bold text-slate-700">{value}</p>
+    </div>
+  );
+}
+
+function CampaignCard({ c, backers }: { c: CampaignView; backers?: number }) {
   const [img, setImg] = useState("");
   useEffect(() => {
     let active = true;
@@ -33,26 +44,29 @@ function CampaignCard({ c }: { c: CampaignView }) {
     };
   }, [c.address]);
 
+  const now = Math.floor(Date.now() / 1000);
+  const ended = !c.launched && c.deadline <= now;
+
   return (
     <Link
       href={`/campaign/${c.address}`}
-      className="card group block transition hover:-translate-y-1 hover:shadow-glow"
+      className="card group block overflow-hidden transition hover:-translate-y-1 hover:shadow-glow"
     >
-      <div className="flex items-center gap-4">
-        {img ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={img}
-            alt={c.name}
-            className="h-14 w-14 rounded-2xl object-cover shadow-glow"
-          />
-        ) : (
-          <div
-            className={`grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-br ${c.accent} text-xl font-black text-white shadow-glow`}
-          >
-            {c.symbol.slice(0, 2)}
-          </div>
-        )}
+      {/* Cover */}
+      {img ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={img}
+          alt={c.name}
+          className="-mx-6 -mt-6 mb-4 h-28 w-[calc(100%+3rem)] object-cover"
+        />
+      ) : (
+        <div
+          className={`-mx-6 -mt-6 mb-4 h-28 w-[calc(100%+3rem)] bg-gradient-to-br ${c.accent}`}
+        />
+      )}
+
+      <div className="flex items-center gap-3">
         <div className="min-w-0">
           <h3 className="truncate text-lg font-bold leading-tight">{c.name}</h3>
           <p className="text-sm font-medium text-slate-400">${c.symbol}</p>
@@ -61,14 +75,29 @@ function CampaignCard({ c }: { c: CampaignView }) {
           className={`ml-auto rounded-full px-3 py-1 text-xs font-bold ${
             c.launched
               ? "bg-base-mint/15 text-base-mint"
-              : "bg-base-violet/10 text-base-violet"
+              : ended
+                ? "bg-slate-100 text-slate-500"
+                : "bg-base-violet/10 text-base-violet"
           }`}
         >
-          {c.launched ? "Launched" : <Countdown deadline={c.deadline} />}
+          {c.launched ? (
+            "Launched"
+          ) : ended ? (
+            "Ended"
+          ) : (
+            <Countdown deadline={c.deadline} />
+          )}
         </span>
       </div>
 
-      <div className="mt-5">
+      <p className="mt-3 text-xs text-slate-400">
+        By{" "}
+        <span className="font-semibold text-slate-600">
+          {shortAddress(c.creator)}
+        </span>
+      </p>
+
+      <div className="mt-4">
         <div className="flex items-center justify-between text-xs font-medium text-slate-500">
           <span>Backed</span>
           <span className="font-bold text-slate-700">
@@ -81,14 +110,17 @@ function CampaignCard({ c }: { c: CampaignView }) {
             style={{ width: `${Math.min(c.progress, 100)}%` }}
           />
         </div>
-        <p className="mt-2 text-xs font-semibold text-slate-400">
-          {targetLabel(c)} committed
-        </p>
       </div>
 
-      <div className="mt-5 flex items-center justify-between">
+      <div className="mt-4 grid grid-cols-3 gap-2 rounded-2xl bg-slate-50 px-4 py-3">
+        <CMetric label="Committed" value={`${formatEth(c.totalCommitted)} ETH`} />
+        <CMetric label="Target" value={`${formatEth(c.targetEth)} ETH`} />
+        <CMetric label="Backers" value={backers != null ? String(backers) : "0"} />
+      </div>
+
+      <div className="mt-4 flex items-center justify-end">
         <span className="text-sm font-bold text-base-blue transition group-hover:translate-x-1">
-          {c.launched ? "View token" : "Back this"}
+          {c.launched ? "View token" : ended ? "View" : "Back this"}
         </span>
       </div>
     </Link>
@@ -180,8 +212,11 @@ function CreateForm() {
     });
   }
 
+  const deadlineDate = new Date(Date.now() + duration * 1000);
+
   return (
-    <form onSubmit={submit} className="card">
+    <div className="grid gap-8 lg:grid-cols-5">
+      <form onSubmit={submit} className="card lg:col-span-3">
       <p className="text-sm text-slate-500">
         Raise commitments. When the target is reached, the token launches and
         backers claim their share. If it falls short, everyone refunds.
@@ -287,7 +322,71 @@ function CreateForm() {
           Campaign created. It will appear below shortly.
         </p>
       )}
-    </form>
+      </form>
+
+      {/* Live preview */}
+      <aside className="lg:col-span-2">
+        <div className="card sticky top-24">
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+            Preview
+          </p>
+          <div className="mt-4 flex items-center gap-4">
+            {imageUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={imageUrl}
+                alt={name || "Campaign"}
+                className="h-16 w-16 rounded-2xl object-cover shadow-glow"
+              />
+            ) : (
+              <div className="grid h-16 w-16 place-items-center rounded-2xl bg-brand-gradient text-2xl font-black text-white shadow-glow">
+                {symbol ? symbol.toUpperCase().slice(0, 2) : "LU"}
+              </div>
+            )}
+            <div>
+              <h3 className="text-xl font-bold">{name || "Campaign name"}</h3>
+              <p className="text-sm font-medium text-slate-400">
+                ${symbol ? symbol.toUpperCase() : "SYMBOL"}
+              </p>
+            </div>
+          </div>
+          <p className="mt-4 text-sm text-slate-500">
+            {blurb || "Your campaign description will appear here."}
+          </p>
+
+          <div className="mt-6 space-y-3 text-sm">
+            <PRow k="Target" v={target ? `${target} ETH` : "Set a target"} />
+            <PRow
+              k="Deadline"
+              v={deadlineDate.toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+              })}
+            />
+            <PRow k="Creator share" v="60% of fees" />
+            <PRow k="Commit fee" v="2%" />
+          </div>
+
+          <div className="mt-5 space-y-2 rounded-2xl bg-slate-50 p-4 text-xs text-slate-500">
+            <p>Launches instantly the moment the target is reached.</p>
+            <p>
+              If the target is not met by the deadline, every backer refunds in
+              full.
+            </p>
+          </div>
+        </div>
+      </aside>
+    </div>
+  );
+}
+
+function PRow({ k, v }: { k: string; v: string }) {
+  return (
+    <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+      <span className="text-slate-500">{k}</span>
+      <span className="font-bold text-slate-800">{v}</span>
+    </div>
   );
 }
 
@@ -303,6 +402,7 @@ const FILTERS: { id: Filter; label: string }[] = [
 export default function CampaignsPage() {
   const { campaigns, isLoading, hasFactory } = useCampaigns();
   const [filter, setFilter] = useState<Filter>("all");
+  const backers = useCampaignBackers(campaigns.map((c) => c.address));
 
   const now = Math.floor(Date.now() / 1000);
   const list = campaigns.filter((c) => {
@@ -365,7 +465,11 @@ export default function CampaignsPage() {
       ) : (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {list.map((c) => (
-            <CampaignCard key={c.address} c={c} />
+            <CampaignCard
+              key={c.address}
+              c={c}
+              backers={backers.get(c.address.toLowerCase())}
+            />
           ))}
         </div>
       )}

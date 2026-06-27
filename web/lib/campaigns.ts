@@ -71,4 +71,13 @@ export const campaignAbi = [
   { type: "function", name: "commit", stateMutability: "payable", inputs: [], outputs: [] },
   { type: "function", name: "claim", stateMutability: "nonpayable", inputs: [], outputs: [] },
   { type: "function", name: "refund", stateMutability: "nonpayable", inputs: [], outputs: [] },
+  {
+    type: "event",
+    name: "Committed",
+    inputs: [
+      { name: "backer", type: "address", indexed: true },
+      { name: "amount", type: "uint256", indexed: false },
+      { name: "total", type: "uint256", indexed: false },
+    ],
+  },
 ] as const;
