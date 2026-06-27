@@ -22,6 +22,22 @@ function fmt(n: number, digits = 2): string {
   return n.toLocaleString("en-US", { maximumFractionDigits: digits });
 }
 
+// Returns an error string for an invalid optional link, or "" when ok or empty.
+function linkError(value: string, host: RegExp, label: string): string {
+  if (!value.trim()) return "";
+  let url: URL;
+  try {
+    url = new URL(value);
+  } catch {
+    return `Enter a full ${label} URL starting with https://`;
+  }
+  if (url.protocol !== "https:" && url.protocol !== "http:") {
+    return `Enter a valid ${label} URL`;
+  }
+  if (!host.test(url.hostname)) return `That does not look like ${label}`;
+  return "";
+}
+
 export default function CreatePage() {
   const { isConnected } = useAccount();
   const [name, setName] = useState("");
@@ -218,6 +234,15 @@ export default function CreatePage() {
     initialShare = (initialTokens / TOTAL_SUPPLY) * 100;
   }
 
+  // Inline validation for the optional links and the ticker.
+  const websiteErr = linkError(website, /.+/, "website");
+  const xErr = linkError(x, /(^|\.)(x|twitter)\.com$/, "X");
+  const telegramErr = linkError(telegram, /(^|\.)t\.me$/, "Telegram");
+  const tickerErr =
+    symbol.length > 0 && symbol.length < 2 ? "Ticker is too short" : "";
+  const formInvalid =
+    !!websiteErr || !!xErr || !!telegramErr || !!tickerErr;
+
   return (
     <div className="mx-auto max-w-6xl px-6 py-14">
       <div className="mx-auto max-w-2xl text-center">
@@ -252,6 +277,17 @@ export default function CreatePage() {
               onChange={(e) => setSymbol(e.target.value.replace(/[^a-zA-Z0-9]/g, ""))}
               maxLength={8}
             />
+            {tickerErr ? (
+              <span className="mt-1 block text-xs font-semibold text-base-pink">
+                {tickerErr}
+              </span>
+            ) : (
+              symbol.length >= 2 && (
+                <span className="mt-1 block text-xs font-semibold text-base-mint">
+                  Ticker looks good
+                </span>
+              )
+            )}
           </label>
 
           <label className="mt-5 block">
@@ -326,32 +362,47 @@ export default function CreatePage() {
             <label className="block">
               <span className="text-sm font-semibold text-slate-700">Website</span>
               <input
-                className="field mt-2"
+                className={`field mt-2 ${websiteErr ? "border-base-pink" : ""}`}
                 placeholder="https://"
                 value={website}
                 onChange={(e) => setWebsite(e.target.value)}
                 maxLength={200}
               />
+              {websiteErr && (
+                <span className="mt-1 block text-xs font-semibold text-base-pink">
+                  {websiteErr}
+                </span>
+              )}
             </label>
             <label className="block">
               <span className="text-sm font-semibold text-slate-700">X</span>
               <input
-                className="field mt-2"
+                className={`field mt-2 ${xErr ? "border-base-pink" : ""}`}
                 placeholder="https://x.com/..."
                 value={x}
                 onChange={(e) => setX(e.target.value)}
                 maxLength={200}
               />
+              {xErr && (
+                <span className="mt-1 block text-xs font-semibold text-base-pink">
+                  {xErr}
+                </span>
+              )}
             </label>
             <label className="block">
               <span className="text-sm font-semibold text-slate-700">Telegram</span>
               <input
-                className="field mt-2"
+                className={`field mt-2 ${telegramErr ? "border-base-pink" : ""}`}
                 placeholder="https://t.me/..."
                 value={telegram}
                 onChange={(e) => setTelegram(e.target.value)}
                 maxLength={200}
               />
+              {telegramErr && (
+                <span className="mt-1 block text-xs font-semibold text-base-pink">
+                  {telegramErr}
+                </span>
+              )}
             </label>
           </div>
 
@@ -392,13 +443,17 @@ export default function CreatePage() {
               <button
                 type="submit"
                 className="btn-primary w-full"
-                disabled={isPending || isConfirming || !name || !symbol}
+                disabled={
+                  isPending || isConfirming || !name || !symbol || formInvalid
+                }
               >
                 {isPending
                   ? "Confirm in wallet"
                   : isConfirming
                     ? "Processing transaction"
-                    : "Launch token"}
+                    : formInvalid
+                      ? "Fix the errors above"
+                      : "Launch token"}
               </button>
             )}
           </div>
