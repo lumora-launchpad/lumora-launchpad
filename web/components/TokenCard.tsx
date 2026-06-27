@@ -52,12 +52,19 @@ function Stat({ label, value }: { label: string; value: string }) {
   );
 }
 
+const BADGES = {
+  king: { label: "King of the hill", cls: "bg-base-pink/15 text-base-pink" },
+  trending: { label: "Trending", cls: "bg-base-violet/15 text-base-violet" },
+} as const;
+
 export function TokenCard({
   token,
   stats,
+  badge,
 }: {
   token: TokenView;
   stats?: TokenStats;
+  badge?: "king" | "trending";
 }) {
   const [metadata, setMetadata] = useState<TokenMetadata | null>(null);
   const animatedProgress = useCountUp(token.progress);
@@ -104,9 +111,18 @@ export function TokenCard({
           </div>
         )}
         <div className="min-w-0">
-          <h3 className="truncate text-lg font-bold leading-tight">
-            {token.name}
-          </h3>
+          <div className="flex items-center gap-1.5">
+            <h3 className="truncate text-lg font-bold leading-tight">
+              {token.name}
+            </h3>
+            {badge && (
+              <span
+                className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold ${BADGES[badge].cls}`}
+              >
+                {BADGES[badge].label}
+              </span>
+            )}
+          </div>
           <p className="text-sm font-medium text-slate-400">${token.symbol}</p>
         </div>
         <div className="ml-auto flex flex-col items-end gap-1">

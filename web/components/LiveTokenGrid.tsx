@@ -152,6 +152,30 @@ export function LiveTokenGrid() {
     return live.reduce((a, b) => (b.progress > a.progress ? b : a));
   }, [tokens, useSample]);
 
+  // The single most active token gets a Trending badge in the grid.
+  const trendingAddr = useMemo(() => {
+    if (useSample) return null;
+    let best: string | null = null;
+    let bestScore = 0;
+    for (const t of tokens) {
+      const s = statOf(t.address);
+      const score = (s?.trades ?? 0) + (s?.volumeEth ?? 0) * 2;
+      if (score > bestScore) {
+        bestScore = score;
+        best = t.address.toLowerCase();
+      }
+    }
+    return best;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tokens, useSample, stats]);
+
+  const badgeFor = (addr: string): "king" | "trending" | undefined => {
+    const a = addr.toLowerCase();
+    if (king && king.address.toLowerCase() === a) return "king";
+    if (trendingAddr === a) return "trending";
+    return undefined;
+  };
+
   const list = useMemo(() => {
     let out = [...base];
     if (status === "live") out = out.filter((t) => !t.graduated);
@@ -276,7 +300,11 @@ export function LiveTokenGrid() {
               className="animate-rise"
               style={{ animationDelay: `${Math.min(i, 8) * 40}ms` }}
             >
-              <TokenCard token={t} stats={statOf(t.address)} />
+              <TokenCard
+                token={t}
+                stats={statOf(t.address)}
+                badge={badgeFor(t.address)}
+              />
             </div>
           ))}
         </div>
