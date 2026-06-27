@@ -9,13 +9,17 @@ export function HeroVisual() {
 
   if (!failed) {
     return (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img
-        src="/hero.png"
-        alt="Lumora"
-        onError={() => setFailed(true)}
-        className="aspect-square w-full rounded-3xl object-cover shadow-card"
-      />
+      <div className="relative">
+        {/* Slow moving glow behind the image for a living feel */}
+        <div className="absolute -inset-4 -z-10 rounded-[2rem] bg-brand-gradient opacity-30 blur-3xl animate-float" />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/hero.png"
+          alt="Lumora"
+          onError={() => setFailed(true)}
+          className="aspect-square w-full rounded-3xl object-cover shadow-card animate-float [animation-duration:8s]"
+        />
+      </div>
     );
   }
 

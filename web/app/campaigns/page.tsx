@@ -9,7 +9,7 @@ import {
   CAMPAIGN_FACTORY_ADDRESS,
   campaignFactoryAbi,
 } from "@/lib/campaigns";
-import { useCampaigns, type CampaignView } from "@/lib/useCampaigns";
+import { useCampaigns, targetLabel, type CampaignView } from "@/lib/useCampaigns";
 import { Countdown } from "@/components/Countdown";
 
 const DURATIONS = [
@@ -81,6 +81,9 @@ function CampaignCard({ c }: { c: CampaignView }) {
             style={{ width: `${Math.min(c.progress, 100)}%` }}
           />
         </div>
+        <p className="mt-2 text-xs font-semibold text-slate-400">
+          {targetLabel(c)} committed
+        </p>
       </div>
 
       <div className="mt-5 flex items-center justify-between">
@@ -179,8 +182,7 @@ function CreateForm() {
 
   return (
     <form onSubmit={submit} className="card">
-      <h2 className="text-lg font-black">Start a campaign</h2>
-      <p className="mt-1 text-sm text-slate-500">
+      <p className="text-sm text-slate-500">
         Raise commitments. When the target is reached, the token launches and
         backers claim their share. If it falls short, everyone refunds.
       </p>
@@ -322,49 +324,59 @@ export default function CampaignsPage() {
         </p>
       </div>
 
-      <CreateForm />
-
+      {/* Running campaigns first, so the page feels alive before the form */}
       {hasFactory && campaigns.length > 0 && (
-        <div className="mt-8 flex gap-1.5 rounded-2xl bg-slate-100 p-1 sm:w-fit">
-          {FILTERS.map((f) => (
-            <button
-              key={f.id}
-              onClick={() => setFilter(f.id)}
-              className={`flex-1 rounded-xl px-3 py-1.5 text-sm font-bold transition sm:flex-none ${
-                filter === f.id
-                  ? "bg-white text-base-blue shadow"
-                  : "text-slate-500 hover:text-slate-700"
-              }`}
-            >
-              {f.label}
-            </button>
-          ))}
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <h2 className="text-xl font-black tracking-tight">Live campaigns</h2>
+          <div className="flex gap-1.5 rounded-2xl bg-slate-100 p-1 sm:w-fit">
+            {FILTERS.map((f) => (
+              <button
+                key={f.id}
+                onClick={() => setFilter(f.id)}
+                className={`flex-1 rounded-xl px-3 py-1.5 text-sm font-bold transition sm:flex-none ${
+                  filter === f.id
+                    ? "bg-white text-base-blue shadow"
+                    : "text-slate-500 hover:text-slate-700"
+                }`}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
         </div>
       )}
 
       {!hasFactory ? (
-        <p className="mt-8 rounded-2xl border border-slate-200 bg-white/60 px-4 py-10 text-center text-sm text-slate-500">
+        <p className="rounded-2xl border border-slate-200 bg-white/60 px-4 py-10 text-center text-sm text-slate-500">
           Campaign factory not connected. Set NEXT_PUBLIC_CAMPAIGN_FACTORY_ADDRESS.
         </p>
       ) : isLoading ? (
-        <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="card h-44 animate-pulse bg-slate-50" />
           ))}
         </div>
       ) : list.length === 0 ? (
-        <p className="mt-6 rounded-2xl border border-slate-200 bg-white/60 px-4 py-10 text-center text-sm text-slate-500">
+        <p className="rounded-2xl border border-slate-200 bg-white/60 px-4 py-10 text-center text-sm text-slate-500">
           {campaigns.length === 0
-            ? "No campaigns yet. Start the first one above."
+            ? "No campaigns yet. Start the first one below."
             : "No campaigns match this filter."}
         </p>
       ) : (
-        <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {list.map((c) => (
             <CampaignCard key={c.address} c={c} />
           ))}
         </div>
       )}
+
+      {/* Start a new campaign */}
+      <div className="mt-12">
+        <h2 className="mb-4 text-xl font-black tracking-tight">
+          Start a <span className="gradient-text">campaign</span>
+        </h2>
+        <CreateForm />
+      </div>
     </div>
   );
 }

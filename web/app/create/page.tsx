@@ -1,12 +1,26 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { decodeEventLog, parseEther } from "viem";
-import { useAccount, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
+import { decodeEventLog, formatEther, parseEther } from "viem";
+import {
+  useAccount,
+  useReadContracts,
+  useWriteContract,
+  useWaitForTransactionReceipt,
+} from "wagmi";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { FACTORY_ADDRESS, factoryAbi } from "@/lib/contracts";
 import { txExplorerUrl } from "@/lib/wagmi";
 import { useToast } from "@/components/Toast";
+
+const ZERO = "0x0000000000000000000000000000000000000000";
+const TOTAL_SUPPLY = 1_000_000_000;
+const CURVE_SUPPLY = 800_000_000;
+const FEE = 0.01;
+
+function fmt(n: number, digits = 2): string {
+  return n.toLocaleString("en-US", { maximumFractionDigits: digits });
+}
 
 export default function CreatePage() {
   const { isConnected } = useAccount();
@@ -33,6 +47,16 @@ export default function CreatePage() {
     isSuccess,
   } = useWaitForTransactionReceipt({
     hash,
+  });
+
+  // Read the live curve parameters so the preview can estimate the starting
+  // price, market cap, and graduation target for a freshly launched token.
+  const { data: curveParams } = useReadContracts({
+    contracts: [
+      { address: FACTORY_ADDRESS, abi: factoryAbi, functionName: "virtualEthReserve" },
+      { address: FACTORY_ADDRESS, abi: factoryAbi, functionName: "graduationMarketCap" },
+    ],
+    query: { enabled: FACTORY_ADDRESS.toLowerCase() !== ZERO },
   });
 
   useEffect(() => {
@@ -170,6 +194,29 @@ export default function CreatePage() {
   }
 
   const preview = symbol ? symbol.toUpperCase().slice(0, 2) : "LU";
+
+  // Curve estimates for the preview. Falls back to the known defaults if the
+  // factory read is not in yet, so the panel never shows blanks.
+  const virtualEth = curveParams?.[0]?.result
+    ? Number(formatEther(curveParams[0].result as bigint))
+    : 1;
+  const gradMcap = curveParams?.[1]?.result
+    ? Number(formatEther(curveParams[1].result as bigint))
+    : 20;
+  const startPrice = virtualEth / CURVE_SUPPLY; // ETH per token
+  const startMcap = startPrice * TOTAL_SUPPLY; // fully diluted, ETH
+
+  // If the creator adds an initial buy, simulate it on the constant product
+  // curve to estimate tokens received and the share of total supply.
+  const buyAmt = Number(initialBuy);
+  let initialTokens = 0;
+  let initialShare = 0;
+  if (initialBuy && !Number.isNaN(buyAmt) && buyAmt > 0) {
+    const k = virtualEth * CURVE_SUPPLY;
+    const newEth = virtualEth + buyAmt * (1 - FEE);
+    initialTokens = CURVE_SUPPLY - k / newEth;
+    initialShare = (initialTokens / TOTAL_SUPPLY) * 100;
+  }
 
   return (
     <div className="mx-auto max-w-6xl px-6 py-14">
@@ -391,6 +438,57 @@ export default function CreatePage() {
               <Row k="On the curve" v="800,000,000" />
               <Row k="Trading fee" v="1%" />
               <Row k="Your share" v="35% of fee" />
+            </div>
+
+            {/* At launch estimates from the live curve */}
+            <div className="mt-6 rounded-2xl bg-slate-50 p-4">
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                At launch
+              </p>
+              <div className="mt-3 space-y-3 text-sm">
+                <Row
+                  k="Starting price"
+                  v={`${startPrice.toPrecision(2)} ETH`}
+                />
+                <Row k="Starting market cap" v={`${fmt(startMcap)} ETH`} />
+                <Row k="Graduates at" v={`${fmt(gradMcap)} ETH`} />
+              </div>
+
+              <div className="mt-4">
+                <div className="flex items-center justify-between text-xs font-medium text-slate-500">
+                  <span>Bonding curve</span>
+                  <span className="font-bold text-slate-700">
+                    {Math.min((startMcap / gradMcap) * 100, 100).toFixed(0)}% to
+                    graduation
+                  </span>
+                </div>
+                <div className="mt-2 h-2.5 w-full overflow-hidden rounded-full bg-slate-200">
+                  <div
+                    className="h-full rounded-full bg-brand-gradient"
+                    style={{
+                      width: `${Math.min((startMcap / gradMcap) * 100, 100)}%`,
+                    }}
+                  />
+                </div>
+              </div>
+
+              {initialTokens > 0 && (
+                <div className="mt-4 rounded-xl bg-white p-3 text-sm">
+                  <p className="font-semibold text-slate-700">
+                    Your initial buy
+                  </p>
+                  <div className="mt-2 space-y-2">
+                    <Row
+                      k="You receive"
+                      v={`${fmt(initialTokens, 0)} ${symbol ? symbol.toUpperCase() : "tokens"}`}
+                    />
+                    <Row
+                      k="Share of supply"
+                      v={`${initialShare.toFixed(2)}%`}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

@@ -38,6 +38,20 @@ export const factoryAbi = [
   },
   {
     type: "function",
+    name: "graduationMarketCap",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ name: "", type: "uint256" }],
+  },
+  {
+    type: "function",
+    name: "virtualEthReserve",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ name: "", type: "uint256" }],
+  },
+  {
+    type: "function",
     name: "tokensByCreator",
     stateMutability: "view",
     inputs: [
