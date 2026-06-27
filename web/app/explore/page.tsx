@@ -2,6 +2,7 @@ import Link from "next/link";
 import { LiveTokenGrid } from "@/components/LiveTokenGrid";
 import { NewTokenTicker } from "@/components/NewTokenTicker";
 import { ExploreCampaigns } from "@/components/ExploreCampaigns";
+import { LiveActivity } from "@/components/LiveActivity";
 
 export default function ExplorePage() {
   return (
@@ -9,10 +10,14 @@ export default function ExplorePage() {
       <NewTokenTicker />
 
       <div className="mt-8">
+        <LiveActivity />
+      </div>
+
+      <div className="mt-10">
         <ExploreCampaigns />
       </div>
 
-      <section id="explore">
+      <section id="explore" className="mt-10">
         <div className="flex items-end justify-between">
           <div>
             <h1 className="text-3xl font-black tracking-tight">

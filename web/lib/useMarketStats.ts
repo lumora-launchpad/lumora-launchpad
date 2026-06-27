@@ -9,6 +9,7 @@ export type TokenStats = {
   volumeEth: number; // total ETH traded (buys + sells)
   trades: number;
   traders: number; // unique buyer/seller addresses
+  holders: number; // addresses with a positive net token balance from trades
   price: number; // latest trade price, ETH per token
   spark: number[]; // recent price series, oldest to newest
   createdMs?: number; // creation block timestamp
@@ -42,6 +43,7 @@ type Row = {
   token: string;
   actor: string;
   eth: number;
+  tokenDelta: number; // + on buy, - on sell, in whole tokens
   price: number | null;
 };
 
@@ -98,6 +100,7 @@ export function useMarketStats(addresses: string[]): Map<string, TokenStats> {
             token,
             actor: (a.buyer ?? "").toLowerCase(),
             eth: a.ethIn ? Number(formatEther(a.ethIn)) : 0,
+            tokenDelta: a.tokensOut ? Number(formatEther(a.tokensOut)) : 0,
             price: priceOf(a.ethIn as bigint, a.tokensOut as bigint),
           });
         }
@@ -111,6 +114,7 @@ export function useMarketStats(addresses: string[]): Map<string, TokenStats> {
             token,
             actor: (a.seller ?? "").toLowerCase(),
             eth: a.ethOut ? Number(formatEther(a.ethOut)) : 0,
+            tokenDelta: a.tokensIn ? -Number(formatEther(a.tokensIn)) : 0,
             price: priceOf(a.ethOut as bigint, a.tokensIn as bigint),
           });
         }
@@ -126,16 +130,23 @@ export function useMarketStats(addresses: string[]): Map<string, TokenStats> {
 
         const map = new Map<string, TokenStats>();
         const traderSets = new Map<string, Set<string>>();
+        // Per token, per actor running token balance, to count current holders.
+        const balances = new Map<string, Map<string, number>>();
         for (const r of rows) {
           let s = map.get(r.token);
           if (!s) {
-            s = { volumeEth: 0, trades: 0, traders: 0, price: 0, spark: [] };
+            s = { volumeEth: 0, trades: 0, traders: 0, holders: 0, price: 0, spark: [] };
             map.set(r.token, s);
             traderSets.set(r.token, new Set());
+            balances.set(r.token, new Map());
           }
           s.volumeEth += r.eth;
           s.trades += 1;
-          if (r.actor) traderSets.get(r.token)!.add(r.actor);
+          if (r.actor) {
+            traderSets.get(r.token)!.add(r.actor);
+            const bal = balances.get(r.token)!;
+            bal.set(r.actor, (bal.get(r.actor) ?? 0) + r.tokenDelta);
+          }
           if (r.price !== null) {
             s.price = r.price;
             s.spark.push(r.price);
@@ -144,6 +155,11 @@ export function useMarketStats(addresses: string[]): Map<string, TokenStats> {
         }
         for (const [token, set] of traderSets) {
           map.get(token)!.traders = set.size;
+        }
+        for (const [token, bal] of balances) {
+          let holders = 0;
+          for (const v of bal.values()) if (v > 1e-9) holders += 1;
+          map.get(token)!.holders = holders;
         }
 
         // creation timestamps (one getBlock per unique block, cached)
@@ -163,6 +179,7 @@ export function useMarketStats(addresses: string[]): Map<string, TokenStats> {
             volumeEth: 0,
             trades: 0,
             traders: 0,
+            holders: 0,
             price: 0,
             spark: [],
           };
