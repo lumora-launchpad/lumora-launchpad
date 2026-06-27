@@ -43,13 +43,27 @@ lumora-launchpad/
   scripts/deploy.sh   Pull, build, and restart the self-hosted web app
 ```
 
+## Two launch modes that differ economically
+
+The launch mode changes who earns more of the trade fee, which is the core
+positioning:
+
+- **Instant.** The token trades the moment it is created. The 1 percent trade fee
+  splits 65 to the developer treasury, 35 to the creator.
+- **Campaign (demand gated).** The token only launches once real backers commit
+  enough ETH, killing zombie coins that launch into no demand. To reward the
+  creator who brought that demand, the split flips toward them: 40 to the
+  developer, 60 to the creator.
+
+Both splits are immutable per token and set at creation. The factory owner can
+retune the defaults for future tokens via `setConfig`.
+
 ## How the fee works
 
-Every buy and sell pays a 1 percent fee, split inside the contract: 65 percent
-to the developer treasury (you), 35 percent to the token creator. The developer
-also takes a graduation fee on the raised ETH when a token graduates, and a
-commit fee on a campaign that launches. Set `devTreasury` in `LaunchpadFactory`
-to your wallet before deploying.
+Every buy and sell pays a 1 percent fee, split inside the contract per the mode
+above. The developer treasury also takes a graduation fee on the raised ETH when
+a token graduates, and a commit fee on a campaign that launches. Set
+`devTreasury` in `LaunchpadFactory` to your wallet before deploying.
 
 ## Running the smart contracts
 
@@ -87,16 +101,17 @@ npm run dev
 Open http://localhost:3000. To publish, see `web/DEPLOY_VERCEL.md` (Vercel) or
 use `scripts/deploy.sh` for a self-hosted server behind a reverse proxy.
 
-## Important notes
+## Status
 
-This is a solid starting point, not a mainnet ready release. Before using real
-funds, get a review and audit, switch to the real Uniswap v2 router on Base
-mainnet, retune the curve parameters (`virtualEthReserve`, `graduationMarketCap`)
-and the anti-snipe window, and consider extra protections.
+The product is feature complete on the Base Sepolia testnet, live at
+https://lumora.men. It is not a mainnet ready release: the contracts hold real
+funds on mainnet, so an audit is a hard gate before going live.
 
-## Suggested next steps
+- `AUDIT.md` is the review scope: contracts in scope, trust roles, invariants,
+  and focus areas. Start here before a mainnet deploy.
+- `LAUNCH.md` is the path to going live: the pre-mainnet checklist (real router,
+  fresh keys, production params, mainnet web env) and the go-to-market plan.
 
-- Farcaster integration (Frame or bot) so tokens can be launched and traded from
-  the Base social feed, the main distribution channel on Base
-- A mainnet deployment after an audit
-- Advanced discovery filters (sort by buys, age, market cap change)
+After an audit, deploy with `make deploy-mainnet` using the real Base Uniswap v2
+router, a fresh deployer key, and a secure treasury, then point the web app at
+the new factory addresses on chain id 8453.
