@@ -36,7 +36,7 @@ export function Navbar() {
         <div className="flex items-center gap-3">
           <GlobalSearch className="hidden w-48 lg:block" />
           <Link href="/create" className="hidden btn-primary !px-5 !py-2.5 sm:inline-flex">
-            Launch
+            New Launch
           </Link>
           <ConnectButton showBalance={false} chainStatus="icon" accountStatus="address" />
 
@@ -87,7 +87,7 @@ export function Navbar() {
               onClick={() => setOpen(false)}
               className="btn-primary mt-2 w-full"
             >
-              Launch
+              New Launch
             </Link>
           </nav>
         </div>
