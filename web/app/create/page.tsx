@@ -376,8 +376,17 @@ export default function CreatePage() {
 
           <div className="mt-6">
             {!isConnected ? (
-              <div className="flex justify-center">
-                <ConnectButton />
+              <div className="space-y-3">
+                <button
+                  type="button"
+                  disabled
+                  className="btn-primary w-full"
+                >
+                  Connect wallet to continue
+                </button>
+                <div className="flex justify-center">
+                  <ConnectButton />
+                </div>
               </div>
             ) : (
               <button

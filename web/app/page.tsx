@@ -2,6 +2,22 @@ import Link from "next/link";
 import { HeroVisual } from "@/components/HeroVisual";
 import { LandingStats } from "@/components/LandingStats";
 
+function CheckIcon({ className = "" }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className={`h-4 w-4 ${className}`}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M20 6L9 17l-5-5" />
+    </svg>
+  );
+}
+
 export default function HomePage() {
   return (
     <div className="mx-auto max-w-7xl px-6">
@@ -19,8 +35,8 @@ export default function HomePage() {
             <span className="gradient-text">Two ways to launch.</span>
           </h1>
           <p className="mt-6 max-w-md text-lg text-slate-500">
-            Launch a token instantly, or launch it only when real demand shows
-            up. Bright, fair, on Base.
+            Choose how your token begins. Launch instantly with a bonding curve,
+            or launch only after real demand is proven.
           </p>
           <div className="mt-9 flex flex-col gap-3 sm:flex-row">
             <Link href="/create" className="btn-primary w-full sm:w-auto">
@@ -71,11 +87,21 @@ export default function HomePage() {
             <h3 className="mt-5 text-xl font-bold">Trade from second one</h3>
             <p className="mt-2 text-sm text-slate-500">
               Enter a name and symbol and your token deploys instantly with a
-              fair price curve. Anyone can trade right away. Fast and simple.
+              fair price curve. Anyone can trade right away.
             </p>
+            <ul className="mt-4 space-y-2 text-sm text-slate-600">
+              {["Best for memes", "Immediate trading", "Bonding curve"].map(
+                (b) => (
+                  <li key={b} className="flex items-center gap-2">
+                    <CheckIcon className="text-base-blue" />
+                    {b}
+                  </li>
+                ),
+              )}
+            </ul>
             <Link
               href="/create"
-              className="mt-4 inline-block text-sm font-bold text-base-blue hover:underline"
+              className="mt-5 inline-block text-sm font-bold text-base-blue hover:underline"
             >
               Start an instant launch
             </Link>
@@ -97,11 +123,23 @@ export default function HomePage() {
             <h3 className="mt-5 text-xl font-bold">Launch only on real demand</h3>
             <p className="mt-2 text-sm text-slate-500">
               Raise commitments first. The token only launches once backers hit
-              the target, then they claim pro rata. Refunds if it falls short.
+              the target, then they claim pro rata.
             </p>
+            <ul className="mt-4 space-y-2 text-sm text-slate-600">
+              {[
+                "Best for communities",
+                "Launch after target reached",
+                "Refund if unsuccessful",
+              ].map((b) => (
+                <li key={b} className="flex items-center gap-2">
+                  <CheckIcon className="text-base-violet" />
+                  {b}
+                </li>
+              ))}
+            </ul>
             <Link
               href="/campaigns"
-              className="mt-4 inline-block text-sm font-bold text-base-violet hover:underline"
+              className="mt-5 inline-block text-sm font-bold text-base-violet hover:underline"
             >
               Start a demand campaign
             </Link>
@@ -114,13 +152,24 @@ export default function HomePage() {
         <h2 className="text-center text-3xl font-black tracking-tight">
           Why <span className="gradient-text">Lumora</span>
         </h2>
-        <div className="mt-10 grid gap-6 sm:grid-cols-3">
+        <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {[
             {
               t: "Fair launch",
-              d: "An anti-snipe window caps per-wallet buys at the start, so bots cannot grab the whole curve before anyone else.",
+              d: "Every token starts on the same fair price curve, with no presale and no hidden allocation for insiders.",
               icon: (
                 <path d="M12 3l7 3v5c0 4-3 7-7 8-4-1-7-4-7-8V6l7-3z" />
+              ),
+            },
+            {
+              t: "Anti snipe",
+              d: "An opening window caps per-wallet buys for the first blocks, so bots cannot grab the whole curve before anyone else.",
+              icon: (
+                <>
+                  <circle cx="12" cy="12" r="9" />
+                  <path d="M12 3v3M12 18v3M3 12h3M18 12h3" />
+                  <circle cx="12" cy="12" r="2.5" />
+                </>
               ),
             },
             {
@@ -167,33 +216,63 @@ export default function HomePage() {
         <p className="mx-auto mt-3 max-w-xl text-center text-slate-500">
           From idea to locked liquidity in one simple flow.
         </p>
-        <div className="mt-10 grid gap-6 md:grid-cols-4">
+        <div className="relative mt-12">
+          {/* Connecting line behind the steps */}
+          <div className="absolute left-0 right-0 top-5 hidden h-0.5 bg-gradient-to-r from-base-blue via-base-violet to-base-pink md:block" />
+          <div className="grid gap-8 md:grid-cols-4">
+            {[
+              {
+                n: "1",
+                t: "Choose",
+                d: "Pick an instant launch, or a demand campaign that only fires when backers commit.",
+              },
+              {
+                n: "2",
+                t: "Launch",
+                d: "Your token deploys on a fair price curve, ready to trade on Base.",
+              },
+              {
+                n: "3",
+                t: "Trade",
+                d: "Anyone can buy and sell on the curve. Every trade pays a 1 percent fee.",
+              },
+              {
+                n: "4",
+                t: "Graduate",
+                d: "At the target, liquidity moves to Uniswap and the LP is locked forever.",
+              },
+            ].map((step) => (
+              <div key={step.n} className="relative text-center md:text-left">
+                <div className="mx-auto grid h-10 w-10 place-items-center rounded-full bg-brand-gradient text-sm font-black text-white shadow-glow md:mx-0">
+                  {step.n}
+                </div>
+                <h3 className="mt-4 text-lg font-bold">{step.t}</h3>
+                <p className="mt-2 text-sm text-slate-500">{step.d}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Trust */}
+      <section className="py-12">
+        <h2 className="text-center text-3xl font-black tracking-tight">
+          Why users <span className="gradient-text">trust Lumora</span>
+        </h2>
+        <div className="mx-auto mt-10 grid max-w-4xl gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {[
-            {
-              n: "01",
-              t: "Choose launch type",
-              d: "Pick an instant launch, or a demand campaign that only fires when backers commit.",
-            },
-            {
-              n: "02",
-              t: "Launch",
-              d: "Your token deploys on a fair price curve, ready to trade on Base.",
-            },
-            {
-              n: "03",
-              t: "Trade",
-              d: "Anyone can buy and sell on the curve. Every trade pays a 1 percent fee.",
-            },
-            {
-              n: "04",
-              t: "Graduate",
-              d: "At the target, liquidity moves to Uniswap and the LP is locked forever.",
-            },
-          ].map((step) => (
-            <div key={step.n} className="card">
-              <span className="text-sm font-black text-base-blue">{step.n}</span>
-              <h3 className="mt-2 text-lg font-bold">{step.t}</h3>
-              <p className="mt-2 text-sm text-slate-500">{step.d}</p>
+            "Liquidity locks on graduation",
+            "LP is burned, not held",
+            "Anti snipe protection",
+            "Open source contracts",
+            "No hidden mint",
+            "Refunds on failed campaigns",
+          ].map((t) => (
+            <div key={t} className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white/70 px-4 py-3 backdrop-blur">
+              <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-base-mint/15 text-base-mint">
+                <CheckIcon />
+              </span>
+              <span className="text-sm font-semibold text-slate-700">{t}</span>
             </div>
           ))}
         </div>
@@ -203,7 +282,9 @@ export default function HomePage() {
       <section className="pb-24">
         <div className="card overflow-hidden bg-brand-gradient text-white">
           <div className="flex flex-col items-center gap-5 px-8 py-14 text-center">
-            <h2 className="text-3xl font-black sm:text-4xl">Ready to launch?</h2>
+            <h2 className="text-3xl font-black sm:text-4xl">
+              Ready to build your community on Base?
+            </h2>
             <p className="max-w-lg text-white/80">
               Launch instantly, or let real demand decide. Either way, liquidity
               locks on graduation.
