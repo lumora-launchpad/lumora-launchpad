@@ -10,15 +10,15 @@ import { useWatchlist } from "@/lib/useWatchlist";
 import { sampleTokens } from "@/lib/sampleTokens";
 import type { TokenView } from "@/lib/tokens";
 
-type Sort = "new" | "progress" | "almost" | "volume" | "trades";
+type Sort = "new" | "trending" | "almost" | "volume" | "holders";
 type Status = "all" | "live" | "listed" | "saved";
 
 const SORTS: { id: Sort; label: string }[] = [
   { id: "new", label: "Newest" },
-  { id: "volume", label: "Top volume" },
-  { id: "trades", label: "Most traded" },
-  { id: "progress", label: "Top progress" },
-  { id: "almost", label: "Almost there" },
+  { id: "trending", label: "Trending" },
+  { id: "almost", label: "Graduating soon" },
+  { id: "volume", label: "Highest volume" },
+  { id: "holders", label: "Most holders" },
 ];
 
 const STATUSES: { id: Status; label: string }[] = [
@@ -163,8 +163,13 @@ export function LiveTokenGrid() {
           t.symbol.toLowerCase().includes(q),
       );
     }
-    if (sort === "progress") {
-      out.sort((a, b) => b.progress - a.progress);
+    if (sort === "trending") {
+      // Recent activity blend: trades weighted with volume.
+      const score = (addr: string) => {
+        const s = statOf(addr);
+        return (s?.trades ?? 0) + (s?.volumeEth ?? 0) * 2;
+      };
+      out.sort((a, b) => score(b.address) - score(a.address));
     } else if (sort === "almost") {
       out = out
         .filter((t) => !t.graduated)
@@ -175,10 +180,10 @@ export function LiveTokenGrid() {
           (statOf(b.address)?.volumeEth ?? 0) -
           (statOf(a.address)?.volumeEth ?? 0),
       );
-    } else if (sort === "trades") {
+    } else if (sort === "holders") {
       out.sort(
         (a, b) =>
-          (statOf(b.address)?.trades ?? 0) - (statOf(a.address)?.trades ?? 0),
+          (statOf(b.address)?.holders ?? 0) - (statOf(a.address)?.holders ?? 0),
       );
     }
     // "new" keeps the incoming order (already newest first)

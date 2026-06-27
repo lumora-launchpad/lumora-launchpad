@@ -43,6 +43,7 @@ export function useTokens(): {
     { address: addr, abi: tokenAbi, functionName: "graduationProgressBps" } as const,
     { address: addr, abi: tokenAbi, functionName: "realEthReserve" } as const,
     { address: addr, abi: tokenAbi, functionName: "graduated" } as const,
+    { address: addr, abi: tokenAbi, functionName: "creator" } as const,
   ]);
 
   const { data: meta, isLoading: metaLoading } = useReadContracts({
@@ -53,12 +54,13 @@ export function useTokens(): {
   const tokens: TokenView[] = [];
   if (meta) {
     for (let i = 0; i < ordered.length; i++) {
-      const b = i * 5;
+      const b = i * 6;
       const name = meta[b]?.result as string | undefined;
       const symbol = meta[b + 1]?.result as string | undefined;
       const bps = meta[b + 2]?.result as bigint | undefined;
       const raised = meta[b + 3]?.result as bigint | undefined;
       const graduated = meta[b + 4]?.result as boolean | undefined;
+      const creator = meta[b + 5]?.result as string | undefined;
       if (!name || !symbol) continue;
 
       tokens.push({
@@ -70,6 +72,7 @@ export function useTokens(): {
         progress: bps ? Number(bps) / 100 : 0,
         accent: accentFor(ordered[i]),
         graduated: Boolean(graduated),
+        creator,
       });
     }
   }

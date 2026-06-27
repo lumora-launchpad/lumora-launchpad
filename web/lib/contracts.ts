@@ -201,4 +201,14 @@ export const tokenAbi = [
       { name: "fee", type: "uint256", indexed: false },
     ],
   },
+  {
+    type: "event",
+    name: "Graduated",
+    inputs: [
+      { name: "pair", type: "address", indexed: true },
+      { name: "ethLiquidity", type: "uint256", indexed: false },
+      { name: "tokenLiquidity", type: "uint256", indexed: false },
+      { name: "devFee", type: "uint256", indexed: false },
+    ],
+  },
 ] as const;

@@ -11,7 +11,13 @@ export type TokenView = {
   progress: number; // 0 to 100
   accent: string; // tailwind gradient classes
   graduated?: boolean;
+  creator?: string;
 };
+
+export function shortAddress(addr?: string): string {
+  if (!addr || addr.length < 10) return "unknown";
+  return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
+}
 
 const ACCENTS = [
   "from-base-blue to-base-violet",

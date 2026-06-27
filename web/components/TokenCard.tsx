@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import type { TokenView } from "@/lib/tokens";
+import { shortAddress, type TokenView } from "@/lib/tokens";
 import type { TokenStats } from "@/lib/useMarketStats";
 import { Sparkline } from "./Sparkline";
 import { StarButton } from "./StarButton";
@@ -30,9 +30,22 @@ function fmtVol(n: number): string {
   return n.toLocaleString("en-US", { maximumFractionDigits: 2 });
 }
 
+// Rough linear estimate of time to graduation from the launch pace so far.
+// Honest "est." label, since real pace varies with demand.
+function graduationEta(progress: number, createdMs?: number): string | null {
+  if (!createdMs || progress <= 1 || progress >= 100) return null;
+  const elapsed = Date.now() - createdMs;
+  if (elapsed <= 0) return null;
+  const remaining = (elapsed * (100 - progress)) / progress;
+  const h = remaining / 3_600_000;
+  if (h < 1) return `~${Math.max(1, Math.round(remaining / 60_000))}m`;
+  if (h < 48) return `~${Math.round(h)}h`;
+  return `~${Math.round(h / 24)}d`;
+}
+
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex-1">
+    <div>
       <p className="text-[11px] font-medium text-slate-400">{label}</p>
       <p className="text-sm font-bold text-slate-700">{value}</p>
     </div>
@@ -66,6 +79,7 @@ export function TokenCard({
     metadata?.description || token.blurb || "Live token on the Base curve.";
   const imageUrl = metadata?.imageUrl || token.imageUrl;
   const spark = stats?.spark ?? [];
+  const eta = stats ? graduationEta(token.progress, stats.createdMs) : null;
 
   return (
     <Link
@@ -108,17 +122,36 @@ export function TokenCard({
 
       <p className="mt-4 line-clamp-2 text-sm text-slate-500">{description}</p>
 
-      {stats && (
-        <div className="mt-4 flex items-center gap-2 rounded-2xl bg-slate-50 px-4 py-2.5">
-          <Stat label="Age" value={ago(stats.createdMs)} />
-          <Stat label="Volume" value={`${fmtVol(stats.volumeEth)} ETH`} />
-          <Stat label="Traders" value={String(stats.traders)} />
-        </div>
-      )}
+      {/* Key metrics */}
+      <div className="mt-4 grid grid-cols-4 gap-2 rounded-2xl bg-slate-50 px-4 py-3">
+        <Stat label="MCap" value={`${fmtVol(token.raisedEth)} ETH`} />
+        <Stat
+          label="Volume"
+          value={stats ? `${fmtVol(stats.volumeEth)} ETH` : "0"}
+        />
+        <Stat label="Holders" value={stats ? String(stats.holders) : "0"} />
+        <Stat label="Age" value={stats ? ago(stats.createdMs) : "new"} />
+      </div>
 
-      <div className="mt-5">
+      {/* Creator and fee */}
+      <div className="mt-3 flex items-center justify-between text-xs text-slate-400">
+        <span>
+          By{" "}
+          <span className="font-semibold text-slate-600">
+            {shortAddress(token.creator)}
+          </span>
+        </span>
+        <span className="pill !py-1 !text-xs">1% fee</span>
+      </div>
+
+      <div className="mt-4">
         <div className="flex items-center justify-between text-xs font-medium text-slate-500">
-          <span>Curve progress</span>
+          <span>
+            Curve progress
+            {eta && !token.graduated && (
+              <span className="ml-1 text-slate-400">graduates {eta}</span>
+            )}
+          </span>
           <span className="font-bold text-slate-700">
             {Math.round(animatedProgress)}%
           </span>
@@ -131,8 +164,7 @@ export function TokenCard({
         </div>
       </div>
 
-      <div className="mt-5 flex items-center justify-between">
-        <span className="pill">Raised {token.marketCap}</span>
+      <div className="mt-5 flex items-center justify-end">
         <span className="text-sm font-bold text-base-blue transition group-hover:translate-x-1">
           Trade
         </span>
