@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { HeroVisual } from "@/components/HeroVisual";
 import { LandingStats } from "@/components/LandingStats";
+import { DashboardPreview } from "@/components/DashboardPreview";
 
 function CheckIcon({ className = "" }: { className?: string }) {
   return (
@@ -14,6 +15,24 @@ function CheckIcon({ className = "" }: { className?: string }) {
       strokeLinejoin="round"
     >
       <path d="M20 6L9 17l-5-5" />
+    </svg>
+  );
+}
+
+function BoltIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="mr-2 h-5 w-5" fill="currentColor" aria-hidden>
+      <path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z" />
+    </svg>
+  );
+}
+
+function TargetIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="mr-2 h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <circle cx="12" cy="12" r="9" />
+      <circle cx="12" cy="12" r="4.5" />
+      <circle cx="12" cy="12" r="1" fill="currentColor" />
     </svg>
   );
 }
@@ -43,24 +62,27 @@ export default function HomePage() {
         </div>
         <div>
           <span className="pill">
-            <span className="h-2 w-2 rounded-full bg-base-mint" />
-            Live on Base
+            <span className="h-2 w-2 rounded-full bg-base-violet" />
+            Built on Base
           </span>
           <h1 className="mt-6 text-5xl font-black leading-tight tracking-tight sm:text-6xl">
-            One launchpad.
+            The new era of
             <br />
-            <span className="gradient-text">Two ways to launch.</span>
+            <span className="text-base-violet">fair</span> token{" "}
+            <span className="gradient-text">launches</span>
           </h1>
           <p className="mt-6 max-w-md text-lg text-slate-500">
-            Choose how your token begins. Launch instantly with a bonding curve,
-            or launch only after real demand is proven.
+            Launch instantly with a fair bonding curve, or create a demand
+            campaign. Powered by the Base network.
           </p>
           <div className="mt-9 flex flex-col gap-3 sm:flex-row">
             <Link href="/create" className="btn-primary w-full sm:w-auto">
-              Instant Launch
+              <BoltIcon />
+              Launch Instantly
             </Link>
             <Link href="/campaigns" className="btn-ghost w-full sm:w-auto">
-              Demand Campaign
+              <TargetIcon />
+              Create Campaign
             </Link>
           </div>
           <Link
@@ -78,6 +100,9 @@ export default function HomePage() {
 
       {/* Social proof */}
       <LandingStats />
+
+      {/* Interface preview */}
+      <DashboardPreview />
 
       {/* The two launch modes */}
       <section className="py-12">
