@@ -62,6 +62,7 @@ export type DisplayCampaign = {
   featured?: boolean;
   sample: boolean;
   createdAt: number; // unix seconds, for ordering New
+  token?: string; // launched token address, for graduated campaigns
 };
 
 export type RiskLevel = "Low" | "Medium" | "High";
@@ -113,6 +114,7 @@ export function useDisplayCampaigns(): {
       accent: c.accent,
       sample: false,
       createdAt: now - i, // real campaigns are returned newest first
+      token: c.token,
     };
   });
 

@@ -2,6 +2,18 @@
 
 import { useDisplayCampaigns, type DisplayCampaign } from "./campaignDisplay";
 import { useWatchlist } from "./useWatchlist";
+import { usePrefs, type NotifPrefs } from "./usePrefs";
+
+// Maps each notification kind to the preference group that gates it.
+const GROUP: Record<NotificationKind, keyof NotifPrefs> = {
+  fifty: "milestones",
+  seventyfive: "milestones",
+  almost: "milestones",
+  launched: "launches",
+  failed: "launches",
+  refund: "refunds",
+  featured: "featured",
+};
 
 export type NotificationKind =
   | "fifty"
@@ -90,6 +102,7 @@ function statusNotification(c: DisplayCampaign): NotificationItem | null {
 export function useNotifications(): NotificationItem[] {
   const { all } = useDisplayCampaigns();
   const { list } = useWatchlist();
+  const { prefs } = usePrefs();
 
   const items: NotificationItem[] = [];
   const watched = new Set(list);
@@ -113,5 +126,6 @@ export function useNotifications(): NotificationItem[] {
     });
   }
 
-  return items;
+  // Respect the notification preferences set in Settings.
+  return items.filter((n) => prefs.notif[GROUP[n.kind]]);
 }

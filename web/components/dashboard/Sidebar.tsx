@@ -13,18 +13,15 @@ type NavItem = { label: string; href: string; icon: IconName };
 // nothing dead ends.
 const NAV: NavItem[] = [
   { label: "Home", href: "/", icon: "home" },
-  { label: "Explore Campaign", href: "/discover", icon: "compass" },
-  { label: "Almost Funded", href: "/#almost-funded", icon: "target" },
-  { label: "Ending Soon", href: "/#ending-soon", icon: "clock" },
-  { label: "Launch Campaign", href: "/campaigns", icon: "rocket" },
+  { label: "Explore", href: "/explore", icon: "compass" },
+  { label: "Launch", href: "/launch", icon: "rocket" },
   { label: "Portfolio", href: "/portfolio", icon: "wallet" },
   { label: "Watchlist", href: "/watchlist", icon: "star" },
   { label: "Notifications", href: "/notifications", icon: "bell" },
   { label: "Leaderboard", href: "/leaderboard", icon: "trophy" },
-  { label: "Creators", href: "/leaderboard#creators", icon: "users" },
-  { label: "Successful Campaigns", href: "/graduated", icon: "check" },
-  { label: "Docs & FAQ", href: "/docs", icon: "book" },
-  { label: "Settings", href: "/support", icon: "settings" },
+  { label: "My Campaigns", href: "/my-campaigns", icon: "layers" },
+  { label: "Docs", href: "/docs", icon: "book" },
+  { label: "Settings", href: "/settings", icon: "settings" },
 ];
 
 function WalletCard() {
