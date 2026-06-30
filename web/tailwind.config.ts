@@ -9,10 +9,12 @@ const config: Config = {
     extend: {
       colors: {
         base: {
-          blue: "#0052ff",
-          sky: "#3b82f6",
+          // Purple brand palette, matching the Lumora logo. The token names are
+          // kept so existing classes keep working; only the values changed.
+          blue: "#7c3aed",
+          sky: "#a855f7",
           violet: "#7c3aed",
-          pink: "#ec4899",
+          pink: "#d946ef",
           mint: "#10b981",
         },
         ink: "#0b1020",
@@ -22,14 +24,14 @@ const config: Config = {
         sans: ["var(--font-sans)", "system-ui", "sans-serif"],
       },
       boxShadow: {
-        glow: "0 20px 60px -20px rgba(59, 130, 246, 0.45)",
+        glow: "0 20px 60px -20px rgba(124, 58, 237, 0.45)",
         card: "0 10px 40px -15px rgba(15, 23, 42, 0.18)",
       },
       backgroundImage: {
         "brand-gradient":
-          "linear-gradient(120deg, #0052ff 0%, #7c3aed 45%, #ec4899 100%)",
+          "linear-gradient(120deg, #7c3aed 0%, #9333ea 45%, #c026d3 100%)",
         "soft-radial":
-          "radial-gradient(1200px 600px at 10% -10%, rgba(124,58,237,0.18), transparent), radial-gradient(1000px 500px at 100% 0%, rgba(236,72,153,0.16), transparent)",
+          "radial-gradient(1200px 600px at 10% -10%, rgba(124,58,237,0.20), transparent), radial-gradient(1000px 500px at 100% 0%, rgba(192,38,211,0.16), transparent)",
       },
       keyframes: {
         float: {

@@ -127,9 +127,9 @@ export function PriceChart({
           >
             <defs>
               <linearGradient id="lineGrad" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stopColor="#0052ff" />
-                <stop offset="50%" stopColor="#7c3aed" />
-                <stop offset="100%" stopColor="#ec4899" />
+                <stop offset="0%" stopColor="#7c3aed" />
+                <stop offset="50%" stopColor="#9333ea" />
+                <stop offset="100%" stopColor="#c026d3" />
               </linearGradient>
               <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor="#7c3aed" stopOpacity="0.25" />
