@@ -1,10 +1,5 @@
 import Link from "next/link";
-
-const GITHUB = "https://github.com/lumora-launchpad/lumora-launchpad";
-
-const FACTORY = process.env.NEXT_PUBLIC_FACTORY_ADDRESS;
-const EXPLORER = process.env.NEXT_PUBLIC_EXPLORER_URL ?? "https://sepolia.basescan.org";
-const CONTRACT_URL = FACTORY ? `${EXPLORER}/address/${FACTORY}` : GITHUB;
+import { GITHUB } from "@/lib/deployments";
 
 const COLUMNS: { title: string; links: { label: string; href: string; external?: boolean }[] }[] = [
   {
@@ -20,9 +15,19 @@ const COLUMNS: { title: string; links: { label: string; href: string; external?:
     title: "Resources",
     links: [
       { label: "How it works", href: "/#how-it-works" },
-      { label: "Docs", href: GITHUB, external: true },
-      { label: "Contract", href: CONTRACT_URL, external: true },
+      { label: "Docs", href: "/docs" },
+      { label: "Contracts", href: "/contracts" },
       { label: "FAQ", href: "/faq" },
+    ],
+  },
+  {
+    title: "GitHub",
+    links: [
+      { label: "Repository", href: GITHUB.repo, external: true },
+      { label: "Smart contracts", href: GITHUB.contracts, external: true },
+      { label: "Frontend", href: GITHUB.frontend, external: true },
+      { label: "Issue tracker", href: GITHUB.issues, external: true },
+      { label: "Release notes", href: GITHUB.releases, external: true },
     ],
   },
   {
@@ -45,14 +50,14 @@ const COLUMNS: { title: string; links: { label: string; href: string; external?:
 // Add real handles here when the accounts exist. The GitHub link points to the
 // repository, which must be public for visitors to open it.
 const SOCIAL: { label: string; href: string }[] = [
-  { label: "GitHub", href: GITHUB },
+  { label: "GitHub", href: GITHUB.repo },
 ];
 
 export function Footer() {
   return (
     <footer className="mt-16 border-t border-white/60 bg-white/50 backdrop-blur">
       <div className="mx-auto max-w-7xl px-6 py-12">
-        <div className="grid gap-10 lg:grid-cols-6">
+        <div className="grid gap-10 sm:grid-cols-3 lg:grid-cols-7">
           {/* Brand */}
           <div className="lg:col-span-2">
             <div className="flex items-center gap-2">

@@ -4,11 +4,13 @@ import { useState } from "react";
 import Link from "next/link";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { GlobalSearch } from "./GlobalSearch";
+import { GITHUB } from "@/lib/deployments";
 
 const LINKS = [
   { label: "Explore", href: "/explore" },
   { label: "Campaigns", href: "/campaigns" },
   { label: "Portfolio", href: "/portfolio" },
+  { label: "Docs", href: "/docs" },
 ];
 
 const LAUNCH_OPTIONS = [
@@ -44,6 +46,14 @@ export function Navbar() {
               {l.label}
             </Link>
           ))}
+          <a
+            href={GITHUB.repo}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="transition hover:text-base-blue"
+          >
+            GitHub
+          </a>
         </nav>
 
         <div className="flex items-center gap-3">
@@ -141,6 +151,15 @@ export function Navbar() {
                 {l.label}
               </Link>
             ))}
+            <a
+              href={GITHUB.repo}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => setOpen(false)}
+              className="rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 hover:text-base-blue"
+            >
+              GitHub
+            </a>
             <div className="mt-2 grid gap-2">
               {LAUNCH_OPTIONS.map((o) => (
                 <Link
