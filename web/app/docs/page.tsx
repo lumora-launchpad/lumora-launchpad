@@ -60,7 +60,7 @@ const CHANGELOG: { version: string; date: string; items: string[] }[] = [
 
 export default function DocsPage() {
   return (
-    <div className="mx-auto max-w-3xl px-6 py-14">
+    <div className="mx-auto max-w-3xl px-6 py-10 sm:py-14">
       <h1 className="text-4xl font-black tracking-tight">
         Lumora <span className="gradient-text">documentation</span>
       </h1>

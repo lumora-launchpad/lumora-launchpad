@@ -9,7 +9,7 @@ const GITHUB = "https://github.com/lumora-launchpad/lumora-launchpad";
 
 export default function SupportPage() {
   return (
-    <div className="mx-auto max-w-3xl px-6 py-14">
+    <div className="mx-auto max-w-3xl px-6 py-10 sm:py-14">
       <h1 className="text-4xl font-black tracking-tight">
         Help <span className="gradient-text">center</span>
       </h1>

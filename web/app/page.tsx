@@ -54,7 +54,7 @@ export default function HomePage() {
     <div className="mx-auto max-w-7xl px-6">
       <AmbientBackground />
       {/* Hero */}
-      <section className="relative grid items-center gap-12 py-16 sm:py-24 lg:grid-cols-2">
+      <section className="relative grid items-center gap-10 py-12 sm:gap-12 sm:py-20 lg:grid-cols-2 lg:py-24">
         <div className="absolute left-0 top-10 -z-10 h-72 w-72 rounded-full bg-brand-gradient opacity-20 blur-3xl animate-float" />
         {/* Soft floating particles */}
         <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
@@ -78,7 +78,7 @@ export default function HomePage() {
             <span className="h-2 w-2 rounded-full bg-base-violet" />
             Built on Base
           </span>
-          <h1 className="mt-6 text-5xl font-black leading-tight tracking-tight sm:text-6xl">
+          <h1 className="mt-6 text-4xl font-black leading-tight tracking-tight sm:text-5xl lg:text-6xl">
             The new era of
             <br />
             <span className="text-base-violet">fair</span> token{" "}
@@ -118,7 +118,7 @@ export default function HomePage() {
       <DashboardPreview />
 
       {/* The two launch modes */}
-      <section className="py-12">
+      <section className="py-10 sm:py-14">
         <h2 className="text-center text-3xl font-black tracking-tight">
           Two ways to <span className="gradient-text">launch</span>
         </h2>
@@ -203,7 +203,7 @@ export default function HomePage() {
       </section>
 
       {/* Why Lumora */}
-      <section className="py-12">
+      <section className="py-10 sm:py-14">
         <h2 className="text-center text-3xl font-black tracking-tight">
           Why <span className="gradient-text">Lumora</span>
         </h2>
@@ -264,7 +264,7 @@ export default function HomePage() {
       </section>
 
       {/* How it works: the full flow */}
-      <section id="how-it-works" className="py-16">
+      <section id="how-it-works" className="py-12 sm:py-16">
         <h2 className="text-center text-3xl font-black tracking-tight">
           How it <span className="gradient-text">works</span>
         </h2>
@@ -310,7 +310,7 @@ export default function HomePage() {
       </section>
 
       {/* Protocol status */}
-      <section className="py-14">
+      <section className="py-12 sm:py-14">
         <h2 className="text-center text-3xl font-black tracking-tight">
           Protocol <span className="gradient-text">status</span>
         </h2>
@@ -333,7 +333,7 @@ export default function HomePage() {
       </section>
 
       {/* Closing CTA */}
-      <section className="pb-24">
+      <section className="pb-16 sm:pb-24">
         <div className="card overflow-hidden bg-brand-gradient text-white">
           <div className="flex flex-col items-center gap-5 px-8 py-14 text-center">
             <h2 className="text-3xl font-black sm:text-4xl">
