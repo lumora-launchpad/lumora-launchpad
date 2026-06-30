@@ -1,0 +1,85 @@
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+import { Sidebar } from "./Sidebar";
+import { Topbar } from "./Topbar";
+import { StatCards } from "./StatCards";
+import { CampaignSections } from "./CampaignSections";
+import { ActivityPanel } from "./ActivityPanel";
+import { TrustPanel } from "./TrustPanel";
+import { HeroVisual } from "@/components/HeroVisual";
+import { Icon } from "./icons";
+
+function Hero() {
+  return (
+    <section className="glass-card relative overflow-hidden p-6 sm:p-9">
+      {/* Ambient glow */}
+      <div className="orb left-[-6rem] top-[-6rem] h-72 w-72 bg-brand-gradient opacity-30 animate-drift" />
+      <div className="orb bottom-[-8rem] right-[-4rem] h-72 w-72 bg-base-pink/40 opacity-20 animate-drift [animation-delay:3s]" />
+
+      <div className="relative grid items-center gap-8 lg:grid-cols-[1.1fr_0.9fr]">
+        <div>
+          <span className="pill">
+            <span className="h-2 w-2 rounded-full bg-base-violet" />
+            Demand based launchpad on Base
+          </span>
+          <h1 className="mt-5 text-4xl font-black leading-[1.05] tracking-tight sm:text-5xl">
+            Demand First.
+            <br />
+            <span className="gradient-text">Launch Second.</span>
+          </h1>
+          <p className="mt-5 max-w-lg text-base text-slate-500 sm:text-lg">
+            Create a campaign, prove community demand, and launch only when the
+            funding target is reached. If the target is not reached, every
+            supporter can withdraw one hundred percent of their committed ETH.
+          </p>
+          <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+            <Link href="/explore" className="btn-primary w-full sm:w-auto">
+              Explore Campaigns
+              <Icon name="arrowRight" className="ml-2 h-5 w-5" />
+            </Link>
+            <Link href="/campaigns" className="btn-ghost w-full sm:w-auto">
+              Launch Campaign
+            </Link>
+          </div>
+        </div>
+
+        <div className="mx-auto w-full max-w-sm animate-float [animation-duration:9s] lg:max-w-none">
+          <HeroVisual />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+export function Dashboard() {
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  return (
+    <div className="flex min-h-screen">
+      <Sidebar open={menuOpen} onClose={() => setMenuOpen(false)} />
+
+      <div className="flex min-w-0 flex-1 flex-col">
+        <Topbar onMenu={() => setMenuOpen(true)} />
+
+        <main className="flex-1 px-4 py-6 sm:px-6 lg:px-8">
+          <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
+            {/* Main column */}
+            <div className="min-w-0 space-y-8">
+              <Hero />
+              <StatCards />
+              <CampaignSections />
+            </div>
+
+            {/* Right rail */}
+            <aside className="space-y-6 xl:sticky xl:top-24 xl:self-start">
+              <ActivityPanel />
+              <TrustPanel />
+            </aside>
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+}
