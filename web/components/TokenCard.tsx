@@ -4,9 +4,29 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { shortAddress, type TokenView } from "@/lib/tokens";
 import type { TokenStats } from "@/lib/useMarketStats";
+import { isVerified } from "@/lib/verified";
 import { Sparkline } from "./Sparkline";
 import { StarButton } from "./StarButton";
 import { useCountUp } from "@/lib/useCountUp";
+
+function VerifiedBadge() {
+  return (
+    <span
+      title="Verified"
+      className="grid h-4 w-4 shrink-0 place-items-center rounded-full bg-base-violet text-white"
+    >
+      <svg viewBox="0 0 24 24" className="h-2.5 w-2.5" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M20 6L9 17l-5-5" />
+      </svg>
+    </span>
+  );
+}
+
+function fmtPrice(n: number): string {
+  if (!n) return "0";
+  if (n < 0.000001) return n.toExponential(2);
+  return n.toLocaleString("en-US", { maximumFractionDigits: 8 });
+}
 
 type TokenMetadata = {
   description?: string;
@@ -115,6 +135,7 @@ export function TokenCard({
             <h3 className="truncate text-lg font-bold leading-tight">
               {token.name}
             </h3>
+            {isVerified(token.address) && <VerifiedBadge />}
             {badge && (
               <span
                 className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold ${BADGES[badge].cls}`}
@@ -151,7 +172,7 @@ export function TokenCard({
         <Stat label="Age" value={stats ? ago(stats.createdMs) : "new"} />
       </div>
 
-      {/* Creator and fee */}
+      {/* Creator, last trade, and fee */}
       <div className="mt-3 flex items-center justify-between text-xs text-slate-400">
         <span>
           By{" "}
@@ -159,7 +180,16 @@ export function TokenCard({
             {shortAddress(token.creator)}
           </span>
         </span>
-        <span className="pill !py-1 !text-xs">1% fee</span>
+        {stats && stats.price > 0 ? (
+          <span>
+            Last{" "}
+            <span className="font-semibold text-slate-600">
+              {fmtPrice(stats.price)} ETH
+            </span>
+          </span>
+        ) : (
+          <span className="pill !py-1 !text-xs">1% fee</span>
+        )}
       </div>
 
       <div className="mt-4">

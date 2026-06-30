@@ -7,11 +7,12 @@ import { Sparkline } from "./Sparkline";
 import { useTokens } from "@/lib/useTokens";
 import { useMarketStats, type TokenStats } from "@/lib/useMarketStats";
 import { useWatchlist } from "@/lib/useWatchlist";
+import { isVerified } from "@/lib/verified";
 import { sampleTokens } from "@/lib/sampleTokens";
 import type { TokenView } from "@/lib/tokens";
 
 type Sort = "new" | "trending" | "almost" | "volume" | "holders";
-type Status = "all" | "live" | "listed" | "saved";
+type Status = "all" | "live" | "listed" | "saved" | "verified";
 
 const SORTS: { id: Sort; label: string }[] = [
   { id: "new", label: "Newest" },
@@ -25,6 +26,7 @@ const STATUSES: { id: Status; label: string }[] = [
   { id: "all", label: "All" },
   { id: "live", label: "Live" },
   { id: "listed", label: "Listed" },
+  { id: "verified", label: "Verified" },
   { id: "saved", label: "Saved" },
 ];
 
@@ -180,6 +182,7 @@ export function LiveTokenGrid() {
     let out = [...base];
     if (status === "live") out = out.filter((t) => !t.graduated);
     else if (status === "listed") out = out.filter((t) => t.graduated);
+    else if (status === "verified") out = out.filter((t) => isVerified(t.address));
     else if (status === "saved") out = out.filter((t) => isSaved(t.address));
     const q = query.trim().toLowerCase();
     if (q) {
@@ -254,7 +257,7 @@ export function LiveTokenGrid() {
               <button
                 key={s.id}
                 onClick={() => setStatus(s.id)}
-                className={`rounded-xl px-3 py-1.5 text-sm font-bold transition ${
+                className={`rounded-xl px-3.5 py-2 text-sm font-bold transition ${
                   status === s.id
                     ? "bg-white text-base-violet shadow"
                     : "text-slate-500 hover:text-slate-700"
@@ -269,7 +272,7 @@ export function LiveTokenGrid() {
               <button
                 key={s.id}
                 onClick={() => setSort(s.id)}
-                className={`rounded-xl px-3 py-1.5 text-sm font-bold transition ${
+                className={`rounded-xl px-3.5 py-2 text-sm font-bold transition ${
                   sort === s.id
                     ? "bg-white text-base-blue shadow"
                     : "text-slate-500 hover:text-slate-700"
