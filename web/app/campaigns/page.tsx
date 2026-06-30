@@ -3,12 +3,18 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { parseEther, decodeEventLog } from "viem";
-import { useAccount, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
+import {
+  useAccount,
+  useWriteContract,
+  useWaitForTransactionReceipt,
+  useSignMessage,
+} from "wagmi";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import {
   CAMPAIGN_FACTORY_ADDRESS,
   campaignFactoryAbi,
 } from "@/lib/campaigns";
+import { metadataMessage } from "@/lib/metadataAuth";
 import { useCampaigns, type CampaignView } from "@/lib/useCampaigns";
 import { useCampaignBackers } from "@/lib/useCampaignBackers";
 import { Countdown } from "@/components/Countdown";
@@ -140,6 +146,7 @@ function CreateForm() {
   const [uploading, setUploading] = useState(false);
 
   const { writeContract, data: hash, isPending } = useWriteContract();
+  const { signMessageAsync } = useSignMessage();
   const {
     data: receipt,
     isLoading: isConfirming,
@@ -182,15 +189,30 @@ function CreateForm() {
       });
       const campaignAddress = decoded.args.campaign as string;
       saved.current = true;
-      fetch("/api/token", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          address: campaignAddress,
-          description: blurb,
-          imageUrl,
-        }),
-      }).catch(() => {});
+      // Sign as the campaign creator (the wallet that just deployed it) so the
+      // API accepts the metadata write. A rejected signature only skips the off
+      // chain image and description; the campaign is already live.
+      void (async () => {
+        try {
+          const signedAt = Date.now();
+          const signature = await signMessageAsync({
+            message: metadataMessage(campaignAddress, signedAt),
+          });
+          await fetch("/api/token", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              address: campaignAddress,
+              signedAt,
+              signature,
+              description: blurb,
+              imageUrl,
+            }),
+          });
+        } catch {
+          // Signature rejected or request failed; campaign remains live.
+        }
+      })();
     } catch {
       // ignore non-matching logs
     }
