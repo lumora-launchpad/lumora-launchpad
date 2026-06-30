@@ -18,7 +18,15 @@ export function Countdown({
   }, []);
 
   const left = deadline - now;
-  if (left <= 0) return <span className={className}>ended</span>;
+  // This text depends on the current time, so the server render and the first
+  // client render can differ by the network latency. suppressHydrationWarning
+  // lets React keep the server text, then the interval updates it on the client.
+  if (left <= 0)
+    return (
+      <span className={className} suppressHydrationWarning>
+        ended
+      </span>
+    );
 
   const d = Math.floor(left / 86400);
   const h = Math.floor((left % 86400) / 3600);
@@ -28,5 +36,9 @@ export function Countdown({
   const text =
     d > 0 ? `${d}d ${h}h ${m}m` : h > 0 ? `${h}h ${m}m ${s}s` : `${m}m ${s}s`;
 
-  return <span className={className}>{text} left</span>;
+  return (
+    <span className={className} suppressHydrationWarning>
+      {text} left
+    </span>
+  );
 }
