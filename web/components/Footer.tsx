@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { GITHUB } from "@/lib/deployments";
+import { GITHUB, X_URL } from "@/lib/deployments";
 
 const COLUMNS: { title: string; links: { label: string; href: string; external?: boolean }[] }[] = [
   {
@@ -50,6 +50,7 @@ const COLUMNS: { title: string; links: { label: string; href: string; external?:
 // Add real handles here when the accounts exist. The GitHub link points to the
 // repository, which must be public for visitors to open it.
 const SOCIAL: { label: string; href: string }[] = [
+  { label: "X", href: X_URL },
   { label: "GitHub", href: GITHUB.repo },
 ];
 

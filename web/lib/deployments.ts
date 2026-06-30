@@ -63,3 +63,6 @@ export const GITHUB = {
   releases: `${GITHUB_REPO}/releases`,
   readme: `${GITHUB_REPO}#readme`,
 };
+
+export const X_HANDLE = "LumoraLaunchpad";
+export const X_URL = `https://x.com/${X_HANDLE}`;
