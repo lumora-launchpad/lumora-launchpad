@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { StatCards } from "./StatCards";
 import { CampaignSections } from "./CampaignSections";
+import { TopCreators } from "./TopCreators";
 import { ActivityPanel } from "./ActivityPanel";
 import { TrustPanel } from "./TrustPanel";
 import { RiskNotice } from "./RiskNotice";
@@ -60,6 +61,7 @@ export function Dashboard() {
           <Hero />
           <StatCards />
           <CampaignSections />
+          <TopCreators />
         </div>
 
         {/* Right rail */}
