@@ -140,7 +140,7 @@ const GROUPS: Group[] = [
 
 export default function FaqPage() {
   return (
-    <div className="mx-auto max-w-3xl px-6 py-14">
+    <div className="mx-auto max-w-3xl px-6 py-10 sm:py-14">
       <h1 className="text-4xl font-black tracking-tight">
         Frequently asked <span className="gradient-text">questions</span>
       </h1>
