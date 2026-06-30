@@ -5,6 +5,7 @@ import { StatCards } from "./StatCards";
 import { CampaignSections } from "./CampaignSections";
 import { ActivityPanel } from "./ActivityPanel";
 import { TrustPanel } from "./TrustPanel";
+import { RiskNotice } from "./RiskNotice";
 import { HeroVisual } from "@/components/HeroVisual";
 import { Icon } from "./icons";
 
@@ -27,9 +28,9 @@ function Hero() {
             <span className="gradient-text">Launch Second.</span>
           </h1>
           <p className="mt-5 max-w-lg text-base text-slate-500 sm:text-lg">
-            Create a campaign, prove community demand, and launch only when the
-            funding target is reached. If the target is not reached, every
-            supporter can withdraw one hundred percent of their committed ETH.
+            Support campaigns with confidence. If a campaign reaches its target,
+            the token launches. If it does not, you can withdraw one hundred
+            percent of your committed ETH, anytime before it launches.
           </p>
           <div className="mt-7 flex flex-col gap-3 sm:flex-row">
             <Link href="/explore" className="btn-primary w-full sm:w-auto">
@@ -63,6 +64,7 @@ export function Dashboard() {
 
         {/* Right rail */}
         <aside className="space-y-6 xl:sticky xl:top-24 xl:self-start">
+          <RiskNotice />
           <ActivityPanel />
           <TrustPanel />
         </aside>

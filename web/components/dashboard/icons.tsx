@@ -18,6 +18,11 @@ export type IconName =
   | "search"
   | "menu"
   | "close"
+  | "eye"
+  | "fire"
+  | "spark"
+  | "shield"
+  | "bolt"
   | "arrowRight"
   | "chevronDown";
 
@@ -38,6 +43,11 @@ const PATHS: Record<IconName, React.ReactNode> = {
   search: <><circle cx="11" cy="11" r="7" /><path d="M21 21l-4.3-4.3" /></>,
   menu: <><path d="M4 7h16" /><path d="M4 12h16" /><path d="M4 17h16" /></>,
   close: <><path d="M6 6l12 12" /><path d="M18 6L6 18" /></>,
+  eye: <><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z" /><circle cx="12" cy="12" r="3" /></>,
+  fire: <><path d="M12 3c1 4-2 5-2 8a4 4 0 008 0c0-2-1-3-1-5 2 1 3 3 3 6a8 8 0 11-16 0c0-5 5-6 8-9z" /></>,
+  spark: <><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z" /></>,
+  shield: <><path d="M12 3l7 3v5c0 4-3 7-7 8-4-1-7-4-7-8V6l7-3z" /><path d="M9.5 12l1.8 1.8 3.2-3.6" /></>,
+  bolt: <><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z" /></>,
   arrowRight: <><path d="M5 12h14" /><path d="M13 6l6 6-6 6" /></>,
   chevronDown: <><path d="M6 9l6 6 6-6" /></>,
 };
