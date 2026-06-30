@@ -219,7 +219,11 @@ contract LaunchpadToken is ERC20, ReentrancyGuard {
         }
 
         _approve(address(this), address(router), tokenLiq);
-        router.addLiquidityETH{value: ethLiq}(
+        // The router creates the pair if needed and, for a fresh pair, takes our
+        // full ETH and tokens at the price we set, so the zero minimums are safe
+        // in the normal path. If someone pre-seeds the pair to skew the ratio,
+        // the router uses only part of our liquidity and refunds the rest here.
+        (uint256 usedToken, uint256 usedEth,) = router.addLiquidityETH{value: ethLiq}(
             address(this),
             tokenLiq,
             0,
@@ -228,8 +232,16 @@ contract LaunchpadToken is ERC20, ReentrancyGuard {
             block.timestamp
         );
 
+        // Sweep any refund so nothing is left permanently locked in this
+        // contract: burn leftover tokens and send leftover ETH to the treasury
+        // for recovery. In the normal path (a fresh pair) both are zero.
+        uint256 leftoverToken = tokenLiq - usedToken;
+        if (leftoverToken > 0) _transfer(address(this), address(0xdead), leftoverToken);
+        uint256 leftoverEth = ethLiq - usedEth;
+        if (leftoverEth > 0) _payOrAccrue(devTreasury, leftoverEth);
+
         address pair = IUniswapV2Factory(router.factory()).getPair(address(this), router.WETH());
-        emit Graduated(pair, ethLiq, tokenLiq, devFee);
+        emit Graduated(pair, usedEth, usedToken, devFee);
     }
 
     // Views used by the frontend.
