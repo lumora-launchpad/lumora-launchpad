@@ -7,6 +7,7 @@ import { GlobalSearch } from "./GlobalSearch";
 import { GITHUB } from "@/lib/deployments";
 
 const LINKS = [
+  { label: "Home", href: "/" },
   { label: "Explore", href: "/explore" },
   { label: "Campaigns", href: "/campaigns" },
   { label: "Portfolio", href: "/portfolio" },
