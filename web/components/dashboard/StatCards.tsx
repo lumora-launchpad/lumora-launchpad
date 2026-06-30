@@ -1,8 +1,6 @@
 "use client";
 
-import { formatEther } from "viem";
-import { useCampaigns } from "@/lib/useCampaigns";
-import { useCampaignBackers } from "@/lib/useCampaignBackers";
+import { useDisplayCampaigns } from "@/lib/campaignDisplay";
 import { useCountUp } from "@/lib/useCountUp";
 import { Icon, type IconName } from "./icons";
 
@@ -37,20 +35,13 @@ function StatCard({
 }
 
 export function StatCards() {
-  const { campaigns } = useCampaigns();
-  const backers = useCampaignBackers(campaigns.map((c) => c.address));
+  const { all } = useDisplayCampaigns();
 
-  const total = campaigns.length;
-  const successful = campaigns.filter((c) => c.launched).length;
-
-  let raisedWei = 0n;
-  for (const c of campaigns) raisedWei += c.totalCommitted;
-  const raised = Number(formatEther(raisedWei));
-
-  let supporters = 0;
-  for (const n of backers.values()) supporters += n;
-
-  const creators = new Set(campaigns.map((c) => c.creator.toLowerCase())).size;
+  const total = all.length;
+  const successful = all.filter((c) => c.status === "graduated").length;
+  const raised = all.reduce((sum, c) => sum + c.currentEth, 0);
+  const supporters = all.reduce((sum, c) => sum + (c.supporters ?? 0), 0);
+  const creators = new Set(all.map((c) => c.creator.toLowerCase())).size;
 
   return (
     <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
