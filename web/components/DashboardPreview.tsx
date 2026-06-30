@@ -31,18 +31,17 @@ const NAV: NavItem[] = [
 type Token = {
   name: string;
   ticker: string;
-  badge: "Instant" | "Campaign";
+  slug: string;
   metric: string;
   sub: string;
   progress: number;
-  art: string;
 };
 
 const TOKENS: Token[] = [
-  { name: "Nebula", ticker: "NEBULA", badge: "Instant", metric: "24.6 ETH", sub: "1,250 holders", progress: 78, art: "from-violet-500 via-fuchsia-500 to-indigo-500" },
-  { name: "DreamLand", ticker: "DREAM", badge: "Campaign", metric: "15.3 ETH", sub: "532 backers", progress: 51, art: "from-fuchsia-500 via-purple-500 to-pink-500" },
-  { name: "Aurora", ticker: "AURORA", badge: "Instant", metric: "52.1 ETH", sub: "2,341 holders", progress: 92, art: "from-indigo-500 via-violet-500 to-purple-600" },
-  { name: "BuddyAI", ticker: "BUDDY", badge: "Campaign", metric: "8.7 ETH", sub: "287 backers", progress: 29, art: "from-purple-500 via-violet-500 to-fuchsia-500" },
+  { name: "Nebula", ticker: "NEBULA", slug: "nebula", metric: "24.6 ETH", sub: "1,250 holders", progress: 78 },
+  { name: "DreamLand", ticker: "DREAM", slug: "dreamland", metric: "15.3 ETH", sub: "532 backers", progress: 51 },
+  { name: "Aurora", ticker: "AURORA", slug: "aurora", metric: "52.1 ETH", sub: "2,341 holders", progress: 92 },
+  { name: "BuddyAI", ticker: "BUDDY", slug: "buddyai", metric: "8.7 ETH", sub: "287 backers", progress: 29 },
 ];
 
 const ACTIVITY: { name: string; what: string; meta: string }[] = [
@@ -52,12 +51,15 @@ const ACTIVITY: { name: string; what: string; meta: string }[] = [
   { name: "BUDDY", what: "New backer", meta: "7m ago" },
 ];
 
-function Thumb({ art }: { art: string }) {
+function Thumb({ slug, name }: { slug: string; name: string }) {
   return (
-    <div className={`relative h-20 w-full overflow-hidden rounded-xl bg-gradient-to-br ${art}`}>
-      <div className="absolute inset-0 [background:radial-gradient(60%_60%_at_30%_25%,rgba(255,255,255,0.55),transparent)]" />
-      <span className="absolute right-3 top-3 h-1.5 w-1.5 rounded-full bg-white/80" />
-      <span className="absolute left-6 bottom-4 h-1 w-1 rounded-full bg-white/70" />
+    <div className="relative h-24 w-full overflow-hidden rounded-xl bg-slate-100">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={`/tokens/${slug}.png`}
+        alt={name}
+        className="h-full w-full object-cover"
+      />
     </div>
   );
 }
@@ -117,16 +119,7 @@ export function DashboardPreview() {
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
               {TOKENS.map((t) => (
                 <div key={t.ticker} className="rounded-2xl border border-slate-100 bg-white p-3">
-                  <div className="relative">
-                    <Thumb art={t.art} />
-                    <span
-                      className={`absolute left-2 top-2 rounded-full px-2 py-0.5 text-[10px] font-bold text-white ${
-                        t.badge === "Instant" ? "bg-base-violet" : "bg-base-pink"
-                      }`}
-                    >
-                      {t.badge}
-                    </span>
-                  </div>
+                  <Thumb slug={t.slug} name={t.name} />
                   <div className="mt-2.5 flex items-baseline justify-between">
                     <span className="text-sm font-bold text-slate-800">{t.name}</span>
                     <span className="text-[11px] font-semibold text-slate-400">{t.ticker}</span>
