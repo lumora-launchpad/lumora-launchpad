@@ -68,7 +68,10 @@ export default function CreatorPage({
               )}
             </div>
             <p className="text-sm font-medium text-slate-400">
-              Creator{profile ? ` / joined ${fmtDate(profile.joinedAt)}` : ""}
+              Creator
+              {profile && (
+                <span suppressHydrationWarning> / joined {fmtDate(profile.joinedAt)}</span>
+              )}
             </p>
           </div>
         </div>
