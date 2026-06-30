@@ -20,9 +20,9 @@ const NAV: NavItem[] = [
   { label: "Portfolio", href: "/portfolio", icon: "wallet" },
   { label: "Watchlist", href: "/portfolio#watchlist", icon: "star" },
   { label: "Notifications", href: "/#activity", icon: "bell" },
-  { label: "Leaderboard", href: "/explore", icon: "trophy" },
-  { label: "Creators", href: "/explore", icon: "users" },
-  { label: "Successful Campaigns", href: "/campaigns", icon: "check" },
+  { label: "Leaderboard", href: "/leaderboard", icon: "trophy" },
+  { label: "Creators", href: "/leaderboard#creators", icon: "users" },
+  { label: "Successful Campaigns", href: "/graduated", icon: "check" },
   { label: "Docs & FAQ", href: "/docs", icon: "book" },
   { label: "Settings", href: "/support", icon: "settings" },
 ];
