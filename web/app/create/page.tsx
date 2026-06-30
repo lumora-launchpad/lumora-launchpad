@@ -7,9 +7,11 @@ import {
   useReadContracts,
   useWriteContract,
   useWaitForTransactionReceipt,
+  useSignMessage,
 } from "wagmi";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { FACTORY_ADDRESS, factoryAbi } from "@/lib/contracts";
+import { metadataMessage } from "@/lib/metadataAuth";
 import { txExplorerUrl } from "@/lib/wagmi";
 import { useToast } from "@/components/Toast";
 
@@ -40,6 +42,7 @@ function linkError(value: string, host: RegExp, label: string): string {
 
 export default function CreatePage() {
   const { isConnected } = useAccount();
+  const { signMessageAsync } = useSignMessage();
   const [name, setName] = useState("");
   const [symbol, setSymbol] = useState("");
   const [blurb, setBlurb] = useState("");
@@ -170,20 +173,35 @@ export default function CreatePage() {
       });
       const tokenAddress = decoded.args.token as string;
 
-      fetch("/api/token", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          address: tokenAddress,
-          description: blurb,
-          imageUrl,
-          website,
-          x,
-          telegram,
-        }),
-      })
-        .then(() => setMetadataSaved(true))
-        .catch(() => {});
+      // Prove we are the creator by signing a time-bound message with the same
+      // wallet that just launched the token, then save the metadata. If the
+      // user rejects the signature the token is still live, only the off chain
+      // description and image are skipped.
+      void (async () => {
+        try {
+          const signedAt = Date.now();
+          const signature = await signMessageAsync({
+            message: metadataMessage(tokenAddress, signedAt),
+          });
+          await fetch("/api/token", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              address: tokenAddress,
+              signedAt,
+              signature,
+              description: blurb,
+              imageUrl,
+              website,
+              x,
+              telegram,
+            }),
+          });
+          setMetadataSaved(true);
+        } catch {
+          // Signature rejected or request failed; token remains live.
+        }
+      })();
     } catch {
       // Ignore logs that do not match the expected event shape.
     }

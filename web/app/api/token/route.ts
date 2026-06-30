@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { metadataStore } from "@/lib/metadataStore";
 import { rateLimit, clientIp } from "@/lib/server/rateLimit";
+import { isCreatorSignature } from "@/lib/server/publicClient";
+import { METADATA_SIG_MAX_AGE_MS } from "@/lib/metadataAuth";
 
 const ADDRESS_RE = /^0x[a-fA-F0-9]{40}$/;
+const SIGNATURE_RE = /^0x[a-fA-F0-9]+$/;
 const MAX_DESCRIPTION_LENGTH = 280;
 const MAX_IMAGE_URL_LENGTH = 2048;
 
@@ -31,6 +34,28 @@ export async function POST(request: NextRequest) {
 
   if (!isValidAddress(address)) {
     return NextResponse.json({ error: "Invalid token address" }, { status: 400 });
+  }
+
+  // Only the token's on-chain creator may write its metadata. The caller proves
+  // this by signing a time-bound message with the creator wallet.
+  const signedAt = body?.signedAt;
+  const signature = body?.signature;
+  if (
+    typeof signedAt !== "number" ||
+    !Number.isFinite(signedAt) ||
+    typeof signature !== "string" ||
+    !SIGNATURE_RE.test(signature)
+  ) {
+    return NextResponse.json({ error: "Signature required" }, { status: 401 });
+  }
+  if (Math.abs(Date.now() - signedAt) > METADATA_SIG_MAX_AGE_MS) {
+    return NextResponse.json({ error: "Signature expired, please try again" }, { status: 401 });
+  }
+  if (!(await isCreatorSignature(address, signedAt, signature as `0x${string}`))) {
+    return NextResponse.json(
+      { error: "Only the token creator can edit this" },
+      { status: 403 },
+    );
   }
 
   const description =
