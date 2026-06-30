@@ -6,7 +6,7 @@ import { useMarketStats } from "@/lib/useMarketStats";
 import { useCountUp } from "@/lib/useCountUp";
 
 // Live protocol statistics shown directly below the hero buttons. Values update
-// from the same on-chain hooks the rest of the app uses, so they stay live.
+// from the same on chain hooks the rest of the app uses, so they stay live.
 function Stat({
   label,
   value,

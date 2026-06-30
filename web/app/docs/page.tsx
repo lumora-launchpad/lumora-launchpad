@@ -15,7 +15,7 @@ const TOC: { id: string; label: string }[] = [
   { id: "graduation", label: "Graduation" },
   { id: "liquidity-lock", label: "Liquidity Lock" },
   { id: "lp-burn", label: "LP Burn" },
-  { id: "anti-snipe", label: "Anti Snipe Protection" },
+  { id: "anti snipe", label: "Anti Snipe Protection" },
   { id: "trading-fees", label: "Trading Fees" },
   { id: "creator-rewards", label: "Creator Rewards" },
   { id: "supported-wallets", label: "Supported Wallets" },
@@ -190,7 +190,7 @@ export default function DocsPage() {
           </p>
         </Section>
 
-        <Section id="anti-snipe" title="Anti Snipe Protection">
+        <Section id="anti snipe" title="Anti Snipe Protection">
           <p>
             For a short window of blocks right after launch, each wallet has a cap
             on how much ETH it can spend on the curve. This stops a single bot from
