@@ -19,6 +19,8 @@ contract Deploy is Script {
         vm.startBroadcast(pk);
         LaunchpadFactory factory = new LaunchpadFactory(devTreasury, router);
         CampaignFactory campaignFactory = new CampaignFactory(address(factory), devTreasury);
+        // Trust the campaign factory so its campaigns can deploy tokens.
+        factory.setCampaignFactory(address(campaignFactory));
         vm.stopBroadcast();
 
         console2.log("LaunchpadFactory", address(factory));

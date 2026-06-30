@@ -3,6 +3,10 @@ pragma solidity 0.8.24;
 
 import {LaunchCampaign} from "./LaunchCampaign.sol";
 
+interface ILaunchpadRegistry {
+    function registerCampaign(address campaign) external;
+}
+
 /// @title CampaignFactory
 /// @notice Deploys demand gated launch campaigns and keeps a registry the
 ///         frontend reads. Holds the launchpad factory address that campaigns
@@ -54,6 +58,11 @@ contract CampaignFactory {
 
         LaunchCampaign campaign =
             new LaunchCampaign(launchpadFactory, devTreasury, msg.sender, name, symbol, targetEth, duration, commitFeeBps);
+
+        // Authorize the campaign to deploy its token through the launchpad
+        // factory. This requires the launchpad factory to trust this contract as
+        // its campaignFactory (set via setCampaignFactory after deployment).
+        ILaunchpadRegistry(launchpadFactory).registerCampaign(address(campaign));
 
         allCampaigns.push(address(campaign));
         campaignsByCreator[msg.sender].push(address(campaign));

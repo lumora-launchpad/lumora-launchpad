@@ -20,12 +20,21 @@ contract LaunchpadFactory {
     uint16 public campaignDevShareBps; // dev share for campaign launched tokens (creator gets more)
     uint256 public creationFee;
 
+    // Only campaigns registered by the trusted CampaignFactory may use
+    // createTokenFor, which grants the more generous campaign fee split. Without
+    // this gate any caller could claim the campaign split without running a
+    // campaign, starving the dev treasury and breaking the fee model.
+    address public campaignFactory;
+    mapping(address => bool) public isCampaign;
+
     address[] public allTokens;
     mapping(address => address[]) public tokensByCreator;
 
     event TokenCreated(address indexed token, address indexed creator, string name, string symbol);
     event ConfigUpdated();
     event OwnershipTransferred(address indexed from, address indexed to);
+    event CampaignFactorySet(address indexed campaignFactory);
+    event CampaignRegistered(address indexed campaign);
 
     modifier onlyOwner() {
         require(msg.sender == owner, "not owner");
@@ -52,14 +61,26 @@ contract LaunchpadFactory {
     }
 
     /// @notice Create a token whose creator is set to `creator_`, while any
-    ///         initial buy tokens go to the caller. Used by launch campaigns,
-    ///         which give the creator a larger share of the trade fee.
+    ///         initial buy tokens go to the caller. Restricted to launch
+    ///         campaigns registered by the trusted CampaignFactory, which give
+    ///         the creator a larger share of the trade fee.
     function createTokenFor(address creator_, string calldata name, string calldata symbol)
         external
         payable
         returns (address)
     {
+        require(isCampaign[msg.sender], "not a campaign");
         return _create(creator_, name, symbol, campaignDevShareBps);
+    }
+
+    /// @notice Register a campaign as authorized to call createTokenFor. Only
+    ///         the trusted CampaignFactory may register, and it does so when it
+    ///         deploys each campaign.
+    function registerCampaign(address campaign) external {
+        require(msg.sender == campaignFactory, "not campaign factory");
+        require(campaign != address(0), "zero campaign");
+        isCampaign[campaign] = true;
+        emit CampaignRegistered(campaign);
     }
 
     function _create(address creator_, string calldata name, string calldata symbol, uint16 shareBps)
@@ -122,6 +143,14 @@ contract LaunchpadFactory {
     }
 
     // Admin controls.
+
+    /// @notice Set the CampaignFactory trusted to register campaigns. Set this
+    ///         to the deployed CampaignFactory after both are deployed.
+    function setCampaignFactory(address campaignFactory_) external onlyOwner {
+        require(campaignFactory_ != address(0), "zero address");
+        campaignFactory = campaignFactory_;
+        emit CampaignFactorySet(campaignFactory_);
+    }
 
     function setConfig(
         address devTreasury_,
