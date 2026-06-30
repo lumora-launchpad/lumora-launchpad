@@ -54,4 +54,20 @@ body {
   .pill {
     @apply inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/70 px-4 py-1.5 text-sm font-medium text-slate-600 backdrop-blur;
   }
+
+  /* Premium glass surface, a touch lighter and more blurred than .card. */
+  .glass-card {
+    @apply rounded-3xl border border-white/60 bg-white/70 shadow-card backdrop-blur-xl;
+  }
+
+  /* Subtle hover elevation for interactive cards. */
+  .lift {
+    @apply transition duration-300 hover:-translate-y-1 hover:shadow-glow;
+  }
+
+  /* Blurred gradient orb for ambient backgrounds. Size and position with
+     utilities; pair with animate-drift for slow motion. */
+  .orb {
+    @apply pointer-events-none absolute -z-10 rounded-full blur-3xl;
+  }
 }

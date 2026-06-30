@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { HeroVisual } from "@/components/HeroVisual";
-import { LandingStats } from "@/components/LandingStats";
+import { HeroStats } from "@/components/HeroStats";
 import { DashboardPreview } from "@/components/DashboardPreview";
+import { AmbientBackground } from "@/components/AmbientBackground";
 
 function CheckIcon({ className = "" }: { className?: string }) {
   return (
@@ -37,9 +38,21 @@ function TargetIcon() {
   );
 }
 
+const PROTOCOL: { t: string; d: string; icon: React.ReactNode }[] = [
+  { t: "Liquidity Locks", d: "Liquidity is deposited to Uniswap on graduation and cannot be pulled.", icon: <><rect x="5" y="11" width="14" height="9" rx="2" /><path d="M8 11V7a4 4 0 018 0v4" /></> },
+  { t: "LP Burned", d: "The LP token is sent to a burn address, so the lock is permanent.", icon: <path d="M12 3c1 4-2 5-2 8a4 4 0 008 0c0-2-1-3-1-5 2 1 3 3 3 6a8 8 0 11-16 0c0-5 5-6 8-9z" /> },
+  { t: "Anti Sniping", d: "An opening window caps per wallet buys so bots cannot grab the curve.", icon: <><path d="M12 3l7 3v5c0 4-3 7-7 8-4-1-7-4-7-8V6l7-3z" /><path d="M9.5 12l1.8 1.8 3.2-3.6" /></> },
+  { t: "Open Source", d: "The contracts are public and verifiable on GitHub.", icon: <><path d="M8 9l-4 3 4 3" /><path d="M16 9l4 3-4 3" /><path d="M13 6l-2 12" /></> },
+  { t: "Demand Campaigns", d: "Tokens can launch only after real backers commit, with refunds if short.", icon: <><circle cx="9" cy="8" r="3" /><path d="M15 11a3 3 0 100-6" /><path d="M3 20c0-3 3-5 6-5s6 2 6 5" /><path d="M17 15c2 0 4 2 4 5" /></> },
+  { t: "Fair Launch", d: "Every token starts on the same curve, with no presale or hidden allocation.", icon: <><path d="M12 3v18" /><path d="M5 7h14" /><path d="M5 7l-2 5a3 3 0 006 0z" /><path d="M19 7l-2 5a3 3 0 006 0z" /></> },
+  { t: "Built on Base", d: "Fast and low cost transactions on Coinbase's Base network.", icon: <><circle cx="12" cy="12" r="9" /><path d="M12 7v10M7.5 9.5l9 5M16.5 9.5l-9 5" /></> },
+  { t: "Bonding Curve", d: "Transparent constant product pricing with no order book.", icon: <><path d="M4 20V4" /><path d="M4 20h16" /><path d="M4 16c5 0 9-2 14-10" /></> },
+];
+
 export default function HomePage() {
   return (
     <div className="mx-auto max-w-7xl px-6">
+      <AmbientBackground />
       {/* Hero */}
       <section className="relative grid items-center gap-12 py-16 sm:py-24 lg:grid-cols-2">
         <div className="absolute left-0 top-10 -z-10 h-72 w-72 rounded-full bg-brand-gradient opacity-20 blur-3xl animate-float" />
@@ -91,15 +104,15 @@ export default function HomePage() {
           >
             or explore what is launching
           </Link>
+
+          {/* Live protocol statistics */}
+          <HeroStats />
         </div>
 
-        <div className="mx-auto w-full max-w-md lg:max-w-none">
+        <div className="mx-auto w-full max-w-md lg:max-w-none animate-float [animation-duration:9s]">
           <HeroVisual />
         </div>
       </section>
-
-      {/* Social proof */}
-      <LandingStats />
 
       {/* Interface preview */}
       <DashboardPreview />
@@ -296,25 +309,24 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Trust */}
-      <section className="py-12">
+      {/* Protocol status */}
+      <section className="py-14">
         <h2 className="text-center text-3xl font-black tracking-tight">
-          Why users <span className="gradient-text">trust Lumora</span>
+          Protocol <span className="gradient-text">status</span>
         </h2>
-        <div className="mx-auto mt-10 grid max-w-4xl gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {[
-            "Liquidity locks on graduation",
-            "LP is burned, not held",
-            "Anti snipe protection",
-            "Open source contracts",
-            "No hidden mint",
-            "Refunds on failed campaigns",
-          ].map((t) => (
-            <div key={t} className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white/70 px-4 py-3 backdrop-blur">
-              <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-base-mint/15 text-base-mint">
-                <CheckIcon />
-              </span>
-              <span className="text-sm font-semibold text-slate-700">{t}</span>
+        <p className="mx-auto mt-3 max-w-xl text-center text-slate-500">
+          The guarantees built into every Lumora launch.
+        </p>
+        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {PROTOCOL.map((p) => (
+            <div key={p.t} className="glass-card lift p-5">
+              <div className="grid h-11 w-11 place-items-center rounded-2xl bg-brand-gradient text-white shadow-glow">
+                <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  {p.icon}
+                </svg>
+              </div>
+              <h3 className="mt-4 text-base font-bold text-slate-800">{p.t}</h3>
+              <p className="mt-1.5 text-xs leading-relaxed text-slate-500">{p.d}</p>
             </div>
           ))}
         </div>

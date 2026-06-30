@@ -54,6 +54,19 @@ const config: Config = {
           "0%": { backgroundColor: "rgba(16,185,129,0.18)" },
           "100%": { backgroundColor: "transparent" },
         },
+        drift: {
+          "0%, 100%": { transform: "translate(0px, 0px) scale(1)" },
+          "33%": { transform: "translate(22px, -26px) scale(1.05)" },
+          "66%": { transform: "translate(-18px, 16px) scale(0.97)" },
+        },
+        glowPulse: {
+          "0%, 100%": { opacity: "0.35" },
+          "50%": { opacity: "0.6" },
+        },
+        popIn: {
+          "0%": { opacity: "0", transform: "translateY(-6px) scale(0.98)" },
+          "100%": { opacity: "1", transform: "translateY(0) scale(1)" },
+        },
       },
       animation: {
         float: "float 6s ease-in-out infinite",
@@ -61,6 +74,9 @@ const config: Config = {
         marquee: "marquee 40s linear infinite",
         rise: "rise 0.4s ease-out both",
         flash: "flash 1.2s ease-out",
+        drift: "drift 18s ease-in-out infinite",
+        "glow-pulse": "glowPulse 7s ease-in-out infinite",
+        "pop-in": "popIn 0.16s ease-out both",
       },
     },
   },

@@ -66,3 +66,14 @@ export const GITHUB = {
 
 export const X_HANDLE = "LumoraLaunchpad";
 export const X_URL = `https://x.com/${X_HANDLE}`;
+
+// Protocol reference values shown on the contracts page. Treasury and router
+// addresses are optional via env and show a placeholder until set, so the page
+// is ready to display the official mainnet values after launch.
+export const VERSION = process.env.NEXT_PUBLIC_VERSION ?? "v1.0";
+export const AUDIT_STATUS =
+  process.env.NEXT_PUBLIC_AUDIT_STATUS ??
+  (IS_MAINNET ? "Pending" : "Unaudited, testnet");
+export const TREASURY_ADDRESS = process.env.NEXT_PUBLIC_DEV_TREASURY ?? "";
+export const ROUTER_ADDRESS = process.env.NEXT_PUBLIC_ROUTER ?? "";
+export const EXPLORER_HOME = EXPLORER_BASE;
