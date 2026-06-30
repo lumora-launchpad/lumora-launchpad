@@ -23,6 +23,12 @@ export type IconName =
   | "spark"
   | "shield"
   | "bolt"
+  | "layers"
+  | "user"
+  | "palette"
+  | "lock"
+  | "globe"
+  | "logout"
   | "arrowRight"
   | "chevronDown";
 
@@ -48,6 +54,12 @@ const PATHS: Record<IconName, React.ReactNode> = {
   spark: <><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z" /></>,
   shield: <><path d="M12 3l7 3v5c0 4-3 7-7 8-4-1-7-4-7-8V6l7-3z" /><path d="M9.5 12l1.8 1.8 3.2-3.6" /></>,
   bolt: <><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z" /></>,
+  layers: <><path d="M12 3l9 5-9 5-9-5 9-5z" /><path d="M3 13l9 5 9-5" /></>,
+  user: <><circle cx="12" cy="8" r="4" /><path d="M4 21c0-4 4-6 8-6s8 2 8 6" /></>,
+  palette: <><path d="M12 3a9 9 0 100 18c1.5 0 2-1 2-2 0-1.5 1-2 2-2h1a4 4 0 004-4c0-5-4-8-9-8z" /><circle cx="7.5" cy="11" r="1" fill="currentColor" stroke="none" /><circle cx="11" cy="7.5" r="1" fill="currentColor" stroke="none" /><circle cx="15" cy="8.5" r="1" fill="currentColor" stroke="none" /></>,
+  lock: <><rect x="5" y="11" width="14" height="9" rx="2" /><path d="M8 11V7a4 4 0 018 0v4" /></>,
+  globe: <><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3c2.5 2.5 2.5 15 0 18M12 3c-2.5 2.5-2.5 15 0 18" /></>,
+  logout: <><path d="M10 4H6a2 2 0 00-2 2v12a2 2 0 002 2h4" /><path d="M16 8l4 4-4 4" /><path d="M20 12H9" /></>,
   arrowRight: <><path d="M5 12h14" /><path d="M13 6l6 6-6 6" /></>,
   chevronDown: <><path d="M6 9l6 6 6-6" /></>,
 };
