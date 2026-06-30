@@ -53,6 +53,50 @@ contract RejectEth {
     }
 }
 
+contract MockUniFactoryEmpty {
+    function getPair(address, address) external pure returns (address) {
+        return address(0xBEEF);
+    }
+}
+
+// A router that simulates a pre-seeded pair: it accepts only part of the offered
+// liquidity and refunds the configured leftover ETH back to the caller, like the
+// real router does when an existing pool forces a ratio.
+contract MockRouterRefund {
+    address public factoryAddr;
+    uint256 public ethRefund;
+    uint256 public tokenLeftover;
+
+    constructor() {
+        factoryAddr = address(new MockUniFactoryEmpty());
+    }
+
+    function setRefunds(uint256 ethRefund_, uint256 tokenLeftover_) external {
+        ethRefund = ethRefund_;
+        tokenLeftover = tokenLeftover_;
+    }
+
+    function factory() external view returns (address) {
+        return factoryAddr;
+    }
+
+    function WETH() external pure returns (address) {
+        return address(0x4200000000000000000000000000000000000006);
+    }
+
+    function addLiquidityETH(address, uint256 amountToken, uint256, uint256, address, uint256)
+        external
+        payable
+        returns (uint256, uint256, uint256)
+    {
+        if (ethRefund > 0) {
+            (bool ok,) = msg.sender.call{value: ethRefund}("");
+            require(ok, "refund failed");
+        }
+        return (amountToken - tokenLeftover, msg.value - ethRefund, 1);
+    }
+}
+
 contract LaunchpadTest is Test {
     LaunchpadFactory factory;
     address dev = address(0xD37);
@@ -224,5 +268,32 @@ contract LaunchpadTest is Test {
         vm.prank(address(bad));
         vm.expectRevert("nothing owed");
         token.withdrawFees();
+    }
+
+    // M3: if the liquidity add refunds excess ETH or tokens (a pre-seeded pair),
+    // graduation sweeps the leftover so nothing is permanently locked.
+
+    function test_GraduationSweepsLeftover() public {
+        MockRouterRefund r = new MockRouterRefund();
+        LaunchpadFactory f = new LaunchpadFactory(dev, address(r));
+        r.setRefunds(0.1 ether, 1_000 ether); // refund 0.1 ETH and 1000 tokens
+
+        vm.prank(creator);
+        LaunchpadToken token = LaunchpadToken(payable(f.createToken("Lumora", "LUM")));
+        vm.roll(block.number + 6); // past the anti snipe window
+
+        uint256 deadBefore = token.balanceOf(address(0xdead));
+        uint256 devBefore = dev.balance;
+
+        vm.prank(buyer);
+        token.buy{value: 5 ether}(0); // crosses the target and graduates
+        assertTrue(token.graduated());
+
+        // Leftover tokens were burned to the dead address.
+        assertEq(token.balanceOf(address(0xdead)) - deadBefore, 1_000 ether);
+        // Leftover ETH reached the treasury (alongside graduation and trade fees).
+        assertGe(dev.balance - devBefore, 0.1 ether);
+        // No ETH is stranded in the token contract.
+        assertEq(address(token).balance, 0);
     }
 }
