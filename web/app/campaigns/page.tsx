@@ -76,7 +76,7 @@ function CampaignCard({ c, backers }: { c: CampaignView; backers?: number }) {
 
       <div className="flex items-center gap-3">
         <div className="min-w-0">
-          <h3 className="truncate text-lg font-bold leading-tight">{c.name}</h3>
+          <h3 className="truncate text-xl font-black leading-tight">{c.name}</h3>
           <p className="text-sm font-medium text-slate-400">${c.symbol}</p>
         </div>
         <span
