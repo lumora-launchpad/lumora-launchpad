@@ -3,10 +3,9 @@
 Step by step checklist for the production deploy of Lumora to Base mainnet
 (chain 8453) and pointing the web app at it. Run this only once, after an audit.
 
-This uses `Deploy.s.sol`, which deploys both factories with the launchpad
-production defaults (graduation at 20 ETH fully diluted market cap, anti snipe
-window, fees), wires the campaign factory, and sets the campaign minimum target
-to 0.6 ETH.
+This uses `Deploy.s.sol`, which deploys both factories, sets the launchpad config
+(graduation at 10 ETH fully diluted market cap, anti snipe window, fees), wires
+the campaign factory, and sets the campaign minimum target to 0.6 ETH.
 
 ## 0. Hard gates, do not skip
 
@@ -76,7 +75,7 @@ cast call <CAMPAIGN_FACTORY> "minTarget()(uint256)" --rpc-url base
 
 - [ ] `campaignFactory()` returns the new CampaignFactory address.
 - [ ] `owner()` is the deployer.
-- [ ] `graduationMarketCap()` is 20 ETH (20000000000000000000).
+- [ ] `graduationMarketCap()` is 10 ETH (10000000000000000000).
 - [ ] `minTarget()` is 0.6 ETH (600000000000000000).
 - [ ] Both contracts are verified on Basescan (the deploy used `--verify`; if it
       failed, verify manually with `forge verify-contract`).
