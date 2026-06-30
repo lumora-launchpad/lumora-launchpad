@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid token address" }, { status: 400 });
   }
 
-  // Only the token's on-chain creator may write its metadata. The caller proves
+  // Only the token's on chain creator may write its metadata. The caller proves
   // this by signing a time-bound message with the creator wallet.
   const signedAt = body?.signedAt;
   const signature = body?.signature;

@@ -218,7 +218,7 @@ export default function HomePage() {
             },
             {
               t: "Anti snipe",
-              d: "An opening window caps per-wallet buys for the first blocks, so bots cannot grab the whole curve before anyone else.",
+              d: "An opening window caps per wallet buys for the first blocks, so bots cannot grab the whole curve before anyone else.",
               icon: (
                 <>
                   <circle cx="12" cy="12" r="9" />

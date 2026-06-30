@@ -69,7 +69,7 @@ export function Footer() {
             </div>
             <p className="mt-3 max-w-xs text-sm text-slate-500">
               Launch tokens on Base with a fair, bright bonding curve. Demand
-              gated campaigns, anti-snipe, and liquidity that locks on
+              gated campaigns, anti snipe, and liquidity that locks on
               graduation.
             </p>
             <div className="mt-4 flex gap-2">

@@ -31,7 +31,7 @@ function AnimatedStat({
 }
 
 // Live activity strip shown on the landing page so the platform feels active
-// from the first view. Renders nothing until real on-chain data is available,
+// from the first view. Renders nothing until real on chain data is available,
 // so the landing never shows empty zeros.
 export function LandingStats() {
   const { tokens, hasFactory } = useTokens();

@@ -449,7 +449,7 @@ export default function CreatePage() {
             />
             <span className="mt-1 block text-right text-xs text-slate-400">
               Optional. Buy your own token in the same transaction, exempt from
-              the anti-snipe cap.
+              the anti snipe cap.
             </span>
           </label>
 
