@@ -485,11 +485,31 @@ export default function CampaignsPage() {
           ))}
         </div>
       ) : list.length === 0 ? (
-        <p className="rounded-2xl border border-slate-200 bg-white/60 px-4 py-10 text-center text-sm text-slate-500">
-          {campaigns.length === 0
-            ? "No campaigns yet. Start the first one below."
-            : "No campaigns match this filter."}
-        </p>
+        campaigns.length === 0 ? (
+          <div className="glass-card flex flex-col items-center px-6 py-16 text-center">
+            <div className="relative grid h-24 w-24 place-items-center">
+              <div className="absolute inset-0 rounded-full bg-brand-gradient opacity-30 blur-2xl animate-glow-pulse" />
+              <div className="grid h-16 w-16 place-items-center rounded-3xl bg-brand-gradient text-white shadow-glow animate-float">
+                <svg viewBox="0 0 24 24" className="h-8 w-8" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="9" />
+                  <circle cx="12" cy="12" r="4.5" />
+                  <circle cx="12" cy="12" r="1" fill="currentColor" />
+                </svg>
+              </div>
+            </div>
+            <h3 className="mt-6 text-2xl font-black tracking-tight">No campaigns yet</h3>
+            <p className="mt-2 max-w-sm text-sm text-slate-500">
+              Be the first creator to launch a demand campaign.
+            </p>
+            <a href="#start" className="btn-primary mt-6">
+              Create Campaign
+            </a>
+          </div>
+        ) : (
+          <p className="rounded-2xl border border-slate-200 bg-white/60 px-4 py-10 text-center text-sm text-slate-500">
+            No campaigns match this filter.
+          </p>
+        )
       ) : (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {list.map((c) => (
@@ -503,7 +523,7 @@ export default function CampaignsPage() {
       )}
 
       {/* Start a new campaign */}
-      <div className="mt-12">
+      <div id="start" className="mt-12 scroll-mt-24">
         <h2 className="mb-4 text-xl font-black tracking-tight">
           Start a <span className="gradient-text">campaign</span>
         </h2>

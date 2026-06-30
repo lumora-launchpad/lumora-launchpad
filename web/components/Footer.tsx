@@ -120,10 +120,37 @@ export function Footer() {
           ))}
         </div>
 
-        <div className="mt-10 flex flex-wrap items-center gap-2 border-t border-slate-100 pt-6">
-          <span className="pill !py-1 text-xs">Built on Base</span>
-          <span className="pill !py-1 text-xs">Powered by Uniswap</span>
-          <span className="pill !py-1 text-xs">Open source</span>
+        <div className="mt-10 grid grid-cols-2 gap-5 border-t border-slate-100 pt-6 text-xs sm:grid-cols-3 lg:grid-cols-5">
+          <div>
+            <p className="font-semibold uppercase tracking-wide text-slate-400">Network</p>
+            <p className="mt-1 font-bold text-slate-700">Base</p>
+          </div>
+          <div>
+            <p className="font-semibold uppercase tracking-wide text-slate-400">Protocol</p>
+            <p className="mt-1 font-bold text-slate-700">Uniswap V2</p>
+          </div>
+          <div>
+            <p className="font-semibold uppercase tracking-wide text-slate-400">Version</p>
+            <p className="mt-1 font-bold text-slate-700">v1.0</p>
+          </div>
+          <div>
+            <p className="font-semibold uppercase tracking-wide text-slate-400">Status</p>
+            <p className="mt-1 flex items-center gap-1.5 font-bold text-base-mint">
+              <span className="h-2 w-2 rounded-full bg-base-mint" />
+              Operational
+            </p>
+          </div>
+          <div>
+            <p className="font-semibold uppercase tracking-wide text-slate-400">Open Source</p>
+            <a
+              href={GITHUB.repo}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-1 inline-block font-bold text-base-blue hover:underline"
+            >
+              GitHub
+            </a>
+          </div>
         </div>
 
         <div className="mt-6 flex flex-col items-center justify-between gap-3 text-xs text-slate-400 sm:flex-row">

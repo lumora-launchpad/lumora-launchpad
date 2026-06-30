@@ -87,7 +87,7 @@ export function Navbar() {
                   className="fixed inset-0 z-10 cursor-default"
                   onClick={() => setLaunchOpen(false)}
                 />
-                <div className="absolute right-0 z-20 mt-2 w-64 overflow-hidden rounded-2xl border border-slate-200 bg-white p-1.5 shadow-card">
+                <div className="absolute right-0 z-20 mt-2 w-64 origin-top-right animate-pop-in overflow-hidden rounded-2xl border border-slate-200 bg-white p-1.5 shadow-card">
                   {LAUNCH_OPTIONS.map((o) => (
                     <Link
                       key={o.href}
