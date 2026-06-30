@@ -1,10 +1,43 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { formatEther } from "viem";
 import { useCampaigns } from "./useCampaigns";
 import { useCampaignBackers } from "./useCampaignBackers";
 import { IS_MAINNET } from "./deployments";
 import { sampleCampaigns } from "./sampleCampaigns";
+
+type CampaignMeta = { category?: string; description?: string; imageUrl?: string };
+
+// Fetches the off chain metadata for the real campaigns so their cards can show
+// a category, image, and description, just like the samples.
+function useCampaignMeta(addresses: string[]): Map<string, CampaignMeta> {
+  const [meta, setMeta] = useState<Map<string, CampaignMeta>>(new Map());
+  const key = addresses.map((a) => a.toLowerCase()).sort().join(",");
+
+  useEffect(() => {
+    if (!key) {
+      setMeta(new Map());
+      return;
+    }
+    let active = true;
+    Promise.all(
+      key.split(",").map((a) =>
+        fetch(`/api/token?address=${a}`)
+          .then((r) => (r.ok ? r.json() : {}))
+          .catch(() => ({}))
+          .then((d: CampaignMeta) => [a, d ?? {}] as [string, CampaignMeta]),
+      ),
+    ).then((entries) => {
+      if (active) setMeta(new Map(entries));
+    });
+    return () => {
+      active = false;
+    };
+  }, [key]);
+
+  return meta;
+}
 
 // A single shape the dashboard renders, whether the campaign is a real on chain
 // campaign or a clearly flagged sample. Real campaigns link to their detail
@@ -57,24 +90,31 @@ export function useDisplayCampaigns(): {
 } {
   const { campaigns } = useCampaigns();
   const backers = useCampaignBackers(campaigns.map((c) => c.address));
+  const meta = useCampaignMeta(campaigns.map((c) => c.address));
   const now = Math.floor(Date.now() / 1000);
 
-  const real: DisplayCampaign[] = campaigns.map((c, i) => ({
-    key: c.address,
-    href: `/campaign/${c.address}`,
-    name: c.name,
-    symbol: c.symbol,
-    creator: c.creator,
-    currentEth: Number(formatEther(c.totalCommitted)),
-    targetEth: Number(formatEther(c.targetEth)),
-    progress: c.progress,
-    supporters: backers.get(c.address.toLowerCase()),
-    deadline: c.deadline,
-    status: c.launched ? "graduated" : "live",
-    accent: c.accent,
-    sample: false,
-    createdAt: now - i, // real campaigns are returned newest first
-  }));
+  const real: DisplayCampaign[] = campaigns.map((c, i) => {
+    const m = meta.get(c.address.toLowerCase()) ?? {};
+    return {
+      key: c.address,
+      href: `/campaign/${c.address}`,
+      name: c.name,
+      symbol: c.symbol,
+      creator: c.creator,
+      category: m.category,
+      blurb: m.description,
+      image: m.imageUrl,
+      currentEth: Number(formatEther(c.totalCommitted)),
+      targetEth: Number(formatEther(c.targetEth)),
+      progress: c.progress,
+      supporters: backers.get(c.address.toLowerCase()),
+      deadline: c.deadline,
+      status: c.launched ? "graduated" : "live",
+      accent: c.accent,
+      sample: false,
+      createdAt: now - i, // real campaigns are returned newest first
+    };
+  });
 
   const samples: DisplayCampaign[] = SHOW_SAMPLES
     ? sampleCampaigns.map((s) => ({
