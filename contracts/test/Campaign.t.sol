@@ -49,6 +49,8 @@ contract CampaignTest is Test {
         MockRouterC router = new MockRouterC();
         launchpad = new LaunchpadFactory(dev, address(router));
         campaigns = new CampaignFactory(address(launchpad), dev);
+        // Trust the campaign factory so its campaigns can deploy tokens.
+        launchpad.setCampaignFactory(address(campaigns));
         vm.deal(backer1, 10 ether);
         vm.deal(backer2, 10 ether);
     }
@@ -125,5 +127,41 @@ contract CampaignTest is Test {
         vm.prank(backer1);
         vm.expectRevert("ended");
         c.commit{value: 0.1 ether}();
+    }
+
+    // M1: only campaigns registered by the trusted CampaignFactory may use the
+    // generous campaign fee split via createTokenFor.
+
+    function test_CampaignIsRegisteredOnCreate() public {
+        LaunchCampaign c = _newCampaign(0.5 ether);
+        assertTrue(launchpad.isCampaign(address(c)));
+    }
+
+    function test_CreateTokenForRejectsNonCampaign() public {
+        // An arbitrary caller cannot grab the campaign fee split directly.
+        vm.prank(address(0xBAD));
+        vm.expectRevert("not a campaign");
+        launchpad.createTokenFor(creator, "Lumora", "LUM");
+    }
+
+    function test_RegisterCampaignOnlyByCampaignFactory() public {
+        vm.prank(address(0xBAD));
+        vm.expectRevert("not campaign factory");
+        launchpad.registerCampaign(address(0xBAD));
+    }
+
+    function test_SetCampaignFactoryOnlyOwner() public {
+        vm.prank(address(0xBAD));
+        vm.expectRevert("not owner");
+        launchpad.setCampaignFactory(address(0xBAD));
+    }
+
+    function test_CreateCampaignFailsIfFactoryNotTrusted() public {
+        // A campaign factory the launchpad does not trust cannot register its
+        // campaigns, so creation reverts rather than minting unauthorized ones.
+        CampaignFactory rogue = new CampaignFactory(address(launchpad), dev);
+        vm.prank(creator);
+        vm.expectRevert("not campaign factory");
+        rogue.createCampaign("Lumora", "LUM", 0.5 ether, 1 days);
     }
 }

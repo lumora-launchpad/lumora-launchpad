@@ -73,6 +73,8 @@ contract DeployTestnet is Script {
             7 days, // maxDuration
             200 // commitFeeBps (2 percent)
         );
+        // Trust the campaign factory so its campaigns can deploy tokens.
+        factory.setCampaignFactory(address(campaignFactory));
         vm.stopBroadcast();
 
         console2.log("MockRouter", address(router));
