@@ -5,6 +5,7 @@ import { BackButton } from "@/components/BackButton";
 import { shortAddress } from "@/lib/tokens";
 import { riskLabel, RISK_TONE } from "@/lib/campaignDisplay";
 import { RiskNotice } from "./RiskNotice";
+import { SaveButton } from "./SaveButton";
 import { Icon } from "./icons";
 
 export type CampaignDetailData = {
@@ -29,6 +30,7 @@ export type CampaignDetailData = {
   status: "live" | "ended" | "launched";
   fundingSpeedPerDay?: number;
   sample: boolean;
+  watchKey?: string;
 };
 
 const num = (n?: number, d = 0) =>
@@ -55,9 +57,11 @@ const SOCIALS: { key: keyof NonNullable<CampaignDetailData["socials"]>; label: s
 export function CampaignDetail({
   c,
   action,
+  comments,
 }: {
   c: CampaignDetailData;
   action: React.ReactNode;
+  comments?: React.ReactNode;
 }) {
   const pct = Math.min(Math.round(c.progress), 100);
   const risk = riskLabel(c.progress);
@@ -125,7 +129,12 @@ export function CampaignDetail({
                 {c.address && <> / {shortAddress(c.address)}</>}
               </p>
             </div>
-            <ShareButton name={c.name} symbol={c.symbol} />
+            <div className="flex items-center gap-2">
+              {c.watchKey && (
+                <SaveButton itemKey={c.watchKey} className="!h-9 !w-9 border border-slate-200 !bg-white/70 !text-slate-500 hover:!text-amber-500" />
+              )}
+              <ShareButton name={c.name} symbol={c.symbol} />
+            </div>
           </div>
 
           <div className="mt-4 flex flex-wrap items-center gap-2">
@@ -251,6 +260,19 @@ export function CampaignDetail({
               </>
             )}
           </section>
+
+          {/* Community */}
+          {comments && (
+            <section className="glass-card p-6">
+              <h2 className="text-lg font-black tracking-tight text-slate-900">
+                Community
+              </h2>
+              <p className="mt-1 text-sm text-slate-500">
+                Questions and comments. The creator can reply here.
+              </p>
+              <div className="mt-4">{comments}</div>
+            </section>
+          )}
         </div>
 
         {/* Right column: action + risk */}

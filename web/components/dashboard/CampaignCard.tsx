@@ -4,6 +4,7 @@ import Link from "next/link";
 import { type DisplayCampaign, riskLabel, RISK_TONE } from "@/lib/campaignDisplay";
 import { shortAddress } from "@/lib/tokens";
 import { Countdown } from "@/components/Countdown";
+import { SaveButton } from "./SaveButton";
 import { Icon } from "./icons";
 
 function fmtViews(n: number): string {
@@ -37,6 +38,7 @@ function CardBody({ c }: { c: DisplayCampaign }) {
           />
         )}
         <div className="absolute inset-0 opacity-30 [background:radial-gradient(70%_80%_at_25%_15%,white,transparent)]" />
+        <SaveButton itemKey={c.key} className="absolute left-4 top-4" />
         <div className="absolute right-4 top-4 flex gap-2">
           {c.sample && (
             <span className="rounded-full bg-slate-900/40 px-2.5 py-1 text-[11px] font-bold text-white backdrop-blur">
