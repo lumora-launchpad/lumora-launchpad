@@ -26,6 +26,17 @@ const DURATIONS = [
   { label: "7 days", secs: 604800 },
 ];
 
+const CATEGORIES = [
+  "AI",
+  "Meme",
+  "Gaming",
+  "DeFi",
+  "Infrastructure",
+  "NFT",
+  "Utility",
+  "SocialFi",
+];
+
 function CMetric({ label, value }: { label: string; value: string }) {
   return (
     <div>
@@ -144,6 +155,12 @@ function CreateForm() {
   const [blurb, setBlurb] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [category, setCategory] = useState("");
+  const [why, setWhy] = useState("");
+  const [website, setWebsite] = useState("");
+  const [x, setX] = useState("");
+  const [telegram, setTelegram] = useState("");
+  const [discord, setDiscord] = useState("");
 
   const { writeContract, data: hash, isPending } = useWriteContract();
   const { signMessageAsync } = useSignMessage();
@@ -175,7 +192,8 @@ function CreateForm() {
   // keyed by the new campaign address from the CampaignCreated event.
   useEffect(() => {
     if (!isSuccess || !receipt || saved.current) return;
-    if (!blurb && !imageUrl) return;
+    if (!blurb && !imageUrl && !category && !why && !website && !x && !telegram && !discord)
+      return;
     const log = receipt.logs.find(
       (l) => l.address.toLowerCase() === CAMPAIGN_FACTORY_ADDRESS.toLowerCase(),
     );
@@ -207,6 +225,12 @@ function CreateForm() {
               signature,
               description: blurb,
               imageUrl,
+              category,
+              why,
+              website,
+              x,
+              telegram,
+              discord,
             }),
           });
         } catch {
@@ -289,6 +313,56 @@ function CreateForm() {
         maxLength={140}
         onChange={(e) => setBlurb(e.target.value)}
       />
+
+      <div className="mt-3 grid gap-3 sm:grid-cols-2">
+        <select
+          className="field"
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+        >
+          <option value="">Category (optional)</option>
+          {CATEGORIES.map((cat) => (
+            <option key={cat} value={cat}>
+              {cat}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <textarea
+        className="field mt-3 min-h-20 resize-none"
+        placeholder="Why this token? (optional)"
+        value={why}
+        maxLength={600}
+        onChange={(e) => setWhy(e.target.value)}
+      />
+
+      <div className="mt-3 grid gap-3 sm:grid-cols-2">
+        <input
+          className="field"
+          placeholder="Website (optional)"
+          value={website}
+          onChange={(e) => setWebsite(e.target.value)}
+        />
+        <input
+          className="field"
+          placeholder="X / Twitter (optional)"
+          value={x}
+          onChange={(e) => setX(e.target.value)}
+        />
+        <input
+          className="field"
+          placeholder="Telegram (optional)"
+          value={telegram}
+          onChange={(e) => setTelegram(e.target.value)}
+        />
+        <input
+          className="field"
+          placeholder="Discord (optional)"
+          value={discord}
+          onChange={(e) => setDiscord(e.target.value)}
+        />
+      </div>
 
       <div className="mt-3 flex items-center gap-4">
         {imageUrl ? (

@@ -4,9 +4,13 @@ import path from "path";
 export type TokenMetadata = {
   description?: string;
   imageUrl?: string;
+  bannerUrl?: string;
+  category?: string;
+  why?: string;
   website?: string;
   x?: string;
   telegram?: string;
+  discord?: string;
 };
 
 export interface MetadataStore {

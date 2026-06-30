@@ -79,7 +79,7 @@ export function useDisplayCampaigns(): {
   const samples: DisplayCampaign[] = SHOW_SAMPLES
     ? sampleCampaigns.map((s) => ({
         key: `sample-${s.id}`,
-        href: null,
+        href: `/campaign/sample/${s.id}`,
         name: s.name,
         symbol: s.symbol,
         creator: s.creator,

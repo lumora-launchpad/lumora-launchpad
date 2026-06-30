@@ -62,9 +62,19 @@ export async function POST(request: NextRequest) {
     typeof body.description === "string"
       ? body.description.trim().slice(0, MAX_DESCRIPTION_LENGTH)
       : undefined;
+  const why =
+    typeof body.why === "string" ? body.why.trim().slice(0, 600) : undefined;
+  const category =
+    typeof body.category === "string"
+      ? body.category.trim().slice(0, 40)
+      : undefined;
   const imageUrl =
     typeof body.imageUrl === "string"
       ? body.imageUrl.trim().slice(0, MAX_IMAGE_URL_LENGTH)
+      : undefined;
+  const bannerUrl =
+    typeof body.bannerUrl === "string"
+      ? body.bannerUrl.trim().slice(0, MAX_IMAGE_URL_LENGTH)
       : undefined;
 
   const link = (v: unknown): string | undefined =>
@@ -72,10 +82,14 @@ export async function POST(request: NextRequest) {
 
   await metadataStore.set(address, {
     description: description || undefined,
+    why: why || undefined,
+    category: category || undefined,
     imageUrl: imageUrl || undefined,
+    bannerUrl: bannerUrl || undefined,
     website: link(body.website),
     x: link(body.x),
     telegram: link(body.telegram),
+    discord: link(body.discord),
   });
 
   return NextResponse.json({ ok: true });
