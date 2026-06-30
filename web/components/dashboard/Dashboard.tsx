@@ -1,9 +1,6 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
-import { Sidebar } from "./Sidebar";
-import { Topbar } from "./Topbar";
 import { StatCards } from "./StatCards";
 import { CampaignSections } from "./CampaignSections";
 import { ActivityPanel } from "./ActivityPanel";
@@ -54,31 +51,21 @@ function Hero() {
 }
 
 export function Dashboard() {
-  const [menuOpen, setMenuOpen] = useState(false);
-
   return (
-    <div className="flex min-h-screen">
-      <Sidebar open={menuOpen} onClose={() => setMenuOpen(false)} />
+    <div className="px-4 py-6 sm:px-6 lg:px-8">
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
+        {/* Main column */}
+        <div className="min-w-0 space-y-8">
+          <Hero />
+          <StatCards />
+          <CampaignSections />
+        </div>
 
-      <div className="flex min-w-0 flex-1 flex-col">
-        <Topbar onMenu={() => setMenuOpen(true)} />
-
-        <main className="flex-1 px-4 py-6 sm:px-6 lg:px-8">
-          <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
-            {/* Main column */}
-            <div className="min-w-0 space-y-8">
-              <Hero />
-              <StatCards />
-              <CampaignSections />
-            </div>
-
-            {/* Right rail */}
-            <aside className="space-y-6 xl:sticky xl:top-24 xl:self-start">
-              <ActivityPanel />
-              <TrustPanel />
-            </aside>
-          </div>
-        </main>
+        {/* Right rail */}
+        <aside className="space-y-6 xl:sticky xl:top-24 xl:self-start">
+          <ActivityPanel />
+          <TrustPanel />
+        </aside>
       </div>
     </div>
   );
