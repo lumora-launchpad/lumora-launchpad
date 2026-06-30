@@ -35,6 +35,24 @@ contract MockRouter {
     }
 }
 
+// A contract that rejects ETH unless explicitly toggled to accept, used to
+// model a creator or treasury that cannot receive fees.
+contract RejectEth {
+    bool public accept;
+
+    function setAccept(bool a) external {
+        accept = a;
+    }
+
+    function createOn(LaunchpadFactory factory) external returns (address) {
+        return factory.createToken("Lumora", "LUM");
+    }
+
+    receive() external payable {
+        require(accept, "reject");
+    }
+}
+
 contract LaunchpadTest is Test {
     LaunchpadFactory factory;
     address dev = address(0xD37);
@@ -161,5 +179,50 @@ contract LaunchpadTest is Test {
         // alone would be about 0.0325 ether, so anything above 0.04 proves the
         // graduation fee was paid.
         assertGt(dev.balance, 0.04 ether);
+    }
+
+    // M2: a fee recipient that cannot receive ETH must not be able to block
+    // trading. Fees that fail to push are accrued for later withdrawal.
+
+    function test_NormalCreatorPaidDirectly() public {
+        LaunchpadToken token = _newToken();
+        vm.roll(block.number + 6);
+
+        vm.prank(buyer);
+        token.buy{value: 1 ether}(0);
+
+        // A receiving creator is paid immediately, nothing is left owed.
+        assertEq(creator.balance, 0.0035 ether);
+        assertEq(token.feesOwed(creator), 0);
+    }
+
+    function test_TradingSurvivesNonReceivingCreator() public {
+        RejectEth bad = new RejectEth(); // rejects ETH by default
+        address t = bad.createOn(factory); // creator is the rejecting contract
+        LaunchpadToken token = LaunchpadToken(payable(t));
+        assertEq(token.creator(), address(bad));
+        vm.roll(block.number + 6); // past the anti snipe window
+
+        // The buy succeeds even though the creator cannot receive its fee.
+        vm.prank(buyer);
+        token.buy{value: 1 ether}(0);
+        assertGt(token.balanceOf(buyer), 0);
+
+        // The creator's 35 percent of the 1 percent fee is held, not lost.
+        uint256 owed = token.feesOwed(address(bad));
+        assertEq(owed, 0.0035 ether);
+
+        // Once the creator can receive, it withdraws the accrued fees.
+        bad.setAccept(true);
+        uint256 before = address(bad).balance;
+        vm.prank(address(bad));
+        token.withdrawFees();
+        assertEq(address(bad).balance - before, owed);
+        assertEq(token.feesOwed(address(bad)), 0);
+
+        // Withdrawing again reverts since nothing is owed.
+        vm.prank(address(bad));
+        vm.expectRevert("nothing owed");
+        token.withdrawFees();
     }
 }

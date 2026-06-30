@@ -47,9 +47,16 @@ contract LaunchpadToken is ERC20, ReentrancyGuard {
 
     IUniswapV2Router02 public immutable router;
 
+    // Trade and graduation fees that could not be pushed to a recipient (for
+    // example one that reverts on ETH receipt) are held here for later
+    // withdrawal, so a non receiving creator or treasury can never block trading.
+    mapping(address => uint256) public feesOwed;
+
     event Buy(address indexed buyer, uint256 ethIn, uint256 tokensOut, uint256 fee);
     event Sell(address indexed seller, uint256 tokensIn, uint256 ethOut, uint256 fee);
     event Graduated(address indexed pair, uint256 ethLiquidity, uint256 tokenLiquidity, uint256 devFee);
+    event FeesAccrued(address indexed recipient, uint256 amount);
+    event FeesWithdrawn(address indexed recipient, uint256 amount);
 
     constructor(
         string memory name_,
@@ -173,14 +180,30 @@ contract LaunchpadToken is ERC20, ReentrancyGuard {
         if (fee == 0) return;
         uint256 devCut = (fee * devShareBps) / 10_000;
         uint256 creatorCut = fee - devCut;
-        if (devCut > 0) {
-            (bool a,) = devTreasury.call{value: devCut}("");
-            require(a, "dev fee failed");
+        _payOrAccrue(devTreasury, devCut);
+        _payOrAccrue(creator, creatorCut);
+    }
+
+    /// @notice Pay `to` directly, but if the transfer fails (for example a
+    ///         recipient that reverts on ETH) credit it as withdrawable instead,
+    ///         so a non receiving creator or treasury can never revert a trade.
+    function _payOrAccrue(address to, uint256 amount) internal {
+        if (amount == 0) return;
+        (bool ok,) = to.call{value: amount}("");
+        if (!ok) {
+            feesOwed[to] += amount;
+            emit FeesAccrued(to, amount);
         }
-        if (creatorCut > 0) {
-            (bool b,) = creator.call{value: creatorCut}("");
-            require(b, "creator fee failed");
-        }
+    }
+
+    /// @notice Withdraw fees that were accrued because a direct payout failed.
+    function withdrawFees() external nonReentrant {
+        uint256 amount = feesOwed[msg.sender];
+        require(amount > 0, "nothing owed");
+        feesOwed[msg.sender] = 0;
+        (bool ok,) = msg.sender.call{value: amount}("");
+        require(ok, "withdraw failed");
+        emit FeesWithdrawn(msg.sender, amount);
     }
 
     function _graduate() internal {
@@ -192,8 +215,7 @@ contract LaunchpadToken is ERC20, ReentrancyGuard {
         uint256 devFee = (ethLiq * graduationFeeBps) / 10_000;
         if (devFee > 0) {
             ethLiq -= devFee;
-            (bool f,) = devTreasury.call{value: devFee}("");
-            require(f, "grad fee failed");
+            _payOrAccrue(devTreasury, devFee);
         }
 
         _approve(address(this), address(router), tokenLiq);
