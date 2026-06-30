@@ -15,6 +15,7 @@ import { accentFor, formatEth } from "@/lib/tokens";
 import { txExplorerUrl } from "@/lib/wagmi";
 import { useCampaignBackers } from "@/lib/useCampaignBackers";
 import { useToast } from "@/components/Toast";
+import { Comments } from "@/components/Comments";
 import { CampaignDetail, type CampaignDetailData } from "@/components/dashboard/CampaignDetail";
 
 const ZERO = "0x0000000000000000000000000000000000000000" as const;
@@ -206,6 +207,7 @@ export default function CampaignPage({
     deadline,
     status: launched ? "launched" : ended ? "ended" : "live",
     sample: false,
+    watchKey: address,
   };
 
   const action = (
@@ -300,5 +302,7 @@ export default function CampaignPage({
     </div>
   );
 
-  return <CampaignDetail c={data} action={action} />;
+  return (
+    <CampaignDetail c={data} action={action} comments={<Comments address={address} />} />
+  );
 }

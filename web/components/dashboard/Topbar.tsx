@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { GlobalSearch } from "@/components/GlobalSearch";
 import { Icon } from "./icons";
@@ -41,13 +42,14 @@ export function Topbar({ onMenu }: { onMenu: () => void }) {
           </ConnectButton.Custom>
 
           {/* Notifications */}
-          <button
+          <Link
+            href="/notifications"
             aria-label="Notifications"
             className="relative grid h-10 w-10 place-items-center rounded-xl border border-slate-200 bg-white/70 text-slate-600 transition hover:border-base-blue hover:text-base-blue"
           >
             <Icon name="bell" className="h-5 w-5" />
             <span className="absolute right-2.5 top-2.5 h-2 w-2 rounded-full bg-base-pink ring-2 ring-white" />
-          </button>
+          </Link>
 
           {/* Wallet + profile */}
           <ConnectButton

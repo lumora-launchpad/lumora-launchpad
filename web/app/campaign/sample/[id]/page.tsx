@@ -37,7 +37,32 @@ export default function SampleCampaignPage({
     fundingSpeedPerDay:
       s.createdHoursAgo > 0 ? s.currentEth / (s.createdHoursAgo / 24) : undefined,
     sample: true,
+    watchKey: `sample-${s.id}`,
   };
+
+  const sampleThread = (
+    <ul className="space-y-3">
+      {[
+        { who: "0x4a2f...9c10", text: "What is the plan after the token launches?", reply: false },
+        {
+          who: `${s.creator.slice(0, 6)}...${s.creator.slice(-4)} (creator)`,
+          text: "Liquidity locks on Uniswap and we ship the next milestone from the roadmap.",
+          reply: true,
+        },
+        { who: "0x91bd...7e02", text: "Backing this one. Love the demand first model.", reply: false },
+      ].map((m, i) => (
+        <li
+          key={i}
+          className={`rounded-2xl border p-3 text-sm ${
+            m.reply ? "border-base-violet/20 bg-base-violet/5" : "border-slate-200 bg-white/60"
+          }`}
+        >
+          <p className="text-xs font-bold text-slate-500">{m.who}</p>
+          <p className="mt-1 text-slate-600">{m.text}</p>
+        </li>
+      ))}
+    </ul>
+  );
 
   const action = (
     <div className="glass-card p-5 text-center">
@@ -52,5 +77,5 @@ export default function SampleCampaignPage({
     </div>
   );
 
-  return <CampaignDetail c={data} action={action} />;
+  return <CampaignDetail c={data} action={action} comments={sampleThread} />;
 }
