@@ -43,7 +43,7 @@ export const metadata: Metadata = {
     title: TITLE,
     description: DESCRIPTION,
     url: SITE_URL,
-    images: [{ url: "/hero.png", width: 800, height: 800, alt: "Lumora" }],
+    images: [{ url: "/hero.jpg", width: 800, height: 800, alt: "Lumora" }],
   },
   twitter: {
     card: "summary_large_image",
@@ -51,7 +51,7 @@ export const metadata: Metadata = {
     creator: "@LumoraLaunchpad",
     title: TITLE,
     description: DESCRIPTION,
-    images: ["/hero.png"],
+    images: ["/hero.jpg"],
   },
 };
 

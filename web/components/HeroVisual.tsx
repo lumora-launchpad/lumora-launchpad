@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-// Shows /hero.png if you drop one into web/public, otherwise a branded panel.
+// Shows /hero.jpg if present in web/public, otherwise a branded panel.
 // Replace the file to use your own photo or logo, no code change needed.
 export function HeroVisual() {
   const [failed, setFailed] = useState(false);
@@ -14,7 +14,7 @@ export function HeroVisual() {
         <div className="absolute -inset-6 -z-10 rounded-[2rem] bg-brand-gradient opacity-30 blur-3xl animate-float [animation-duration:14s]" />
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/hero.png"
+          src="/hero.jpg"
           alt="Lumora"
           onError={() => setFailed(true)}
           className="aspect-square w-full rounded-3xl object-cover shadow-card animate-float [animation-duration:8s]"
