@@ -17,7 +17,7 @@ graduation. Live at https://lumora.men (Base Sepolia testnet).
 - Anti-snipe window: per wallet buys are capped for the first few blocks so bots
   cannot grab the curve at launch.
 - Creator initial buy: a creator can buy their own allocation atomically at
-  creation, exempt from the anti-snipe cap.
+  creation, exempt from the anti snipe cap.
 - Launch campaigns: backers commit ETH toward a target. On reaching it the token
   launches and backers claim pro rata. If it falls short by the deadline, every
   backer refunds in full. A commit fee goes to the dev on a successful launch.
@@ -28,7 +28,7 @@ graduation. Live at https://lumora.men (Base Sepolia testnet).
 lumora-launchpad/
   contracts/        Foundry smart contracts (Solidity)
     src/
-      LaunchpadToken.sol      ERC20 plus bonding curve, fees, anti-snipe, graduation
+      LaunchpadToken.sol      ERC20 plus bonding curve, fees, anti snipe, graduation
       LaunchpadFactory.sol    Token factory and registry
       LaunchCampaign.sol      Demand gated launch: commit, claim, refund
       CampaignFactory.sol     Campaign factory and registry

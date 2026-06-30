@@ -44,7 +44,7 @@ python3 -c "import json; d=json.load(open('broadcast/DeployTestnet.s.sol/84532/r
 
 - [ ] `START_BLOCK` value
 
-## 2. Verify on-chain wiring
+## 2. Verify on chain wiring
 
 ```
 # campaignFactory must equal the deployed CampaignFactory (M1 wiring)
