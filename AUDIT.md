@@ -24,19 +24,19 @@ toward a target and, once met, deploys and seeds a token they claim pro rata.
 
 | File | Lines | Role |
 | --- | --- | --- |
-| `contracts/src/LaunchpadToken.sol` | 255 | ERC20 plus bonding curve, fees, graduation, anti-snipe |
+| `contracts/src/LaunchpadToken.sol` | 255 | ERC20 plus bonding curve, fees, graduation, anti snipe |
 | `contracts/src/LaunchpadFactory.sol` | 160 | Deploys tokens, holds global config, registry, owner admin |
 | `contracts/src/LaunchCampaign.sol` | 147 | Demand gated launch: commit, launch, claim, refund |
 | `contracts/src/CampaignFactory.sol` | 103 | Deploys campaigns, holds config, registry |
 | `contracts/src/interfaces/IUniswapV2.sol` | - | Router and factory interfaces (no logic) |
 
-Out of scope: the Next.js web app, off-chain JSON metadata and comment stores,
+Out of scope: the Next.js web app, off chain JSON metadata and comment stores,
 the deploy scripts beyond confirming they wire the right parameters.
 
 ## Trust and roles
 
 - **Factory owner** can call `setConfig` to change every global parameter
-  (treasury, router, curve seed, graduation target, anti-snipe, fees, fee
+  (treasury, router, curve seed, graduation target, anti snipe, fees, fee
   splits, creation fee) for future tokens. It cannot touch already deployed
   tokens, whose parameters are immutable. Confirm there is no path for the owner
   to drain a live curve or a campaign.
@@ -69,7 +69,7 @@ the deploy scripts beyond confirming they wire the right parameters.
 
 ## Focus areas
 
-1. **Reentrancy.** All external ETH moves use low-level `call`. `nonReentrant`
+1. **Reentrancy.** All external ETH moves use low level `call`. `nonReentrant`
    guards `buy`, `sell`, `initialBuy`, `commit`, `claim`, `refund`. Verify state
    is updated before external calls (checks-effects-interactions), especially in
    `_graduate` (state set, then router call) and `_splitFee` (called after
@@ -96,7 +96,7 @@ the deploy scripts beyond confirming they wire the right parameters.
 6. **`initialBuy` and factory forwarding.** `_create` forwards `msg.value` minus
    creation fee into `initialBuy`, crediting the caller. For campaigns the caller
    is the campaign contract, so bought tokens land there for backers. Verify a
-   creator cannot abuse the anti-snipe exemption to grab an outsized allocation
+   creator cannot abuse the anti snipe exemption to grab an outsized allocation
    beyond what they pay for.
 7. **Owner powers and parameter bounds.** `setConfig` validates fee ceilings and
    non-zero addresses but allows wide ranges. Confirm no setting bricks creation

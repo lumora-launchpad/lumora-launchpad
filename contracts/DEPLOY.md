@@ -50,7 +50,7 @@ There are two options.
 ### Option A. Testnet playground with an easy to test graduation
 
 Recommended for your first run. This script deploys a mock router, sets a low
-market cap graduation target reachable with faucet ETH, a short anti-snipe
+market cap graduation target reachable with faucet ETH, a short anti snipe
 window, and a graduation fee, then deploys a `CampaignFactory` for demand gated
 launches.
 
@@ -134,4 +134,4 @@ cast balance <DEV_TREASURY> --rpc-url base_sepolia
 - Switch the router to the correct Uniswap v2 on Base mainnet and restore the
   graduation target to a production value.
 - Re test the curve parameters `virtualEthReserve` and `graduationMarketCap`,
-  the anti-snipe window, and the graduation fee.
+  the anti snipe window, and the graduation fee.
