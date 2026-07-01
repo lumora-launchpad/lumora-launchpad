@@ -38,7 +38,7 @@ function Section({
           </div>
         </div>
         <Link
-          href="/campaigns"
+          href="/explore"
           className="shrink-0 text-sm font-bold text-base-blue hover:underline"
         >
           View all
@@ -66,7 +66,7 @@ function EmptyState() {
         Be the first to launch a demand campaign. Prove the demand, then launch
         only when your target is reached.
       </p>
-      <Link href="/campaigns" className="btn-primary mt-6">
+      <Link href="/launch" className="btn-primary mt-6">
         Launch Campaign
       </Link>
     </section>
