@@ -3,9 +3,10 @@ import { Countdown } from "@/components/Countdown";
 import { ShareButton } from "@/components/ShareButton";
 import { BackButton } from "@/components/BackButton";
 import { shortAddress } from "@/lib/tokens";
-import { riskLabel, RISK_TONE } from "@/lib/campaignDisplay";
+import { riskLabel, RISK_TONE, type DisplayCampaign } from "@/lib/campaignDisplay";
 import { RiskNotice } from "./RiskNotice";
 import { SaveButton } from "./SaveButton";
+import { CampaignCard } from "./CampaignCard";
 import { Icon } from "./icons";
 
 export type CampaignDetailData = {
@@ -14,6 +15,7 @@ export type CampaignDetailData = {
   address: string | null;
   creator: string;
   accent: string;
+  verified?: boolean;
   imageUrl?: string;
   bannerUrl?: string;
   category?: string;
@@ -32,6 +34,9 @@ export type CampaignDetailData = {
   sample: boolean;
   watchKey?: string;
 };
+
+export type SupporterRow = { backer: string; amount: number };
+export type ActivityRow = { backer: string; amount: number; total: number };
 
 const num = (n?: number, d = 0) =>
   n === undefined ? "—" : n.toLocaleString("en-US", { maximumFractionDigits: d });
@@ -58,10 +63,16 @@ export function CampaignDetail({
   c,
   action,
   comments,
+  topSupporters = [],
+  recentActivity = [],
+  related = [],
 }: {
   c: CampaignDetailData;
   action: React.ReactNode;
   comments?: React.ReactNode;
+  topSupporters?: SupporterRow[];
+  recentActivity?: ActivityRow[];
+  related?: DisplayCampaign[];
 }) {
   const pct = Math.min(Math.round(c.progress), 100);
   const risk = riskLabel(c.progress);
@@ -121,8 +132,16 @@ export function CampaignDetail({
               </span>
             )}
             <div className="min-w-0 flex-1 pb-1">
-              <h1 className="truncate text-2xl font-black tracking-tight text-slate-900">
-                {c.name}
+              <h1 className="flex items-center gap-2 text-2xl font-black tracking-tight text-slate-900">
+                <span className="truncate">{c.name}</span>
+                {c.verified && (
+                  <span
+                    title="Verified Builder"
+                    className="inline-grid h-5 w-5 shrink-0 place-items-center rounded-full bg-base-mint text-white"
+                  >
+                    <Icon name="check" className="h-3.5 w-3.5" />
+                  </span>
+                )}
               </h1>
               <p className="text-sm font-semibold text-slate-400">
                 ${c.symbol}
@@ -261,6 +280,47 @@ export function CampaignDetail({
             )}
           </section>
 
+          {/* Top supporters */}
+          {topSupporters.length > 0 && (
+            <section className="glass-card p-6">
+              <h2 className="text-lg font-black tracking-tight text-slate-900">Top supporters</h2>
+              <ul className="mt-4 space-y-2">
+                {topSupporters.slice(0, 5).map((s, i) => (
+                  <li key={s.backer} className="flex items-center justify-between">
+                    <span className="flex items-center gap-2.5">
+                      <span className="grid h-7 w-7 place-items-center rounded-lg bg-slate-100 text-xs font-black text-slate-500">
+                        {i + 1}
+                      </span>
+                      <span className="font-mono text-sm font-semibold text-slate-700">
+                        {shortAddress(s.backer)}
+                      </span>
+                    </span>
+                    <span className="text-sm font-bold text-slate-800">{num(s.amount, 3)} ETH</span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
+          {/* Funding activity */}
+          {recentActivity.length > 0 && (
+            <section className="glass-card p-6">
+              <h2 className="text-lg font-black tracking-tight text-slate-900">Funding activity</h2>
+              <ul className="mt-4 space-y-1">
+                {recentActivity.slice(0, 8).map((a, i) => (
+                  <li key={`${a.backer}-${i}`} className="flex items-center justify-between rounded-xl px-2 py-2 text-sm">
+                    <span className="flex items-center gap-2.5">
+                      <span className="h-2 w-2 rounded-full bg-base-mint" />
+                      <span className="font-mono text-slate-600">{shortAddress(a.backer)}</span>
+                      <span className="text-slate-400">committed</span>
+                    </span>
+                    <span className="font-bold text-slate-700">{num(a.amount, 3)} ETH</span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
           {/* Community */}
           {comments && (
             <section className="glass-card p-6">
@@ -281,6 +341,20 @@ export function CampaignDetail({
           <RiskNotice compact />
         </div>
       </div>
+
+      {/* Related campaigns */}
+      {related.length > 0 && (
+        <section className="mt-10">
+          <h2 className="text-xl font-black tracking-tight text-slate-900">
+            Related <span className="gradient-text">campaigns</span>
+          </h2>
+          <div className="mt-5 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+            {related.slice(0, 3).map((rc) => (
+              <CampaignCard key={rc.key} c={rc} />
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 }

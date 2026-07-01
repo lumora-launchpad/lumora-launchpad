@@ -3,7 +3,16 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { sampleCampaigns } from "@/lib/sampleCampaigns";
+import { useDisplayCampaigns } from "@/lib/campaignDisplay";
 import { CampaignDetail, type CampaignDetailData } from "@/components/dashboard/CampaignDetail";
+
+const FAKE_BACKERS = [
+  "0x4a2f9c10b7d3e6481529ab6c0d7e8f90a1b2c3d4",
+  "0x91bd7e02c4a5f6178293b04c5d6e7f8091a2b3c4",
+  "0x2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e",
+  "0x6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a",
+  "0xa1c2d3e4f5061728394a5b6c7d8e9f0a1b2c3d4e",
+];
 
 export default function SampleCampaignPage({
   params,
@@ -11,9 +20,27 @@ export default function SampleCampaignPage({
   params: { id: string };
 }) {
   const s = sampleCampaigns.find((x) => x.id === params.id);
+  const { all } = useDisplayCampaigns();
   if (!s) return notFound();
 
   const now = Math.floor(Date.now() / 1000);
+
+  // Synthesized supporters and funding activity for the preview.
+  const fractions = [0.34, 0.24, 0.18, 0.14, 0.1];
+  const topSupporters = FAKE_BACKERS.map((backer, i) => ({
+    backer,
+    amount: Number((s.currentEth * fractions[i]).toFixed(3)),
+  }));
+  let running = 0;
+  const recentActivity = topSupporters
+    .map((r) => {
+      running += r.amount;
+      return { backer: r.backer, amount: r.amount, total: Number(running.toFixed(3)) };
+    })
+    .reverse();
+  const related = all
+    .filter((rc) => rc.key !== `sample-${s.id}` && rc.category === s.category)
+    .slice(0, 3);
   const data: CampaignDetailData = {
     name: s.name,
     symbol: s.symbol,
@@ -38,6 +65,7 @@ export default function SampleCampaignPage({
       s.createdHoursAgo > 0 ? s.currentEth / (s.createdHoursAgo / 24) : undefined,
     sample: true,
     watchKey: `sample-${s.id}`,
+    verified: Boolean(s.featured),
   };
 
   const sampleThread = (
@@ -77,5 +105,14 @@ export default function SampleCampaignPage({
     </div>
   );
 
-  return <CampaignDetail c={data} action={action} comments={sampleThread} />;
+  return (
+    <CampaignDetail
+      c={data}
+      action={action}
+      comments={sampleThread}
+      topSupporters={topSupporters}
+      recentActivity={recentActivity}
+      related={related}
+    />
+  );
 }
