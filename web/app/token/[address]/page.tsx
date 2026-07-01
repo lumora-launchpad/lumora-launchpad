@@ -260,33 +260,35 @@ export default function TokenPage({
         {/* Token info */}
         <div className="lg:col-span-8">
           <div className="card">
-            <div className="flex items-center gap-4">
+            <div className="flex items-start gap-4">
               {imageUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={imageUrl}
                   alt={name}
-                  className="h-16 w-16 rounded-2xl object-cover shadow-glow"
+                  className="h-16 w-16 shrink-0 rounded-2xl object-cover shadow-glow"
                 />
               ) : (
                 <div
-                  className={`grid h-16 w-16 place-items-center rounded-2xl bg-gradient-to-br ${accent} text-2xl font-black text-white shadow-glow`}
+                  className={`grid h-16 w-16 shrink-0 place-items-center rounded-2xl bg-gradient-to-br ${accent} text-2xl font-black text-white shadow-glow`}
                 >
                   {symbol.slice(0, 2)}
                 </div>
               )}
-              <div className="min-w-0">
-                <h1 className="truncate text-2xl font-black">{name}</h1>
-                <p className="text-sm font-medium text-slate-400">
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <h1 className="min-w-0 truncate text-2xl font-black">{name}</h1>
+                  <span className="pill shrink-0 whitespace-nowrap">
+                    <span
+                      className={`h-2 w-2 rounded-full ${graduated ? "bg-base-violet" : "bg-base-mint"}`}
+                    />
+                    {graduated ? "Listed" : "On the curve"}
+                  </span>
+                </div>
+                <p className="mt-1 text-sm font-medium text-slate-400">
                   ${symbol} / {short}
                 </p>
               </div>
-              <span className="pill ml-auto">
-                <span
-                  className={`h-2 w-2 rounded-full ${graduated ? "bg-base-violet" : "bg-base-mint"}`}
-                />
-                {graduated ? "Listed" : "On the curve"}
-              </span>
               <StarButton address={address} />
             </div>
 
