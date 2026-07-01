@@ -57,7 +57,13 @@ contract CampaignTest is Test {
 
     function _newCampaign(uint256 target) internal returns (LaunchCampaign) {
         vm.prank(creator);
-        address c = campaigns.createCampaign("Lumora", "LUM", target, 1 days);
+        address c = campaigns.createCampaign("Lumora", "LUM", target, 1 days, 0);
+        return LaunchCampaign(c);
+    }
+
+    function _newScheduledCampaign(uint256 target, uint256 opensAt) internal returns (LaunchCampaign) {
+        vm.prank(creator);
+        address c = campaigns.createCampaign("Lumora", "LUM", target, 1 days, opensAt);
         return LaunchCampaign(c);
     }
 
@@ -162,6 +168,51 @@ contract CampaignTest is Test {
         CampaignFactory rogue = new CampaignFactory(address(launchpad), dev);
         vm.prank(creator);
         vm.expectRevert("not campaign factory");
-        rogue.createCampaign("Lumora", "LUM", 0.5 ether, 1 days);
+        rogue.createCampaign("Lumora", "LUM", 0.5 ether, 1 days, 0);
+    }
+
+    function test_ScheduledCampaignRejectsCommitBeforeOpen() public {
+        uint256 opensAt = block.timestamp + 5 days;
+        LaunchCampaign c = _newScheduledCampaign(0.5 ether, opensAt);
+
+        assertTrue(c.scheduled());
+        assertEq(c.fundingOpensAt(), opensAt);
+        // Deadline is measured from when funding opens, not from creation.
+        assertEq(c.deadline(), opensAt + 1 days);
+        assertGt(c.opensIn(), 0);
+
+        vm.prank(backer1);
+        vm.expectRevert("not open yet");
+        c.commit{value: 0.3 ether}();
+    }
+
+    function test_ScheduledCampaignOpensAndFunds() public {
+        uint256 opensAt = block.timestamp + 5 days;
+        LaunchCampaign c = _newScheduledCampaign(0.5 ether, opensAt);
+
+        vm.warp(opensAt);
+        assertFalse(c.scheduled());
+        assertEq(c.opensIn(), 0);
+
+        vm.prank(backer1);
+        c.commit{value: 0.3 ether}();
+        vm.prank(backer2);
+        c.commit{value: 0.3 ether}(); // crosses target -> launches
+        assertTrue(c.launched());
+    }
+
+    function test_PastOpenTimeIsImmediate() public {
+        // A zero or past open time means funding is open right away.
+        LaunchCampaign c = _newScheduledCampaign(0.5 ether, 0);
+        assertFalse(c.scheduled());
+        vm.prank(backer1);
+        c.commit{value: 0.5 ether}(); // launches immediately
+        assertTrue(c.launched());
+    }
+
+    function test_CreateCampaignRejectsFarFutureOpen() public {
+        vm.prank(creator);
+        vm.expectRevert("opens too far");
+        campaigns.createCampaign("Lumora", "LUM", 0.5 ether, 1 days, block.timestamp + 61 days);
     }
 }

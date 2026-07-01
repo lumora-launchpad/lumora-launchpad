@@ -30,6 +30,7 @@ contract LaunchCampaign is ReentrancyGuard {
     string public name;
     string public symbol;
     uint256 public immutable targetEth;
+    uint256 public immutable fundingOpensAt; // commits are rejected before this time
     uint256 public immutable deadline;
     uint16 public immutable commitFeeBps;
 
@@ -56,6 +57,7 @@ contract LaunchCampaign is ReentrancyGuard {
         string memory symbol_,
         uint256 targetEth_,
         uint256 duration_,
+        uint256 fundingOpensAt_,
         uint16 commitFeeBps_
     ) {
         require(factory_ != address(0) && devTreasury_ != address(0) && creator_ != address(0), "zero");
@@ -68,13 +70,20 @@ contract LaunchCampaign is ReentrancyGuard {
         name = name_;
         symbol = symbol_;
         targetEth = targetEth_;
-        deadline = block.timestamp + duration_;
+        // A campaign can be scheduled to open later. Funding is closed until
+        // fundingOpensAt, and the deadline is measured from when it opens, so a
+        // scheduled campaign always gets its full funding window. A value in the
+        // past means funding is open immediately.
+        uint256 opensAt = fundingOpensAt_ < block.timestamp ? block.timestamp : fundingOpensAt_;
+        fundingOpensAt = opensAt;
+        deadline = opensAt + duration_;
         commitFeeBps = commitFeeBps_;
     }
 
     /// @notice Back this launch with ETH. Triggers the launch once the target is met.
     function commit() external payable nonReentrant {
         require(!launched, "launched");
+        require(block.timestamp >= fundingOpensAt, "not open yet");
         require(block.timestamp < deadline, "ended");
         require(msg.value > 0, "no eth");
 
@@ -138,6 +147,16 @@ contract LaunchCampaign is ReentrancyGuard {
 
     function timeLeft() external view returns (uint256) {
         return block.timestamp >= deadline ? 0 : deadline - block.timestamp;
+    }
+
+    /// @notice True while the campaign is scheduled but funding has not opened.
+    function scheduled() external view returns (bool) {
+        return block.timestamp < fundingOpensAt;
+    }
+
+    /// @notice Seconds until funding opens, or 0 once it is open.
+    function opensIn() external view returns (uint256) {
+        return block.timestamp >= fundingOpensAt ? 0 : fundingOpensAt - block.timestamp;
     }
 
     function claimable(address backer) external view returns (uint256) {
