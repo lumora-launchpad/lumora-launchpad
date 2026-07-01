@@ -13,7 +13,7 @@ const COLUMNS: { title: string; links: { label: string; href: string; external?:
   {
     title: "Resources",
     links: [
-      { label: "How it works", href: "/#how-it-works" },
+      { label: "How it works", href: "/docs#getting-started" },
       { label: "Docs", href: "/docs" },
       { label: "Contracts", href: "/contracts" },
       { label: "FAQ", href: "/faq" },
