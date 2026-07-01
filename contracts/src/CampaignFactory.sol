@@ -29,6 +29,7 @@ contract CampaignFactory {
         string name,
         string symbol,
         uint256 targetEth,
+        uint256 fundingOpensAt,
         uint256 deadline
     );
     event ConfigUpdated();
@@ -49,15 +50,22 @@ contract CampaignFactory {
         commitFeeBps = 200; // 2 percent
     }
 
-    function createCampaign(string calldata name, string calldata symbol, uint256 targetEth, uint256 duration)
-        external
-        returns (address)
-    {
+    function createCampaign(
+        string calldata name,
+        string calldata symbol,
+        uint256 targetEth,
+        uint256 duration,
+        uint256 fundingOpensAt
+    ) external returns (address) {
         require(targetEth >= minTarget, "target too low");
         require(duration > 0 && duration <= maxDuration, "bad duration");
+        // Campaigns may be scheduled to open later, bounded so a creator cannot
+        // park a campaign that never opens. Zero means open immediately.
+        require(fundingOpensAt <= block.timestamp + 60 days, "opens too far");
 
-        LaunchCampaign campaign =
-            new LaunchCampaign(launchpadFactory, devTreasury, msg.sender, name, symbol, targetEth, duration, commitFeeBps);
+        LaunchCampaign campaign = new LaunchCampaign(
+            launchpadFactory, devTreasury, msg.sender, name, symbol, targetEth, duration, fundingOpensAt, commitFeeBps
+        );
 
         // Authorize the campaign to deploy its token through the launchpad
         // factory. This requires the launchpad factory to trust this contract as
@@ -67,7 +75,9 @@ contract CampaignFactory {
         allCampaigns.push(address(campaign));
         campaignsByCreator[msg.sender].push(address(campaign));
 
-        emit CampaignCreated(address(campaign), msg.sender, name, symbol, targetEth, campaign.deadline());
+        emit CampaignCreated(
+            address(campaign), msg.sender, name, symbol, targetEth, campaign.fundingOpensAt(), campaign.deadline()
+        );
         return address(campaign);
     }
 
