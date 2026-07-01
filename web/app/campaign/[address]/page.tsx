@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { parseEther } from "viem";
+import { parseEther, formatEther } from "viem";
 import {
   useAccount,
   useReadContracts,
@@ -20,6 +20,7 @@ import { useDisplayCampaigns } from "@/lib/campaignDisplay";
 import { useToast } from "@/components/Toast";
 import { Comments } from "@/components/Comments";
 import { CampaignDetail, type CampaignDetailData } from "@/components/dashboard/CampaignDetail";
+import { LaunchedProject, type LaunchedProjectData } from "@/components/dashboard/LaunchedProject";
 
 const ZERO = "0x0000000000000000000000000000000000000000" as const;
 
@@ -316,6 +317,44 @@ export default function CampaignPage({
       )}
     </div>
   );
+
+  // Once the campaign has launched its token, the same URL morphs into the
+  // trading experience: funding modules become trading modules, and backers
+  // claim their allocation. This is the one page lifecycle.
+  if (launched && token && token !== ZERO) {
+    const claimNode =
+      isConnected && myCommit > 0n && !claimed && myClaimable > 0n ? (
+        <button
+          onClick={() => writeContract({ address, abi: campaignAbi, functionName: "claim" })}
+          disabled={busy}
+          className="rounded-2xl bg-white px-5 py-2.5 font-bold text-base-violet shadow-card transition hover:brightness-95 disabled:opacity-60"
+        >
+          {btn ?? `Claim ${formatEth(myClaimable)} ${symbol}`}
+        </button>
+      ) : claimed ? (
+        <span className="rounded-full bg-white/20 px-4 py-2 text-sm font-bold text-white">Claimed</span>
+      ) : null;
+
+    const launchedData: LaunchedProjectData = {
+      token,
+      name,
+      symbol,
+      creator,
+      accent,
+      verified: creatorProfile?.verified ?? false,
+      imageUrl: meta.imageUrl,
+      bannerUrl: meta.bannerUrl,
+      category: meta.category,
+      fundedEth: Number(formatEther(totalCommitted)),
+      targetEth: Number(formatEther(targetEth)),
+      supporters,
+      committed: myCommit,
+      claimable: myClaimable,
+      claimed,
+    };
+
+    return <LaunchedProject d={launchedData} claimNode={claimNode} related={related} />;
+  }
 
   return (
     <CampaignDetail
