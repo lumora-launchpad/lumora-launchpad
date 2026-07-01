@@ -14,6 +14,9 @@ import { campaignAbi } from "@/lib/campaigns";
 import { accentFor, formatEth } from "@/lib/tokens";
 import { txExplorerUrl } from "@/lib/wagmi";
 import { useCampaignBackers } from "@/lib/useCampaignBackers";
+import { useCampaignActivity } from "@/lib/useCampaignActivity";
+import { useCreator } from "@/lib/creatorStats";
+import { useDisplayCampaigns } from "@/lib/campaignDisplay";
 import { useToast } from "@/components/Toast";
 import { Comments } from "@/components/Comments";
 import { CampaignDetail, type CampaignDetailData } from "@/components/dashboard/CampaignDetail";
@@ -83,6 +86,9 @@ export default function CampaignPage({
 
   const backers = useCampaignBackers([address]);
   const supporters = backers.get(address.toLowerCase());
+  const activity = useCampaignActivity(address);
+  const creatorProfile = useCreator(creator);
+  const { all: allCampaigns } = useDisplayCampaigns();
 
   const { data: mine, refetch: refetchMine } = useReadContracts({
     contracts: [
@@ -208,7 +214,16 @@ export default function CampaignPage({
     status: launched ? "launched" : ended ? "ended" : "live",
     sample: false,
     watchKey: address,
+    verified: creatorProfile?.verified ?? false,
   };
+
+  const related = allCampaigns
+    .filter(
+      (rc) =>
+        rc.key.toLowerCase() !== address.toLowerCase() &&
+        (meta.category ? rc.category === meta.category : rc.status === "live"),
+    )
+    .slice(0, 3);
 
   const action = (
     <div className="glass-card p-5">
@@ -303,6 +318,13 @@ export default function CampaignPage({
   );
 
   return (
-    <CampaignDetail c={data} action={action} comments={<Comments address={address} />} />
+    <CampaignDetail
+      c={data}
+      action={action}
+      comments={<Comments address={address} />}
+      topSupporters={activity.topSupporters}
+      recentActivity={activity.commits}
+      related={related}
+    />
   );
 }
