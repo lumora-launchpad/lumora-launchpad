@@ -38,7 +38,7 @@ function Hero() {
               Explore Campaigns
               <Icon name="arrowRight" className="ml-2 h-5 w-5" />
             </Link>
-            <Link href="/campaigns" className="btn-ghost w-full sm:w-auto">
+            <Link href="/launch" className="btn-ghost w-full sm:w-auto">
               Launch Campaign
             </Link>
           </div>

@@ -89,7 +89,7 @@ export function CampaignDetail({
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 lg:px-8">
-      <BackButton label="Back to campaigns" fallback="/campaigns" />
+      <BackButton label="Back to campaigns" fallback="/explore" />
 
       {/* Banner + header */}
       <div className="glass-card mt-4 overflow-hidden">

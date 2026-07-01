@@ -36,7 +36,7 @@ export default function GraduatedPage() {
           <p className="mx-auto mt-2 max-w-sm text-sm text-slate-500">
             When a campaign reaches its target, it launches and appears here.
           </p>
-          <Link href="/campaigns" className="btn-primary mt-6 inline-flex">
+          <Link href="/explore" className="btn-primary mt-6 inline-flex">
             Explore campaigns
           </Link>
         </div>
