@@ -186,7 +186,9 @@ export default function LaunchPage() {
       address: CAMPAIGN_FACTORY_ADDRESS,
       abi: campaignFactoryAbi,
       functionName: "createCampaign",
-      args: [name, symbol.toUpperCase(), targetWei, BigInt(duration)],
+      // fundingOpensAt 0 means the campaign opens immediately. Scheduled opens
+      // are a later per campaign option; the contract treats any past time as now.
+      args: [name, symbol.toUpperCase(), targetWei, BigInt(duration), 0n],
     });
   }
 

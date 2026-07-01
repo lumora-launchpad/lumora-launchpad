@@ -5,6 +5,8 @@ out/
 .env
 .env.local
 .env*.local
+.env*.bak*
+.env.bak.*
 
 # Foundry
 contracts/out/
