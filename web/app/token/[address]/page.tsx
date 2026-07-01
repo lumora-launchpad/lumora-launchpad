@@ -330,7 +330,7 @@ export default function TokenPage({
               </div>
             )}
 
-            <div className="mt-6 grid grid-cols-3 gap-4">
+            <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
               <Stat k="Price" v={`${fmt(price)} ETH`} />
               <Stat k="Market cap" v={`${fmt(mcap, 2)} ETH`} />
               {creator ? (
@@ -575,7 +575,7 @@ export default function TokenPage({
 function Stat({ k, v }: { k: string; v: string }) {
   return (
     <div className="rounded-2xl bg-slate-50 p-4 text-center">
-      <p className="truncate text-lg font-black text-slate-800">{v}</p>
+      <p className="truncate text-base font-black text-slate-800 sm:text-lg">{v}</p>
       <p className="mt-0.5 text-xs font-medium text-slate-400">{k}</p>
     </div>
   );
