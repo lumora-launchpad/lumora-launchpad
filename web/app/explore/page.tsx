@@ -9,11 +9,14 @@ import { type TokenView } from "@/lib/tokens";
 import { CampaignCard } from "@/components/dashboard/CampaignCard";
 import { TokenCard } from "@/components/TokenCard";
 import { NewTokenTicker } from "@/components/NewTokenTicker";
+import { PhaseCountdown } from "@/components/dashboard/PhaseCountdown";
+import { DEMAND_LAUNCH_AT, isDemandOpen } from "@/lib/phase";
 
 const TABS = [
   "All",
-  "Demand Campaign",
   "Instant Launch",
+  "Demand Campaign",
+  "Upcoming Demand Campaigns",
   "Trending",
   "Almost Funded",
   "Ending Soon",
@@ -53,6 +56,7 @@ type Item = {
   createdAt: number;
   graduated: boolean;
   live: boolean;
+  scheduled: boolean;
   progress: number;
   deadline: number;
   funding: number;
@@ -89,6 +93,7 @@ export default function ExplorePage() {
       createdAt: c.createdAt,
       graduated: c.status === "graduated",
       live: c.status === "live" && c.deadline > now,
+      scheduled: Boolean(c.scheduled),
       progress: c.progress,
       deadline: c.deadline,
       funding: c.currentEth,
@@ -107,6 +112,7 @@ export default function ExplorePage() {
       createdAt: now - i,
       graduated: Boolean(t.graduated),
       live: !t.graduated,
+      scheduled: false,
       progress: t.progress,
       deadline: 0,
       funding: t.raisedEth,
@@ -136,6 +142,9 @@ export default function ExplorePage() {
         break;
       case "Successful":
         list = list.filter((i) => i.graduated);
+        break;
+      case "Upcoming Demand Campaigns":
+        list = list.filter((i) => i.scheduled);
         break;
       default:
         break;
@@ -275,7 +284,36 @@ export default function ExplorePage() {
       </div>
 
       {/* Results */}
-      {visible.length === 0 ? (
+      {tab === "Upcoming Demand Campaigns" && visible.length === 0 ? (
+        <div className="glass-card mt-6 flex flex-col items-center px-6 py-16 text-center">
+          {!isDemandOpen() ? (
+            <>
+              <p className="text-[11px] font-bold uppercase tracking-wide text-slate-400">
+                Demand Campaigns open in
+              </p>
+              <div className="mt-3 rounded-3xl bg-brand-gradient p-5 text-white shadow-glow">
+                <PhaseCountdown to={DEMAND_LAUNCH_AT} className="justify-center" />
+              </div>
+              <p className="mx-auto mt-5 max-w-md text-sm text-slate-500">
+                Creators can prepare their campaigns now. Scheduled campaigns will
+                appear here, and supporters can save them to a watchlist before
+                funding opens.
+              </p>
+              <Link href="/launch" className="btn-primary mt-6">
+                Prepare a campaign
+              </Link>
+            </>
+          ) : (
+            <>
+              <p className="text-lg font-black text-slate-900">No upcoming campaigns</p>
+              <p className="mt-2 max-w-sm text-sm text-slate-500">
+                Scheduled campaigns that have not opened funding yet will appear
+                here.
+              </p>
+            </>
+          )}
+        </div>
+      ) : visible.length === 0 ? (
         <div className="glass-card mt-6 px-6 py-16 text-center">
           <p className="text-lg font-black text-slate-900">Nothing matches</p>
           <p className="mt-2 text-sm text-slate-500">Try another tab, category, or search.</p>

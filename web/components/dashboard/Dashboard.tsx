@@ -7,6 +7,7 @@ import { TopCreators } from "./TopCreators";
 import { ActivityPanel } from "./ActivityPanel";
 import { TrustPanel } from "./TrustPanel";
 import { RiskNotice } from "./RiskNotice";
+import { DemandCountdownBanner } from "./DemandCountdownBanner";
 import { HeroVisual } from "@/components/HeroVisual";
 import { Icon } from "./icons";
 
@@ -58,6 +59,7 @@ export function Dashboard() {
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
         {/* Main column */}
         <div className="min-w-0 space-y-8">
+          <DemandCountdownBanner />
           <Hero />
           <StatCards />
           <CampaignSections />

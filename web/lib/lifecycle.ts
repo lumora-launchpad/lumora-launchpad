@@ -3,6 +3,7 @@
 // time user can read the state at a glance.
 
 export type Lifecycle =
+  | "scheduled"
   | "funding"
   | "trading"
   | "graduated"
@@ -12,9 +13,11 @@ export function campaignLifecycle(p: {
   launched: boolean;
   tokenGraduated?: boolean;
   deadline: number;
+  fundingOpensAt?: number;
 }): Lifecycle {
   const now = Math.floor(Date.now() / 1000);
   if (p.launched) return p.tokenGraduated ? "graduated" : "trading";
+  if (p.fundingOpensAt && p.fundingOpensAt > now) return "scheduled";
   if (p.deadline > 0 && p.deadline <= now) return "failed";
   return "funding";
 }
@@ -23,6 +26,7 @@ export const LIFECYCLE_META: Record<
   Lifecycle,
   { label: string; tone: string; dot: string }
 > = {
+  scheduled: { label: "Scheduled", tone: "bg-amber-500/10 text-amber-600", dot: "bg-amber-500" },
   funding: { label: "Funding", tone: "bg-base-violet/10 text-base-violet", dot: "bg-base-violet" },
   trading: { label: "Trading Live", tone: "bg-base-blue/10 text-base-blue", dot: "bg-base-blue" },
   graduated: { label: "Graduated", tone: "bg-base-mint/10 text-base-mint", dot: "bg-base-mint" },

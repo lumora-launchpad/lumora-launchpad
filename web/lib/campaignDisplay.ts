@@ -63,6 +63,7 @@ export type DisplayCampaign = {
   sample: boolean;
   createdAt: number; // unix seconds, for ordering New
   token?: string; // launched token address, for graduated campaigns
+  scheduled?: boolean; // funding not open yet (set once fundingOpensAt is read)
 };
 
 export type RiskLevel = "Low" | "Medium" | "High";

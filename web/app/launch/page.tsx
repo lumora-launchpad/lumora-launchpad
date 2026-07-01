@@ -15,6 +15,8 @@ import { metadataMessage } from "@/lib/metadataAuth";
 import { txExplorerUrl } from "@/lib/wagmi";
 import { useToast } from "@/components/Toast";
 import { Icon } from "@/components/dashboard/icons";
+import { DEMAND_LAUNCH_AT, isDemandOpen } from "@/lib/phase";
+import { PhaseCountdown } from "@/components/dashboard/PhaseCountdown";
 
 type Mode = "demand" | "instant";
 
@@ -189,6 +191,7 @@ export default function LaunchPage() {
   }
 
   const busy = isPending || isConfirming;
+  const demandLocked = mode === "demand" && !isDemandOpen();
   const canSubmit = name && symbol.length >= 2 && (mode === "instant" || Number(target) > 0);
   const cta = isPending
     ? "Confirm in wallet"
@@ -225,7 +228,19 @@ export default function LaunchPage() {
               <Icon name={m.icon as "target" | "bolt"} className="h-5 w-5" />
             </span>
             <span>
-              <span className="block font-black text-slate-900">{m.title}</span>
+              <span className="flex items-center gap-2 font-black text-slate-900">
+                {m.title}
+                {m.id === "demand" && !isDemandOpen() && (
+                  <span className="rounded-full bg-amber-500/10 px-2 py-0.5 text-[10px] font-bold text-amber-600">
+                    Opens soon
+                  </span>
+                )}
+                {m.id === "instant" && !isDemandOpen() && (
+                  <span className="rounded-full bg-base-mint/10 px-2 py-0.5 text-[10px] font-bold text-base-mint">
+                    Available now
+                  </span>
+                )}
+              </span>
               <span className="mt-0.5 block text-xs text-slate-500">{m.desc}</span>
             </span>
           </button>
@@ -287,7 +302,16 @@ export default function LaunchPage() {
           )}
 
           <div className="mt-6">
-            {!isConnected ? (
+            {demandLocked ? (
+              <div className="rounded-2xl bg-brand-gradient p-5 text-center text-white shadow-glow">
+                <p className="text-sm font-bold">Demand Campaigns open in</p>
+                <PhaseCountdown to={DEMAND_LAUNCH_AT} className="mt-3 justify-center" />
+                <p className="mt-4 text-xs text-white/80">
+                  Prepare your campaign now. Publishing opens on launch day.
+                  Instant Launch is available right now.
+                </p>
+              </div>
+            ) : !isConnected ? (
               <div className="flex flex-col items-center gap-3">
                 <p className="text-sm text-slate-500">Connect your wallet to launch.</p>
                 <ConnectButton />
