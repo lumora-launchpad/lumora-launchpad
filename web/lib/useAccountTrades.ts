@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { parseAbiItem, formatEther } from "viem";
 import { usePublicClient } from "wagmi";
+import { scanLogs } from "./scanLogs";
 
 const BUY = parseAbiItem(
   "event Buy(address indexed buyer, uint256 ethIn, uint256 tokensOut, uint256 fee)",
@@ -48,20 +49,12 @@ export function useAccountTrades(
       try {
         const addrs = tokens.map((t) => t as `0x${string}`);
         const [buys, sells] = await Promise.all([
-          client.getLogs({
-            address: addrs,
-            event: BUY,
-            args: { buyer: account as `0x${string}` },
-            fromBlock: START_BLOCK,
-            toBlock: "latest",
-          }),
-          client.getLogs({
-            address: addrs,
-            event: SELL,
-            args: { seller: account as `0x${string}` },
-            fromBlock: START_BLOCK,
-            toBlock: "latest",
-          }),
+          scanLogs(client, START_BLOCK, (from, to) =>
+            client.getLogs({ address: addrs, event: BUY, args: { buyer: account as `0x${string}` }, fromBlock: from, toBlock: to }),
+          ),
+          scanLogs(client, START_BLOCK, (from, to) =>
+            client.getLogs({ address: addrs, event: SELL, args: { seller: account as `0x${string}` }, fromBlock: from, toBlock: to }),
+          ),
         ]);
         if (cancelled) return;
         const trades: AccountTrade[] = [];

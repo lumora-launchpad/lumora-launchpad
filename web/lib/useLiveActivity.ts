@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { formatEther, parseAbiItem } from "viem";
 import { usePublicClient } from "wagmi";
 import { FACTORY_ADDRESS, factoryAbi } from "./contracts";
+import { scanLogs } from "./scanLogs";
 
 export type Activity = {
   kind: "launch" | "buy" | "sell" | "graduate";
@@ -50,16 +51,12 @@ export function useLiveActivity(
       const sym = (a?: string) => symbolByAddress.get((a ?? "").toLowerCase()) ?? "";
       try {
         const [buys, sells, grads, created] = await Promise.all([
-          client.getLogs({ address: addrs, event: BUY, fromBlock: START_BLOCK, toBlock: "latest" }),
-          client.getLogs({ address: addrs, event: SELL, fromBlock: START_BLOCK, toBlock: "latest" }),
-          client.getLogs({ address: addrs, event: GRADUATED, fromBlock: START_BLOCK, toBlock: "latest" }),
-          client.getContractEvents({
-            address: FACTORY_ADDRESS,
-            abi: factoryAbi,
-            eventName: "TokenCreated",
-            fromBlock: START_BLOCK,
-            toBlock: "latest",
-          }),
+          scanLogs(client, START_BLOCK, (from, to) => client.getLogs({ address: addrs, event: BUY, fromBlock: from, toBlock: to })),
+          scanLogs(client, START_BLOCK, (from, to) => client.getLogs({ address: addrs, event: SELL, fromBlock: from, toBlock: to })),
+          scanLogs(client, START_BLOCK, (from, to) => client.getLogs({ address: addrs, event: GRADUATED, fromBlock: from, toBlock: to })),
+          scanLogs(client, START_BLOCK, (from, to) =>
+            client.getContractEvents({ address: FACTORY_ADDRESS, abi: factoryAbi, eventName: "TokenCreated", fromBlock: from, toBlock: to }),
+          ),
         ]);
         if (cancelled) return;
 
