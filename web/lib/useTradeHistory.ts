@@ -5,6 +5,7 @@ import { formatEther, type Log } from "viem";
 import type { PublicClient } from "viem";
 import { usePublicClient, useWatchContractEvent } from "wagmi";
 import { tokenAbi } from "./contracts";
+import { scanLogs } from "./scanLogs";
 
 export type TradePoint = {
   price: number; // ETH per token
@@ -113,20 +114,12 @@ export function useTradeHistory(address: `0x${string}`): {
       setIsLoading(true);
       try {
         const [buys, sells] = await Promise.all([
-          client.getContractEvents({
-            address,
-            abi: tokenAbi,
-            eventName: "Buy",
-            fromBlock: START_BLOCK,
-            toBlock: "latest",
-          }),
-          client.getContractEvents({
-            address,
-            abi: tokenAbi,
-            eventName: "Sell",
-            fromBlock: START_BLOCK,
-            toBlock: "latest",
-          }),
+          scanLogs(client, START_BLOCK, (from, to) =>
+            client.getContractEvents({ address, abi: tokenAbi, eventName: "Buy", fromBlock: from, toBlock: to }),
+          ),
+          scanLogs(client, START_BLOCK, (from, to) =>
+            client.getContractEvents({ address, abi: tokenAbi, eventName: "Sell", fromBlock: from, toBlock: to }),
+          ),
         ]);
         const rawPoints = [
           ...buys.map((l) => toPoint(l, "buy")),

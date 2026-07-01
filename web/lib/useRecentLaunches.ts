@@ -5,6 +5,7 @@ import type { Log } from "viem";
 import { usePublicClient, useWatchContractEvent } from "wagmi";
 import { FACTORY_ADDRESS, factoryAbi } from "./contracts";
 import { accentFor } from "./tokens";
+import { scanLogs } from "./scanLogs";
 
 export type Launch = {
   address: `0x${string}`;
@@ -49,13 +50,9 @@ export function useRecentLaunches(limit = 16): Launch[] {
     async function load() {
       if (!client || !HAS_FACTORY) return;
       try {
-        const logs = await client.getContractEvents({
-          address: FACTORY_ADDRESS,
-          abi: factoryAbi,
-          eventName: "TokenCreated",
-          fromBlock: START_BLOCK,
-          toBlock: "latest",
-        });
+        const logs = await scanLogs(client, START_BLOCK, (from, to) =>
+          client.getContractEvents({ address: FACTORY_ADDRESS, abi: factoryAbi, eventName: "TokenCreated", fromBlock: from, toBlock: to }),
+        );
         if (cancelled) return;
         const items = logs
           .map((l) => toLaunch(l, false))

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { formatEther, parseAbiItem } from "viem";
 import { usePublicClient } from "wagmi";
 import { tokenAbi } from "./contracts";
+import { scanLogs } from "./scanLogs";
 
 export type Holder = {
   address: string;
@@ -41,12 +42,9 @@ export function useHolders(token: `0x${string}`): {
       if (!client) return;
       setIsLoading(true);
       try {
-        const logs = await client.getLogs({
-          address: token,
-          event: TRANSFER,
-          fromBlock: START_BLOCK,
-          toBlock: "latest",
-        });
+        const logs = await scanLogs(client, START_BLOCK, (from, to) =>
+          client.getLogs({ address: token, event: TRANSFER, fromBlock: from, toBlock: to }),
+        );
 
         const addrs = new Set<string>();
         for (const l of logs) {

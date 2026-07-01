@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { parseAbiItem, formatEther } from "viem";
 import { usePublicClient } from "wagmi";
+import { scanLogs } from "./scanLogs";
 
 const COMMITTED = parseAbiItem(
   "event Committed(address indexed backer, uint256 amount, uint256 total)",
@@ -35,12 +36,9 @@ export function useCampaignActivity(address?: string): CampaignActivity {
     async function load() {
       if (!client || !address) return;
       try {
-        const logs = await client.getLogs({
-          address: address as `0x${string}`,
-          event: COMMITTED,
-          fromBlock: START_BLOCK,
-          toBlock: "latest",
-        });
+        const logs = await scanLogs(client, START_BLOCK, (from, to) =>
+          client.getLogs({ address: address as `0x${string}`, event: COMMITTED, fromBlock: from, toBlock: to }),
+        );
         if (cancelled) return;
         const commits: Commit[] = logs.map((l) => ({
           backer: (l.args.backer ?? "") as string,

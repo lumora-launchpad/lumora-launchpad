@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { parseAbiItem } from "viem";
 import { usePublicClient } from "wagmi";
 import { CAMPAIGN_FACTORY_ADDRESS } from "./campaigns";
+import { scanLogs } from "./scanLogs";
 
 const COMMITTED = parseAbiItem(
   "event Committed(address indexed backer, uint256 amount, uint256 total)",
@@ -29,12 +30,9 @@ export function useCampaignBackers(addresses: string[]): Map<string, number> {
     async function load() {
       if (!client || !HAS_FACTORY || addresses.length === 0) return;
       try {
-        const logs = await client.getLogs({
-          address: addresses.map((a) => a as `0x${string}`),
-          event: COMMITTED,
-          fromBlock: START_BLOCK,
-          toBlock: "latest",
-        });
+        const logs = await scanLogs(client, START_BLOCK, (from, to) =>
+          client.getLogs({ address: addresses.map((a) => a as `0x${string}`), event: COMMITTED, fromBlock: from, toBlock: to }),
+        );
         if (cancelled) return;
         const sets = new Map<string, Set<string>>();
         for (const l of logs) {

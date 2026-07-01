@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { formatEther, parseAbiItem, type PublicClient } from "viem";
 import { usePublicClient } from "wagmi";
 import { FACTORY_ADDRESS, factoryAbi } from "./contracts";
+import { scanLogs } from "./scanLogs";
 
 export type TokenStats = {
   volumeEth: number; // total ETH traded (buys + sells)
@@ -67,25 +68,11 @@ export function useMarketStats(addresses: string[]): Map<string, TokenStats> {
       const tokenAddrs = addresses.map((a) => a as `0x${string}`);
       try {
         const [buys, sells, created] = await Promise.all([
-          client.getLogs({
-            address: tokenAddrs,
-            event: BUY,
-            fromBlock: START_BLOCK,
-            toBlock: "latest",
-          }),
-          client.getLogs({
-            address: tokenAddrs,
-            event: SELL,
-            fromBlock: START_BLOCK,
-            toBlock: "latest",
-          }),
-          client.getContractEvents({
-            address: FACTORY_ADDRESS,
-            abi: factoryAbi,
-            eventName: "TokenCreated",
-            fromBlock: START_BLOCK,
-            toBlock: "latest",
-          }),
+          scanLogs(client, START_BLOCK, (from, to) => client.getLogs({ address: tokenAddrs, event: BUY, fromBlock: from, toBlock: to })),
+          scanLogs(client, START_BLOCK, (from, to) => client.getLogs({ address: tokenAddrs, event: SELL, fromBlock: from, toBlock: to })),
+          scanLogs(client, START_BLOCK, (from, to) =>
+            client.getContractEvents({ address: FACTORY_ADDRESS, abi: factoryAbi, eventName: "TokenCreated", fromBlock: from, toBlock: to }),
+          ),
         ]);
         if (cancelled) return;
 
